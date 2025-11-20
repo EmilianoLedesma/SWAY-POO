@@ -1,0 +1,1413 @@
+<!-- =============================================
+     PÁGINA DE TIENDA OCEÁNICA SWAY
+     E-commerce con productos sostenibles que apoyan
+     la conservación marina y protección oceánica
+     ============================================= -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Tienda - SWAY</title>
+
+    <!-- Configuración de favicon del sitio -->
+    <link
+      href="{{ url_for('static', filename='img/SWAY (1).png') }}"
+      rel="icon"
+    />
+
+    <!-- Enlaces a fuentes externas de Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800&family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800"
+      rel="stylesheet"
+    />
+
+    <!-- Archivos CSS de librerías externas -->
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/aos/aos.css') }}"
+      rel="stylesheet"
+    />
+
+    <!-- Archivos CSS específicos de la tienda -->
+    <link
+      href="{{ url_for('static', filename='css/main.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/tienda.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/carrito.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="tienda-page">
+    <!-- =============================================
+         HEADER DE NAVEGACIÓN CON USUARIO
+         Incluye menú de usuario y carrito de compras
+         ============================================= -->
+    <header id="header" class="header d-flex align-items-center fixed-top">
+      <div
+        class="container-fluid container-xl position-relative d-flex align-items-center"
+      >
+        <a href="/" class="logo d-flex align-items-center me-auto">
+          <h1 class="sitename">SWAY</h1>
+        </a>
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/#about">Nosotros</a></li>
+            <li><a href="/#portfolio">Novedades</a></li>
+            <li><a href="/#team">Equipo</a></li>
+            <li><a href="/#contact">Contacto</a></li>
+            <li class="dropdown">
+              <a href="#"
+                ><span>Más</span>
+                <i class="bi bi-chevron-down toggle-dropdown"></i
+              ></a>
+              <ul>
+                <li><a href="/especies">Especies</a></li>
+                <li><a href="/eventos">Eventos</a></li>
+                <li><a href="/biblioteca">Biblioteca</a></li>
+                <li><a href="/tienda" class="active">Tienda</a></li>
+              </ul>
+            </li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+        <!-- Sección de acciones del usuario -->
+        <div class="header-actions d-flex align-items-center">
+          <div class="user-menu" id="user-menu">
+            <button class="btn-user" id="btn-user">
+              <i class="bi bi-person"></i>
+              <span id="user-name">Iniciar Sesión</span>
+            </button>
+            <div class="user-dropdown" id="user-dropdown">
+              <a href="#" id="btn-login">Iniciar Sesión</a>
+              <a href="#" id="btn-register">Registrarse</a>
+              <a href="#" id="btn-my-orders" style="display: none"
+                >Mis Pedidos</a
+              >
+              <a href="#" id="btn-logout" style="display: none"
+                >Cerrar Sesión</a
+              >
+            </div>
+          </div>
+          <a class="btn-getstarted" href="/#donation">Donar</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- =============================================
+         CONTENIDO PRINCIPAL DE LA TIENDA
+         Secciones de productos y funcionalidades
+         ============================================= -->
+    <main class="main">
+      <!-- =============================================
+           SECCIÓN HERO DE LA TIENDA
+           Banner principal con información de la tienda
+           ============================================= -->
+      <section id="hero" class="hero section dark-background">
+        <div class="container">
+          <div class="row gy-4">
+            <div
+              class="col-lg-8 order-2 order-lg-1 d-flex flex-column justify-content-center"
+              data-aos="zoom-out"
+            >
+              <h1>Tienda Oceánica SWAY</h1>
+              <p>
+                Productos sostenibles que apoyan la conservación marina. Cada
+                compra contribuye directamente a nuestros proyectos de
+                protección oceánica.
+              </p>
+              <div class="d-flex">
+                <a href="#productos" class="btn-get-started">Ver Productos</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================
+           SECCIÓN DE FILTROS Y BÚSQUEDA
+           Controles para filtrar productos por categoría
+           ============================================= -->
+      <section id="filtros" class="section light-background">
+        <div class="container">
+          <div class="filtros-container">
+            <div class="filtros-header">
+              <h3>Filtrar por categoría</h3>
+              <div class="busqueda">
+                <input
+                  type="text"
+                  placeholder="Buscar productos..."
+                  id="search-input"
+                />
+                <i class="bi bi-search"></i>
+              </div>
+            </div>
+
+            <div class="filtros-botones">
+              <!-- Los filtros se cargan dinámicamente desde JavaScript -->
+              <button class="filtro-btn active" data-filter="*">Todos</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================
+           SECCIÓN DE PRODUCTOS PRINCIPALES
+           Grid dinámico de productos disponibles
+           ============================================= -->
+      <section id="productos" class="section">
+        <div class="container">
+          <div class="row gy-4 productos-grid">
+            <!-- Los productos se cargan dinámicamente desde JavaScript -->
+            <div class="col-12 text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando productos...</span>
+              </div>
+              <p class="mt-3">Cargando productos...</p>
+            </div>
+          </div>
+
+          <!-- Load More Button -->
+          <div class="text-center mt-5">
+            <button class="btn btn-outline-primary btn-lg" id="load-more-btn">
+              <i class="bi bi-arrow-down-circle me-2"></i>Cargar Más Productos
+            </button>
+          </div>
+
+          <!-- Indicador de carrito de compras flotante -->
+          <div class="carrito-flotante" id="carrito-flotante">
+            <div class="carrito-header">
+              <i class="bi bi-cart3"></i>
+              <span class="carrito-count">0</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================
+           SECCIÓN DE IMPACTO SOSTENIBLE
+           Métricas sobre el impacto de las compras
+           ============================================= -->
+      <section class="py-5">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+              <h2 class="display-6 fw-bold mb-4">Impacto Sostenible</h2>
+              <p class="lead mb-4">
+                Cada compra contribuye directamente a la conservación marina y
+                al desarrollo de comunidades costeras.
+              </p>
+
+              <div class="impact-metrics">
+                <div class="metric-item">
+                  <div class="metric-icon">
+                    <i class="bi bi-droplet-fill"></i>
+                  </div>
+                  <div class="metric-info">
+                    <h4 id="agua-limpiada">Cargando...</h4>
+                    <p>
+                      Litros de agua marina limpiada gracias a las ventas de
+                      2025
+                    </p>
+                  </div>
+                </div>
+
+                <div class="metric-item">
+                  <div class="metric-icon">
+                    <i class="bi bi-tree-fill"></i>
+                  </div>
+                  <div class="metric-info">
+                    <h4 id="corales-plantados">Cargando...</h4>
+                    <p>Corales plantados en arrecifes mexicanos</p>
+                  </div>
+                </div>
+
+                <div class="metric-item">
+                  <div class="metric-icon">
+                    <i class="bi bi-people-fill"></i>
+                  </div>
+                  <div class="metric-info">
+                    <h4 id="familias-beneficiadas">Cargando...</h4>
+                    <p>Familias de pescadores beneficiadas</p>
+                  </div>
+                </div>
+
+                <div class="metric-item">
+                  <div class="metric-icon">
+                    <i class="bi bi-recycle"></i>
+                  </div>
+                  <div class="metric-info">
+                    <h4 id="plastico-reciclado">Cargando...</h4>
+                    <p>Kg de plástico reciclado convertido en productos</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-left">
+              <div class="sustainability-visual">
+                <img
+                  src="https://cedreo.com/wp-content/uploads/cloudinary/2018-corp-wtag-black-l.png"
+                  alt="Impacto Sostenible"
+                  class="img-fluid rounded"
+                />
+                <div class="impact-overlay">
+                  <div class="impact-badge">
+                    <i class="bi bi-award-fill"></i>
+                    <span>Certificado B-Corp</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- =============================================
+         FOOTER DE LA TIENDA
+         Información de contacto y enlaces útiles
+         ============================================= -->
+    <footer id="footer" class="footer">
+      <div class="footer-newsletter">
+        <div class="container">
+          <div class="row justify-content-center text-center">
+            <div class="col-lg-6">
+              <h4>Únete a nuestro newsletter</h4>
+              <p>
+                Subscríbete para obtener las últimas noticias y eventos más
+                importantes!
+              </p>
+              <div class="newsletter-form">
+                <input
+                  type="email"
+                  name="email"
+                  id="newsletter-email"
+                  required
+                  data-validation="email"
+                />
+                <input
+                  type="submit"
+                  value="Subscribirse"
+                  onclick="showNewsletterConfirmation()"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- newletter Section -->
+      <div id="newsletter-popup" class="popup">
+        <div class="popup-content">
+          <span class="close-button" onclick="closeNewsletterPopup()"
+            >&times;</span
+          >
+          <p>¡Gracias por suscribirte a nuestro newsletter!</p>
+        </div>
+      </div>
+      <!-- /End nesletter Section -->
+
+      <div class="container footer-top">
+        <div class="row gy-4">
+          <div class="col-lg-4 col-md-6 footer-about">
+            <a href="index.html" class="d-flex align-items-center">
+              <span class="sitename">SWAY</span>
+            </a>
+            <div class="footer-contact pt-3">
+              <p>Carretera Estatal 420 S/N, El Rosario</p>
+              <p>76240, Santiago de Querétaro, Qro</p>
+              <p class="mt-3">
+                <strong>Telefóno:</strong> <span>+52 442 101 9000</span>
+              </p>
+              <p><strong>Email:</strong> <span>123046244@upq.edu.mx</span></p>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Links útiles</h4>
+            <ul>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="index.html">Home</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="index.html#about">Sobre Nosotros</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="index.html#donation">Donar</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#">Términos de Servicio</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Entérate de más</h4>
+            <ul>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="toma-accion.html">Toma acción</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="starter-page.html">Blog</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="starter-page.html">Casos de Éxito</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#">Patrocinadores</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-4 col-md-12">
+            <h4>Síguenos</h4>
+            <p>Mantente en contacto a través de nuestras redes sociales</p>
+            <div class="social-links d-flex">
+              <a href="https://x.com/UPQoficial"
+                ><i class="bi bi-twitter-x"></i
+              ></a>
+              <a href="https://www.facebook.com/UPQoficial?locale=es_LA"
+                ><i class="bi bi-facebook"></i
+              ></a>
+              <a href="https://www.instagram.com/soyupq/"
+                ><i class="bi bi-instagram"></i
+              ></a>
+              <a href="https://www.linkedin.com/school/upq/posts/?feedView=all"
+                ><i class="bi bi-linkedin"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container copyright text-center mt-4">
+        <p>
+          © <span>Copyright</span> <strong class="px-1 sitename">SWAY</strong>
+          <span>Todos los derechos reservados</span>
+        </p>
+      </div>
+    </footer>
+    <!-- /End footer Section -->
+
+    <!-- Scroll Top -->
+
+    <!-- Preloader -->
+    <div id="preloader"></div>
+
+    <!-- =============================================
+         MODALES DE LA TIENDA
+         Ventanas emergentes para diferentes funciones
+         ============================================= -->
+    <!-- Modal de vista rápida de productos -->
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeQuickView()">&times;</button>
+        <div class="modal-body" id="modal-body">
+          <!-- Contenido dinámico del producto -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de inicio de sesión -->
+    <div class="modal-overlay" id="login-modal" style="display: none">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal('login-modal')">
+          &times;
+        </button>
+        <div class="modal-body">
+          <h4>Iniciar Sesión</h4>
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="loginEmail"
+                name="email"
+                required
+                data-validation="email"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Contraseña</label>
+              <input
+                type="password"
+                class="form-control"
+                id="loginPassword"
+                name="password"
+                required
+                minlength="6"
+                data-validation="password"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              Iniciar Sesión
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de registro de usuarios -->
+    <div class="modal-overlay" id="register-modal" style="display: none">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal('register-modal')">
+          &times;
+        </button>
+        <div class="modal-body">
+          <h4>Registrarse</h4>
+          <form id="registerForm">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="registerName" class="form-label">Nombre</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="registerName"
+                    name="nombre"
+                    required
+                    minlength="2"
+                    maxlength="50"
+                    data-validation="soloTexto"
+                    placeholder="Ej: Juan"
+                  />
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="registerApellidoPaterno" class="form-label"
+                    >Apellido Paterno</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="registerApellidoPaterno"
+                    name="apellidoPaterno"
+                    required
+                    minlength="2"
+                    maxlength="50"
+                    data-validation="soloTexto"
+                    placeholder="Ej: García"
+                  />
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="registerApellidoMaterno" class="form-label"
+                    >Apellido Materno</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="registerApellidoMaterno"
+                    name="apellidoMaterno"
+                    minlength="2"
+                    maxlength="50"
+                    data-validation="soloTexto"
+                    placeholder="Ej: López (opcional)"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="registerEmail" class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="registerEmail"
+                name="email"
+                required
+                data-validation="email"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="registerTelefono" class="form-label">Teléfono</label>
+              <input
+                type="tel"
+                class="form-control"
+                id="registerTelefono"
+                name="telefono"
+                minlength="10"
+                maxlength="15"
+                data-validation="telefono"
+                placeholder="Ej: 555-123-4567"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="registerFechaNacimiento" class="form-label"
+                >Fecha de Nacimiento</label
+              >
+              <input
+                type="date"
+                class="form-control"
+                id="registerFechaNacimiento"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label"
+                >Contraseña</label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="registerPassword"
+                name="password"
+                required
+                minlength="6"
+                data-validation="password"
+              />
+            </div>
+            <div class="mb-3 form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="registerNewsletter"
+              />
+              <label class="form-check-label" for="registerNewsletter">
+                Suscribirme al newsletter para recibir noticias sobre
+                conservación marina
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              Registrarse
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal del carrito de compras -->
+    <div class="modal-overlay" id="cart-modal" style="display: none">
+      <div class="modal-content" style="max-width: 800px">
+        <button class="modal-close" onclick="closeModal('cart-modal')">
+          &times;
+        </button>
+        <div class="modal-body">
+          <h3>Tu Carrito de Compras</h3>
+          <div id="cart-items-container">
+            <!-- Los items del carrito se cargan dinámicamente -->
+          </div>
+          <div class="cart-total mt-3">
+            <h4>Total: $<span id="cart-total">0.00</span></h4>
+          </div>
+          <div
+            class="cart-actions mt-3 d-flex justify-content-between align-items-center"
+          >
+            <button class="btn btn-outline-danger" onclick="clearCart()">
+              <i class="bi bi-trash"></i> Vaciar Carrito
+            </button>
+            <button class="btn btn-primary" onclick="proceedToCheckout()">
+              <i class="bi bi-credit-card"></i> Proceder al Pago
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de proceso de pago -->
+    <div class="modal-overlay" id="payment-modal" style="display: none">
+      <div class="modal-content" style="max-width: 900px">
+        <button class="modal-close" onclick="closeModal('payment-modal')">
+          &times;
+        </button>
+        <div class="modal-body">
+          <div class="section-title text-center mb-4">
+            <h3>Finalizar Compra</h3>
+            <p>Completa tu información y procesa tu pedido de forma segura</p>
+            <div class="donation-amount-display">
+              <span class="amount-label">Total a pagar:</span>
+              <span class="amount-value" id="payment-display-amount">$0</span>
+            </div>
+          </div>
+
+          <form id="payment-form" class="payment-form" novalidate>
+            <!-- Información de Envío -->
+            <div class="shipping-section mb-4">
+              <h5><i class="bi bi-truck"></i> Dirección de Envío</h5>
+
+              <!-- Solo campos de dirección -->
+
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label">Estado *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="shipping-state"
+                    name="estado"
+                    required
+                    placeholder="Ej: Querétaro"
+                    maxlength="100"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Municipio *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="shipping-city"
+                    name="municipio"
+                    required
+                    placeholder="Ej: Querétaro"
+                    maxlength="100"
+                  />
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6">
+                  <label class="form-label">Colonia *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="shipping-colony"
+                    name="colonia"
+                    required
+                    placeholder="Ej: Centro"
+                    maxlength="100"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Calle *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="shipping-street"
+                    name="calle"
+                    required
+                    placeholder="Ej: 5 de Mayo"
+                    maxlength="100"
+                  />
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-4">
+                  <label class="form-label">Código Postal *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="codigo_postal"
+                    id="shipping-zip"
+                    required
+                    minlength="5"
+                    maxlength="5"
+                    placeholder="76000"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Número Exterior *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="numero_exterior"
+                    id="shipping-exterior"
+                    required
+                    placeholder="123"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Número Interior</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="numero_interior"
+                    id="shipping-interior"
+                    placeholder="A (opcional)"
+                  />
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-12">
+                  <label class="form-label">Notas de Entrega</label>
+                  <textarea
+                    class="form-control"
+                    name="notas"
+                    id="shipping-notes"
+                    rows="2"
+                    placeholder="Instrucciones especiales de entrega (opcional)"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- Resumen del Pedido -->
+            <div class="order-summary mb-4">
+              <h5><i class="bi bi-cart-check"></i> Resumen del Pedido</h5>
+              <div id="payment-order-summary">
+                <!-- Se llena dinámicamente -->
+              </div>
+            </div>
+
+            <hr class="my-4" />
+            <!-- Payment Method Selection -->
+            <div class="payment-methods">
+              <h5><i class="bi bi-credit-card"></i> Método de Pago</h5>
+              <div class="payment-options">
+                <label class="payment-option">
+                  <input
+                    type="radio"
+                    name="payment_method"
+                    value="credit_card"
+                    checked
+                  />
+                  <span class="payment-option-content">
+                    <i class="bi bi-credit-card-2-front"></i>
+                    Tarjeta de Crédito/Débito
+                  </span>
+                </label>
+                <label class="payment-option">
+                  <input type="radio" name="payment_method" value="paypal" />
+                  <span class="payment-option-content">
+                    <i class="bi bi-paypal"></i>
+                    PayPal
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Credit Card Form -->
+            <div class="card-details" id="card-details">
+              <h5><i class="bi bi-shield-check"></i> Datos de la Tarjeta</h5>
+
+              <div class="form-row">
+                <div class="form-group full-width">
+                  <label for="card-number">
+                    <i class="bi bi-credit-card"></i> Número de Tarjeta *
+                  </label>
+                  <input
+                    type="text"
+                    id="card-number"
+                    name="card_number"
+                    required
+                    placeholder="1234 5678 9012 3456"
+                    maxlength="19"
+                    data-validation="tarjeta"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="card-name">
+                    <i class="bi bi-person"></i> Nombre en la Tarjeta *
+                  </label>
+                  <input
+                    type="text"
+                    id="card-name"
+                    name="card_name"
+                    required
+                    placeholder="Juan Pérez"
+                    data-validation="soloTexto"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="card-expiry">
+                    <i class="bi bi-calendar-date"></i> Vencimiento *
+                  </label>
+                  <input
+                    type="text"
+                    id="card-expiry"
+                    name="card_expiry"
+                    required
+                    placeholder="MM/YY"
+                    maxlength="5"
+                    data-validation="fechaVencimiento"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="card-cvv">
+                    <i class="bi bi-shield-lock"></i> CVV *
+                  </label>
+                  <input
+                    type="text"
+                    id="card-cvv"
+                    name="card_cvv"
+                    required
+                    placeholder="123"
+                    maxlength="4"
+                    data-validation="cvv"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- PayPal Section -->
+            <div
+              class="paypal-details"
+              id="paypal-details"
+              style="display: none"
+            >
+              <div class="paypal-info text-center">
+                <i
+                  class="bi bi-paypal paypal-icon"
+                  style="font-size: 2rem; color: #0070ba"
+                ></i>
+                <h5>Pagar con PayPal</h5>
+                <p>
+                  Serás redirigido a PayPal para completar el pago de forma
+                  segura.
+                </p>
+              </div>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="security-notice mt-3 mb-3">
+              <div class="d-flex align-items-center">
+                <i
+                  class="bi bi-shield-check me-2"
+                  style="color: #28a745; font-size: 1.2rem"
+                ></i>
+                <div class="security-text">
+                  <strong>Pago 100% Seguro</strong>
+                  <p class="mb-0 text-muted small">
+                    Tus datos están protegidos con encriptación SSL
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-actions d-flex justify-content-between">
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                onclick="closeModal('payment-modal')"
+              >
+                <i class="bi bi-arrow-left"></i> Cancelar
+              </button>
+              <button type="submit" class="btn btn-success btn-payment">
+                <i class="bi bi-lock"></i>
+                <span class="payment-button-text">Procesar Pago</span>
+                <span class="payment-amount" id="payment-button-amount"
+                  >$0</span
+                >
+              </button>
+            </div>
+
+            <!-- Payment Methods Footer -->
+            <div
+              class="payment-methods-footer text-center mt-4 pt-3 border-top"
+            >
+              <h6 class="text-muted mb-3">Métodos de Pago Aceptados</h6>
+              <div
+                class="payment-logos d-flex justify-content-center align-items-center gap-3 mb-3"
+              >
+                <img
+                  src="{{ url_for('static', filename='img/payment/visa.png') }}"
+                  alt="Visa"
+                  class="payment-logo"
+                  style="height: 30px"
+                />
+                <img
+                  src="{{ url_for('static', filename='img/payment/mastercard.png') }}"
+                  alt="Mastercard"
+                  class="payment-logo"
+                  style="height: 30px"
+                />
+                <img
+                  src="{{ url_for('static', filename='img/payment/paypal.png') }}"
+                  alt="PayPal"
+                  class="payment-logo"
+                  style="height: 30px"
+                />
+                <img
+                  src="{{ url_for('static', filename='img/payment/amex.png') }}"
+                  alt="American Express"
+                  class="payment-logo"
+                  style="height: 30px"
+                />
+              </div>
+              <div class="security-badges d-flex justify-content-center gap-3">
+                <span class="badge bg-success">
+                  <i class="bi bi-shield-check"></i> SSL Seguro
+                </span>
+                <span class="badge bg-primary">
+                  <i class="bi bi-lock"></i> Encriptado
+                </span>
+                <span class="badge bg-info">
+                  <i class="bi bi-check-circle"></i> Verificado
+                </span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de confirmación de pago exitoso -->
+    <div class="modal-overlay" id="payment-success-modal" style="display: none">
+      <div class="modal-content" style="max-width: 500px">
+        <div class="modal-body text-center">
+          <div class="success-content">
+            <i
+              class="bi bi-check-circle-fill success-icon"
+              style="font-size: 4rem; color: #28a745"
+            ></i>
+            <h3>¡Pago Completado!</h3>
+            <p>
+              Gracias por tu compra. El pago de
+              <span
+                id="success-amount"
+                style="font-weight: bold; color: #28a745"
+                >$0</span
+              >
+              ha sido procesado exitosamente.
+            </p>
+            <p class="text-muted">
+              Recibirás un recibo por correo electrónico en unos minutos.
+            </p>
+            <button onclick="redirectToOrders()" class="btn btn-primary">
+              <i class="bi bi-bag-check"></i> Ver Mis Pedidos
+            </button>
+            <button
+              onclick="closeAllModals()"
+              class="btn btn-outline-secondary ms-2"
+            >
+              <i class="bi bi-house"></i> Continuar Comprando
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Archivos JavaScript de librerías externas -->
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/waypoints/noframework.waypoints.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+
+    <!-- Archivos JavaScript principales de la tienda -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tienda.js') }}"></script>
+
+    <!-- =============================================
+         JAVASCRIPT DEL MODAL DE PAGO
+         Funcionalidades específicas de procesamiento
+         ============================================= -->
+    <script>
+      // Payment modal functionality
+      let currentOrderData = null;
+
+      // Function to proceed to payment after checkout (DEPRECATED - now unified)
+      function proceedToPayment() {
+        // This function is deprecated - checkout is now unified in payment-modal
+        console.warn(
+          "proceedToPayment() is deprecated - using unified checkout"
+        );
+      }
+
+      // Update contact information summary
+      function updateContactSummary(data) {
+        const summaryContent = document.getElementById(
+          "contact-summary-content"
+        );
+        if (summaryContent && data) {
+          const nombreCompleto = `${data.nombre} ${data.apellido_paterno}${
+            data.apellido_materno ? " " + data.apellido_materno : ""
+          }`;
+          summaryContent.innerHTML = `
+            <div class="row">
+              <div class="col-md-6">
+                <small class="text-muted">Nombre:</small><br>
+                <strong>${nombreCompleto}</strong>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted">Email:</small><br>
+                <strong>${data.email || "No especificado"}</strong>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <small class="text-muted">Teléfono:</small><br>
+                <strong>${data.telefono || "No especificado"}</strong>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted">Estado:</small><br>
+                <strong>${data.estado || "No especificado"}</strong>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      // Update payment amount displays
+      function updatePaymentAmounts(amount) {
+        const formattedAmount = amount.toLocaleString("es-MX", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+
+        const displayElement = document.getElementById(
+          "payment-display-amount"
+        );
+        const buttonElement = document.getElementById("payment-button-amount");
+        const successElement = document.getElementById("success-amount");
+
+        if (displayElement) {
+          displayElement.textContent = `$${formattedAmount}`;
+        }
+        if (buttonElement) {
+          buttonElement.textContent = `$${formattedAmount}`;
+        }
+        if (successElement) {
+          successElement.textContent = `$${formattedAmount}`;
+        }
+
+        // Store amount for later use
+        window.currentPaymentAmount = amount;
+      }
+
+      // Payment method toggle
+      function togglePaymentMethod() {
+        const selectedMethod = document.querySelector(
+          'input[name="payment_method"]:checked'
+        ).value;
+        const cardDetails = document.getElementById("card-details");
+        const paypalDetails = document.getElementById("paypal-details");
+        const paymentButtonText = document.querySelector(
+          ".payment-button-text"
+        );
+
+        // Get all credit card fields
+        const cardFields = [
+          document.getElementById("card-number"),
+          document.getElementById("card-name"),
+          document.getElementById("card-expiry"),
+          document.getElementById("card-cvv"),
+        ];
+
+        if (selectedMethod === "credit_card") {
+          cardDetails.style.display = "block";
+          paypalDetails.style.display = "none";
+          paymentButtonText.textContent = "Procesar Pago";
+
+          // Make card fields required
+          cardFields.forEach((field) => {
+            if (field) {
+              field.setAttribute("required", "required");
+            }
+          });
+        } else {
+          cardDetails.style.display = "none";
+          paypalDetails.style.display = "block";
+          paymentButtonText.textContent = "Continuar con PayPal";
+
+          // Remove required attribute from card fields
+          cardFields.forEach((field) => {
+            if (field) {
+              field.removeAttribute("required");
+              field.setCustomValidity(""); // Clear any validation errors
+            }
+          });
+        }
+      }
+
+      // Handle payment form submission
+      function handlePaymentSubmission(event) {
+        event.preventDefault();
+
+        const selectedMethod = document.querySelector(
+          'input[name="payment_method"]:checked'
+        ).value;
+        const paymentAmount = window.currentPaymentAmount || 0;
+
+        // For PayPal, only validate shipping information
+        if (selectedMethod === "paypal") {
+          // Validate shipping fields only
+          const form = document.getElementById("payment-form");
+          const shippingFields = [
+            "shipping-state",
+            "shipping-city",
+            "shipping-colony",
+            "shipping-street",
+            "shipping-zip",
+            "shipping-exterior",
+          ];
+
+          let isValid = true;
+          shippingFields.forEach((fieldId) => {
+            const field = document.getElementById(fieldId);
+            if (
+              field &&
+              field.hasAttribute("required") &&
+              !field.value.trim()
+            ) {
+              field.setCustomValidity("Este campo es requerido");
+              field.reportValidity();
+              isValid = false;
+            } else if (field) {
+              field.setCustomValidity("");
+            }
+          });
+
+          if (isValid) {
+            processPayment("paypal", paymentAmount);
+          }
+        } else {
+          // For credit card, validate the entire form
+          const form = document.getElementById("payment-form");
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+          processPayment("credit_card", paymentAmount);
+        }
+      }
+
+      // Process payment and create order
+      function processPayment(paymentMethod, amount) {
+        const submitButton = document.querySelector(".btn-payment");
+        const originalText = submitButton.innerHTML;
+
+        submitButton.innerHTML =
+          '<i class="bi bi-hourglass-split"></i> Procesando...';
+        submitButton.disabled = true;
+
+        // Collect data from unified form
+        const form = document.getElementById("payment-form");
+        const formData = new FormData(form);
+
+        // Prepare order data in the format expected by /api/pedidos/crear
+        const orderData = {
+          // User info from logged user
+          user_id: currentUser ? currentUser.id : null,
+          // Products from cart
+          productos: getCartItems(),
+          // Address structure - will create/find address automatically
+          direccion: {
+            estado: formData.get("estado"),
+            municipio: formData.get("municipio"),
+            colonia: formData.get("colonia"),
+            calle: formData.get("calle"),
+            codigo_postal: formData.get("codigo_postal"),
+            numero_exterior: formData.get("numero_exterior"),
+            numero_interior: formData.get("numero_interior") || null,
+            // Use user data for contact info
+            nombre_destinatario: currentUser
+              ? `${currentUser.nombre} ${currentUser.apellido_paterno}${
+                  currentUser.apellido_materno
+                    ? " " + currentUser.apellido_materno
+                    : ""
+                }`
+              : "Usuario",
+            telefono_contacto: currentUser ? currentUser.telefono : "",
+          },
+          // Payment structure as expected by backend
+          pago: {
+            numero_tarjeta:
+              paymentMethod === "credit_card"
+                ? document.getElementById("card-number").value
+                : "", // Empty for PayPal, backend will handle
+            fecha_expiracion:
+              paymentMethod === "credit_card"
+                ? document.getElementById("card-expiry").value
+                : "", // Empty for PayPal, backend will handle
+            cvv:
+              paymentMethod === "credit_card"
+                ? document.getElementById("card-cvv").value
+                : "", // Empty for PayPal, backend will handle
+            nombre_tarjeta:
+              paymentMethod === "credit_card"
+                ? document.getElementById("card-name").value
+                : "", // Empty for PayPal, backend will handle
+            tipo_pago: paymentMethod === "credit_card" ? "tarjeta" : "paypal",
+            monto: amount,
+          },
+          // Additional shipping info
+          notas: formData.get("notas") || "",
+        };
+
+        console.log("Order data prepared:", orderData);
+
+        // Send to server
+        fetch("/api/pedidos/crear", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(orderData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              // Clear cart
+              clearCart();
+              updateCartUI();
+
+              // Show success modal
+              showPaymentSuccess();
+            } else {
+              alert(
+                "Error al procesar el pedido: " + (data.error || data.message)
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Error de conexión. Por favor, inténtalo de nuevo.");
+          })
+          .finally(() => {
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+          });
+      }
+
+      // Show payment success modal
+      function showPaymentSuccess() {
+        closeModal("payment-modal");
+        document.getElementById("payment-success-modal").style.display = "flex";
+      }
+
+      // Close all modals
+      function closeAllModals() {
+        closeModal("payment-success-modal");
+        closeModal("payment-modal");
+        closeModal("checkout-modal");
+      }
+
+      // Redirect to orders page
+      function redirectToOrders() {
+        window.location.href = "/mis-pedidos";
+      }
+
+      // Initialize payment modal when DOM is loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        // Payment method toggle listeners
+        const paymentMethods = document.querySelectorAll(
+          'input[name="payment_method"]'
+        );
+        paymentMethods.forEach((method) => {
+          method.addEventListener("change", togglePaymentMethod);
+        });
+
+        // Initialize payment method toggle for default selection
+        togglePaymentMethod();
+
+        // Payment form submission
+        const paymentForm = document.getElementById("payment-form");
+        if (paymentForm) {
+          paymentForm.addEventListener("submit", handlePaymentSubmission);
+        }
+
+        // Initialize validation if available
+        if (typeof validacionesSway !== "undefined") {
+          validacionesSway.configurarFormulario(paymentForm, {
+            card_number: { tipo: "tarjeta" },
+            card_name: { tipo: "soloTexto" },
+            card_expiry: { tipo: "fechaVencimiento" },
+            card_cvv: { tipo: "cvv" },
+          });
+        }
+      });
+
+      // Modal keyboard accessibility
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          const modals = ["payment-modal", "payment-success-modal"];
+          modals.forEach((modalId) => {
+            const modal = document.getElementById(modalId);
+            if (modal && modal.style.display === "flex") {
+              closeModal(modalId);
+            }
+          });
+        }
+      });
+    </script>
+
+    <!-- =============================================
+         SCRIPT DE OPTIMIZACIÓN DE CARGA
+         Funciones para mejorar la experiencia de usuario
+         ============================================= -->
+    <script>
+      // Función para remover el preloader
+      function removerPreloader() {
+        const preloader = document.querySelector("#preloader");
+        if (preloader) {
+          console.log("Removiendo preloader...");
+          preloader.style.display = "none";
+          preloader.style.visibility = "hidden";
+          preloader.style.opacity = "0";
+          preloader.style.zIndex = "-9999";
+          preloader.remove();
+          document.body.style.visibility = "visible";
+          document.body.style.opacity = "1";
+          return true;
+        }
+        return false;
+      }
+
+      // Ejecutar inmediatamente
+      removerPreloader();
+
+      // Forzar inmediatamente la remoción del preloader
+      document.addEventListener("DOMContentLoaded", function () {
+        removerPreloader();
+      });
+
+      // Backup adicional con múltiples timeouts
+      setTimeout(removerPreloader, 1);
+      setTimeout(removerPreloader, 10);
+      setTimeout(removerPreloader, 100);
+      setTimeout(removerPreloader, 500);
+      setTimeout(removerPreloader, 1000);
+
+      // Observer para detectar si el preloader se agrega dinámicamente
+      const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+          if (mutation.type === "childList") {
+            mutation.addedNodes.forEach(function (node) {
+              if (
+                node.nodeType === 1 &&
+                (node.id === "preloader" || node.querySelector("#preloader"))
+              ) {
+                console.log(
+                  "Preloader detectado por MutationObserver, removiendo..."
+                );
+                removerPreloader();
+              }
+            });
+          }
+        });
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    </script>
+  </body>
+</html>

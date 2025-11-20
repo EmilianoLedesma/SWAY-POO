@@ -1,0 +1,887 @@
+/* =============================================
+   SWAY - BIBLIOTECA DE RECURSOS MARINOS
+   Estilos específicos para sistema de gestión documental
+   Incluye búsqueda, filtrado y categorización de recursos
+   ============================================= */
+
+/* =============================================
+   SECCIÓN HERO DE BIBLIOTECA
+   Imagen de fondo marina con información principal
+   ============================================= */
+/* Contenedor principal de la sección hero */
+.biblioteca-hero {
+    width: 100%;                    /* Ancho completo */
+    min-height: 80vh;               /* Altura mínima viewport */
+    position: relative;             /* Posicionamiento relativo para overlay */
+    padding: 140px 0 60px 0;        /* Espaciado superior e inferior */
+    display: flex;                  /* Flexbox para centrado */
+    align-items: center;            /* Centrado vertical */
+    background: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') no-repeat center center/cover; /* Imagen de fondo marina */
+}
+
+/* Overlay oscuro sobre imagen de fondo */
+.biblioteca-hero::before {
+    content: '';                        /* Pseudo-elemento vacío */
+    position: absolute;                 /* Posicionamiento absoluto */
+    top: 0;
+    left: 0;
+    width: 100%;                        /* Cobertura completa */
+    height: 100%;
+    background: rgba(55, 81, 126, 0.8); /* Overlay azul marino semitransparente */
+    z-index: 1;                         /* Capa superior a la imagen */
+}
+
+/* Contenedor de contenido hero por encima del overlay */
+.biblioteca-hero .container {
+    position: relative;  /* Posición relativa */
+    z-index: 2;          /* Por encima del overlay */
+}
+
+.biblioteca-hero h1 {
+    margin: 0;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 56px;
+    color: var(--contrast-color);
+    margin-bottom: 20px;
+    font-family: var(--heading-font);
+}
+
+.biblioteca-hero p {
+    color: var(--contrast-color);
+    margin: 5px 0 30px 0;
+    font-size: 22px;
+    line-height: 1.3;
+    font-weight: 600;
+    font-family: var(--default-font);
+}
+
+/* Botones de la hero section - siguiendo el diseño actual */
+.biblioteca-hero .btn-get-started {
+    color: var(--contrast-color);
+    background: var(--accent-color);
+    font-family: var(--heading-font);
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 1px;
+    display: inline-block;
+    padding: 10px 28px 12px 28px;
+    border-radius: 50px;
+    transition: 0.5s;
+    text-decoration: none;
+    margin-right: 20px;
+}
+
+.biblioteca-hero .btn-get-started:hover {
+    color: var(--contrast-color);
+    background: color-mix(in srgb, var(--accent-color), transparent 15%);
+}
+
+.biblioteca-hero .btn-watch-video {
+    font-size: 16px;
+    transition: 0.5s;
+    color: var(--contrast-color);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.biblioteca-hero .btn-watch-video i {
+    color: var(--accent-color);
+    font-size: 32px;
+    transition: 0.3s;
+    line-height: 0;
+    margin-right: 8px;
+}
+
+.biblioteca-hero .btn-watch-video:hover {
+    color: var(--accent-color);
+}
+
+.biblioteca-hero .btn-watch-video:hover i {
+    color: color-mix(in srgb, var(--accent-color), transparent 15%);
+}
+
+/* 
+==============================================
+SEARCH SECTION
+==============================================
+*/
+.search-box {
+    background: var(--surface-color);
+    border-radius: 12px;
+    box-shadow: 0 3px 20px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin-bottom: 40px;
+    transition: all 0.3s ease;
+}
+
+.search-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.search-box .form-control {
+    border: none;
+    padding-left: 5px;
+    font-size: 1.05rem;
+    height: 45px;
+    font-family: var(--default-font);
+    color: var(--default-color);
+}
+
+.search-box .form-control:focus {
+    box-shadow: none;
+    border-bottom: 1px solid var(--accent-color);
+}
+
+.search-box .btn-primary {
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-weight: 600;
+    background: var(--accent-color);
+    color: var(--contrast-color);
+    border: none;
+    transition: all 0.3s ease;
+    font-family: var(--heading-font);
+}
+
+.search-box .btn-primary:hover {
+    background: var(--heading-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(55, 81, 126, 0.25);
+}
+
+/* 
+==============================================
+FILTER BUTTONS & TAGS
+==============================================
+*/
+.filter-buttons {
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    background: var(--background-color);
+    border: 1px solid #dee2e6;
+    color: var(--default-color);
+    padding: 8px 20px;
+    margin: 0 5px 10px 0;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-family: var(--nav-font);
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+    background: var(--accent-color);
+    color: var(--contrast-color);
+    border-color: var(--accent-color);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(71, 178, 228, 0.2);
+}
+
+.popular-tags {
+    margin-bottom: 40px;
+}
+
+.popular-tags .badge {
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.85rem;
+    border-radius: 30px;
+    background-color: #f5f6f8;
+    color: var(--default-color);
+    padding: 8px 16px;
+    margin: 0 3px;
+    font-family: var(--nav-font);
+}
+
+.popular-tags .badge:hover {
+    background-color: var(--accent-color) !important;
+    color: var(--contrast-color) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(71, 178, 228, 0.2);
+}
+
+/* 
+==============================================
+RESOURCE CARDS
+==============================================
+*/
+.resource-card {
+  border: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+}
+
+.resource-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.resource-card:hover .resource-icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 8px 25px rgba(71, 178, 228, 0.3);
+}
+
+.resource-card:hover .download-btn {
+  background: var(--heading-color);
+}
+
+/* Animaciones para filtrado */
+.col-lg-4, .col-md-6 {
+  transition: all 0.3s ease;
+}
+
+.col-lg-4.hidden, .col-md-6.hidden {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+
+.resource-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  transition: all 0.4s ease;
+}
+
+.resource-icon i {
+  font-size: 24px;
+  color: var(--contrast-color);
+}
+
+.resource-meta {
+  font-size: 0.9em;
+  color: #6c757d;
+  margin-bottom: 15px;
+  font-family: var(--default-font);
+}
+
+.resource-card .card-title {
+  font-family: var(--heading-font);
+  color: var(--heading-color);
+}
+
+.resource-card .card-text {
+  font-family: var(--default-font);
+  color: var(--default-color);
+}
+
+.download-btn {
+  background: var(--accent-color);
+  color: var(--contrast-color);
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-family: var(--heading-font);
+}
+
+.download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  color: var(--contrast-color);
+}
+
+/* 
+==============================================
+NO RESULTS MESSAGE
+==============================================
+*/
+#no-results-message {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+}
+
+#no-results-message.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#no-results-message .display-1 {
+  opacity: 0.5;
+}
+
+/* Botones en mensaje de no resultados */
+#no-results-message .btn-outline-primary {
+  transition: all 0.3s ease;
+}
+
+#no-results-message .btn-outline-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(71, 178, 228, 0.3);
+}/* 
+==============================================
+FEATURED RESOURCES
+==============================================
+*/
+.featured-resources-section {
+    padding: 60px 0;
+}
+
+.featured-resources-section h2 {
+    color: var(--heading-color);
+    position: relative;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    font-family: var(--heading-font);
+}
+
+.featured-resources-section h2::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: var(--accent-color);
+    bottom: 0;
+    left: 0;
+    border-radius: 2px;
+}
+
+.section-subtitle {
+    color: var(--heading-color);
+    position: relative;
+    padding-bottom: 12px;
+    margin-bottom: 25px;
+    font-family: var(--heading-font);
+}
+
+.section-subtitle::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--accent-color);
+    bottom: 0;
+    left: 0;
+    border-radius: 2px;
+}
+
+.featured-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    border: none;
+    border-radius: 12px;
+}
+
+.featured-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+}
+
+.featured-card img {
+    transition: all 0.3s ease;
+    object-fit: cover;
+}
+
+.featured-card .badge {
+    transition: all 0.3s ease;
+    background-color: var(--accent-color);
+    color: var(--contrast-color);
+    font-weight: 500;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+}
+
+.featured-card:hover .badge {
+    transform: translateY(-3px);
+}
+
+/* Grid de Recursos Destacados - Optimizado para Bootstrap */
+.featured-grid {
+    margin-bottom: 4rem;
+}
+
+/* Tarjetas con tamaño optimizado para Bootstrap Grid */
+.featured-grid .grid-featured-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    height: 100%;
+    min-height: 400px;
+}
+
+/* Espaciado del grid optimizado para Bootstrap */
+.featured-grid.row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 2rem;
+}
+
+/* Eliminar centrado automático de columnas - usar Bootstrap por defecto */
+
+.featured-grid .grid-featured-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+}
+
+.featured-grid .card-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    height: 240px;
+}
+
+.featured-grid .card-img-top {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.featured-grid .grid-featured-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.featured-grid .card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(55, 81, 126, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.featured-grid .grid-featured-card:hover .card-overlay {
+    opacity: 1;
+}
+
+.featured-grid .card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.featured-grid .card-title {
+    font-family: var(--heading-font);
+    color: var(--heading-color);
+    font-size: 1.15rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+    height: auto;
+}
+
+.featured-grid .card-text {
+    font-size: 0.9rem;
+    color: var(--default-color);
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.featured-grid .card-footer {
+    padding: 0 1.5rem 1.5rem;
+    background: transparent;
+    border: none;
+    margin-top: auto;
+}
+
+.featured-badge {
+    position: relative;
+    top: -30px;
+    margin-bottom: -15px;
+    background-color: var(--accent-color);
+    color: var(--contrast-color);
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+/* Media queries para mejorar la respuesta en diferentes pantallas */
+@media (max-width: 576px) {
+    .featured-grid .row {
+        row-gap: 1.5rem;
+    }
+    
+    .featured-grid .grid-featured-card {
+        min-height: 320px;
+    }
+    
+    .biblioteca-hero h1 {
+        font-size: 32px;
+        line-height: 40px;
+    }
+    
+    .biblioteca-hero p {
+        font-size: 18px;
+    }
+    
+    .biblioteca-hero .btn-get-started,
+    .biblioteca-hero .btn-watch-video {
+        font-size: 14px;
+        display: block;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .featured-grid .row {
+        row-gap: 2rem;
+    }
+    
+    .featured-grid .grid-featured-card {
+        min-height: 350px;
+    }
+    
+    /* Mejorar el layout de filtros en móvil */
+    .filter-buttons {
+        text-align: left;
+    }
+    
+    .filter-btn {
+        margin-bottom: 8px;
+        font-size: 14px;
+        padding: 6px 16px;
+    }
+}
+
+@media (min-width: 992px) {
+    .featured-grid .grid-featured-card {
+        min-height: 420px;
+    }
+}
+
+/* Transition suave para el filtrado */
+.featured-grid .col,
+.row.g-4 .col {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.featured-grid .col[style*="display: none"],
+.row.g-4 .col[style*="display: none"] {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+/* 
+==============================================
+NEWSLETTER SECTION 
+==============================================
+*/
+.newsletter-section {
+    background: linear-gradient(135deg, #37517e, #47b2e4);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.newsletter-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M30,65 Q40,120 100,90 T170,110" stroke="rgba(255,255,255,0.1)" fill="none" stroke-width="10"/></svg>') no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.newsletter-section h3 {
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+.newsletter-section .input-group {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.newsletter-section .form-control {
+    padding: 15px 25px;
+    border-radius: 30px 0 0 30px;
+    border: none;
+}
+
+.newsletter-section .btn {
+    padding: 0 25px;
+    border-radius: 0 30px 30px 0;
+    background: #37517e;
+    color: white;
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.newsletter-section .btn:hover {
+    background: #2a3e60;
+}
+
+/* 
+==============================================
+PRELOADER
+==============================================
+*/
+.biblioteca-preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(37, 51, 77, 0.95), rgba(47, 84, 150, 0.9));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+}
+
+.biblioteca-preloader:before {
+    content: "";
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border: 6px solid #fff;
+    border-top-color: #47b2e4;
+    border-radius: 50%;
+    animation: animate-preloader 1.2s infinite ease-in-out;
+}
+
+@keyframes animate-preloader {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/*
+==============================================
+RESOURCE ORGANIZATION & BUTTONS
+==============================================
+*/
+.featured-resources-section {
+    background-color: var(--background-color);
+}
+
+/* Eliminar grid CSS nativo que conflictúa con Bootstrap */
+
+.download-btn.btn-lg {
+    padding: 10px 30px;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 5px 15px rgba(55, 81, 126, 0.2);
+}
+
+.download-btn.btn-lg:hover {
+    box-shadow: 0 8px 20px rgba(55, 81, 126, 0.3);
+    transform: translateY(-4px);
+}
+
+/* Efecto hover unificado para todas las tarjetas */
+.resource-card:hover,
+.grid-featured-card:hover,
+.featured-card:hover {
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px);
+}
+
+/* Mejoras para etiquetas y badges */
+.badge {
+    font-family: var(--nav-font);
+    font-weight: 500;
+}
+
+/* Estilo minimalista para las tarjetas */
+.card {
+    border: none;
+    background-color: var(--surface-color);
+    overflow: hidden;
+}
+
+/* 
+==============================================
+RESPONSIVE STYLES
+==============================================
+*/
+@media (max-width: 1199.98px) {
+    .biblioteca-hero h1 {
+        font-size: 42px;
+    }
+    
+    .featured-resources-section .row-cols-lg-3 {
+        --bs-gutter-x: 1.5rem;
+    }
+    
+    .featured-grid .card-title {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .biblioteca-hero {
+        padding: 140px 0 80px 0;
+    }
+    
+    .biblioteca-hero h1 {
+        font-size: 36px;
+        text-align: center;
+    }
+    
+    .biblioteca-hero p {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .biblioteca-hero .d-flex {
+        justify-content: center;
+    }
+    
+    .section-subtitle {
+        text-align: center;
+    }
+    
+    .section-subtitle::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .biblioteca-hero h1 {
+        font-size: 30px;
+    }
+    
+    .biblioteca-hero p {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .biblioteca-hero {
+        padding: 140px 0 80px 0;
+    }
+    
+    .biblioteca-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .search-box {
+        padding: 15px;
+        border-radius: 8px;
+    }
+    
+    .search-box .btn-primary {
+        padding: 8px 20px;
+        margin-top: 10px;
+        width: 100%;
+        border-radius: 8px;
+    }
+}
+
+/* Mejoras específicas para el layout de las tarjetas */
+.featured-grid .col .card {
+    flex: 1;
+}
+
+/* Asegurar espaciado consistente entre tarjetas usando Bootstrap */
+.featured-grid.row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 2rem;
+}
+
+/* Para pantallas grandes, optimizar el espaciado */
+@media (min-width: 1200px) {
+    .featured-grid.row {
+        --bs-gutter-x: 2rem;
+        --bs-gutter-y: 2.5rem;
+    }
+}
+
+@media (min-width: 1400px) {
+    .featured-grid.row {
+        --bs-gutter-x: 2.5rem;
+        --bs-gutter-y: 3rem;
+    }
+}
+
+/* Asegurar que las tarjetas mantengan proporciones consistentes */
+.featured-grid .card-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    height: 240px;
+}
+
+/* Mejorar el diseño de los badges para pantallas grandes */
+@media (min-width: 1200px) {
+    .featured-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+@media (min-width: 1400px) {
+    .featured-grid .card-title {
+        font-size: 1.25rem;
+        margin-bottom: 1.2rem;
+    }
+    
+    .featured-grid .card-text {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+}
+
+/* Mejoras para el footer de las tarjetas */
+.featured-grid .card-footer {
+    padding: 0 1.5rem 1.5rem;
+    background: transparent;
+    border: none;
+    margin-top: auto;
+}
+
+@media (min-width: 1400px) {
+    .featured-grid .card-footer {
+        padding: 0 2rem 2rem;
+    }
+}
+
+/* Animaciones mejoradas */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.grid-featured-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Estados de carga para imágenes */
+.card-img-top {
+    background-color: #f8f9fa;
+    min-height: 200px;
+    object-fit: cover;
+}

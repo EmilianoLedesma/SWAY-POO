@@ -1,0 +1,956 @@
+<!-- =============================================
+     PÁGINA DE BIBLIOTECA DE RECURSOS MARINOS
+     Repositorio de documentos educativos, guías,
+     investigaciones y materiales de conservación
+     ============================================= -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Biblioteca - SWAY</title>
+    <meta
+      content="Recursos educativos y materiales informativos sobre conservación marina"
+      name="description"
+    />
+    <meta
+      content="biblioteca, recursos, educación, conservación marina, documentos"
+      name="keywords"
+    />
+
+    <!-- Configuración de favicon del sitio -->
+    <link
+      href="{{ url_for('static', filename='img/SWAY (1).png') }}"
+      rel="icon"
+    />
+
+    <!-- Enlaces a fuentes externas de Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Jost:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Archivos CSS de librerías externas -->
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/aos/aos.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/glightbox/css/glightbox.min.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}"
+      rel="stylesheet"
+    />
+    <!-- Archivos CSS específicos de la biblioteca -->
+    <link
+      href="{{ url_for('static', filename='css/main.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/biblioteca.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <!-- =============================================
+         HEADER DE NAVEGACIÓN DE LA BIBLIOTECA
+         Barra de navegación con enlaces principales
+         ============================================= -->
+    <header id="header" class="header d-flex align-items-center fixed-top">
+      <div
+        class="container-fluid container-xl position-relative d-flex align-items-center"
+      >
+        <a href="/" class="logo d-flex align-items-center me-auto">
+          <h1 class="sitename">SWAY</h1>
+        </a>
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/#about">Nosotros</a></li>
+            <li><a href="/#portfolio">Novedades</a></li>
+            <li><a href="/#team">Equipo</a></li>
+            <li><a href="/#contact">Contacto</a></li>
+            <li class="dropdown">
+              <a href="#"
+                ><span>Más</span>
+                <i class="bi bi-chevron-down toggle-dropdown"></i
+              ></a>
+              <ul>
+                <li><a href="/especies">Especies</a></li>
+                <li><a href="/eventos">Eventos</a></li>
+                <li><a href="/biblioteca" class="active">Biblioteca</a></li>
+                <li><a href="/tienda">Tienda</a></li>
+              </ul>
+            </li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+        <a class="btn-getstarted" href="/#donation">Donar</a>
+      </div>
+    </header>
+    <!-- =============================================
+         CONTENIDO PRINCIPAL DE LA BIBLIOTECA
+         Secciones de recursos y materiales educativos
+         ============================================= -->
+    <main class="main">
+      <!-- =============================================
+           SECCIÓN HERO DE LA BIBLIOTECA
+           Banner principal con información de recursos
+           ============================================= -->
+      <section class="biblioteca-hero section dark-background">
+        <div class="container">
+          <div class="row gy-4">
+            <div
+              class="col-lg-6 d-flex flex-column justify-content-center"
+              data-aos="zoom-out"
+            >
+              <h1>Biblioteca de Recursos Marinos</h1>
+              <p>Explora nuestra colección digital de conservación marina</p>
+              <div class="d-flex">
+                <a href="#featured" class="btn-get-started"
+                  >Explorar recursos</a
+                >
+                <a
+                  href="#"
+                  class="glightbox btn-watch-video d-flex align-items-center"
+                >
+                  <i class="bi bi-info-circle"></i><span>Más</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- =============================================
+           SECCIÓN DE BÚSQUEDA Y FILTROS
+           Herramientas para buscar y filtrar recursos
+           ============================================= -->
+      <section class="py-5">
+        <div class="container">
+          <div class="search-box" data-aos="fade-up">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <div class="input-group">
+                  <span class="input-group-text border-0 bg-transparent">
+                    <i class="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control border-0"
+                    placeholder="Buscar recursos, documentos, guías..."
+                  />
+                </div>
+              </div>
+              <div class="col-md-4 text-end">
+                <button class="btn btn-primary rounded-pill px-4">
+                  <i class="bi bi-search me-2"></i>Buscar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter Buttons -->
+          <div
+            class="filter-buttons text-center"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
+            <button class="btn filter-btn active" data-filter="all">
+              Todos
+            </button>
+            <button class="btn filter-btn" data-filter="guides">Guías</button>
+            <button class="btn filter-btn" data-filter="research">
+              Investigación
+            </button>
+            <button class="btn filter-btn" data-filter="educational">
+              Educativo
+            </button>
+            <button class="btn filter-btn" data-filter="infographics">
+              Infografías
+            </button>
+            <button class="btn filter-btn" data-filter="videos">Videos</button>
+          </div>
+
+          <!-- Tags populares -->
+          <div
+            class="popular-tags mt-4 text-center"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+            <span class="d-inline-block me-2 mb-2 small text-muted"
+              >Búsquedas populares:</span
+            >
+            <a
+              href="#"
+              class="badge bg-light text-dark text-decoration-none me-2 mb-2 py-2 px-3"
+              >Conservación</a
+            >
+            <a
+              href="#"
+              class="badge bg-light text-dark text-decoration-none me-2 mb-2 py-2 px-3"
+              >Tortugas marinas</a
+            >
+            <a
+              href="#"
+              class="badge bg-light text-dark text-decoration-none me-2 mb-2 py-2 px-3"
+              >Contaminación</a
+            >
+            <a
+              href="#"
+              class="badge bg-light text-dark text-decoration-none me-2 mb-2 py-2 px-3"
+              >Biodiversidad</a
+            >
+            <a
+              href="#"
+              class="badge bg-light text-dark text-decoration-none me-2 mb-2 py-2 px-3"
+              >Educación</a
+            >
+          </div>
+        </div>
+      </section>
+      <!-- =============================================
+           SECCIÓN DE RECURSOS DISPONIBLES
+           Grid de materiales educativos y científicos
+           ============================================= -->
+      <section class="py-5 bg-light">
+        <div class="container">
+          <div class="row mb-4">
+            <div class="col-lg-6">
+              <h2 class="fw-bold" data-aos="fade-up">Recursos Disponibles</h2>
+              <p class="lead" data-aos="fade-up" data-aos-delay="100">
+                Explora nuestra colección de materiales educativos y científicos
+              </p>
+            </div>
+          </div>
+          <div class="row g-4" id="resources-container">
+            <!-- Guías Prácticas -->
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-category="guides"
+            >
+              <div class="card resource-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="resource-icon">
+                    <i class="bi bi-book"></i>
+                  </div>
+                  <h5 class="card-title">Guía de Conservación Marina</h5>
+                  <div class="resource-meta">
+                    <i class="bi bi-calendar3"></i> Actualizado: Mayo 2025 |
+                    <i class="bi bi-download"></i> 1,247 descargas
+                  </div>
+                  <p class="card-text">
+                    Manual completo sobre técnicas de conservación marina y
+                    protección de ecosistemas costeros.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2">
+                    <button class="btn download-btn">
+                      <i class="bi bi-download me-2"></i>Descargar PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Investigación Científica -->
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-aos-delay="100"
+              data-category="research"
+            >
+              <div class="card resource-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="resource-icon">
+                    <i class="bi bi-graph-up"></i>
+                  </div>
+                  <h5 class="card-title">Impacto del Cambio Climático</h5>
+                  <div class="resource-meta">
+                    <i class="bi bi-calendar3"></i> Publicado: Abril 2025 |
+                    <i class="bi bi-download"></i> 892 descargas
+                  </div>
+                  <p class="card-text">
+                    Estudio científico sobre los efectos del cambio climático en
+                    los ecosistemas marinos mexicanos.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2">
+                    <button class="btn download-btn">
+                      <i class="bi bi-download me-2"></i>Descargar PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Material Educativo -->
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-aos-delay="200"
+              data-category="educational"
+            >
+              <div class="card resource-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="resource-icon">
+                    <i class="bi bi-mortarboard"></i>
+                  </div>
+                  <h5 class="card-title">Kit Educativo Infantil</h5>
+                  <div class="resource-meta">
+                    <i class="bi bi-calendar3"></i> Creado: Marzo 2025 |
+                    <i class="bi bi-download"></i> 2,156 descargas
+                  </div>
+                  <p class="card-text">
+                    Actividades y materiales didácticos para enseñar
+                    conservación marina a niños de 6-12 años.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2">
+                    <button class="btn download-btn">
+                      <i class="bi bi-download me-2"></i>Descargar ZIP
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Infografías -->
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-aos-delay="300"
+              data-category="infographics"
+            >
+              <div class="card resource-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="resource-icon">
+                    <i class="bi bi-bar-chart"></i>
+                  </div>
+                  <h5 class="card-title">Estadísticas de Contaminación</h5>
+                  <div class="resource-meta">
+                    <i class="bi bi-calendar3"></i> Actualizado: Junio 2025 |
+                    <i class="bi bi-download"></i> 756 descargas
+                  </div>
+                  <p class="card-text">
+                    Infografías con datos actualizados sobre contaminación
+                    marina y plásticos en océanos.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2">
+                    <button class="btn download-btn">
+                      <i class="bi bi-download me-2"></i>Ver Online
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Videos Educativos -->
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-aos-delay="400"
+              data-category="videos"
+            >
+              <div class="card resource-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="resource-icon">
+                    <i class="bi bi-play-circle"></i>
+                  </div>
+                  <h5 class="card-title">Documentales Marinos</h5>
+                  <div class="resource-meta">
+                    <i class="bi bi-calendar3"></i> Colección 2025 |
+                    <i class="bi bi-eye"></i> 3,421 visualizaciones
+                  </div>
+                  <p class="card-text">
+                    Serie de documentales sobre biodiversidad marina y esfuerzos
+                    de conservación en México.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2">
+                    <button class="btn download-btn">
+                      <i class="bi bi-play-circle me-2"></i>Ver Videos
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Herramientas Prácticas -->
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-aos-delay="500"
+              data-category="guides"
+            >
+              <div class="card resource-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="resource-icon">
+                    <i class="bi bi-tools"></i>
+                  </div>
+                  <h5 class="card-title">Herramientas de Monitoreo</h5>
+                  <div class="resource-meta">
+                    <i class="bi bi-calendar3"></i> Desarrollado: 2025 |
+                    <i class="bi bi-download"></i> 445 descargas
+                  </div>
+                  <p class="card-text">
+                    Aplicaciones y herramientas digitales para el monitoreo de
+                    ecosistemas marinos.
+                  </p>
+                  <div class="d-flex justify-content-center gap-2">
+                    <button class="btn download-btn">
+                      <i class="bi bi-download me-2"></i>Acceder
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Load More Button -->
+          <div class="text-center mt-5" data-aos="fade-up">
+            <button class="btn download-btn btn-lg px-5">
+              <i class="bi bi-arrow-down-circle me-2"></i>Cargar Más Recursos
+            </button>
+          </div>
+        </div>
+      </section>
+      <!-- =============================================
+           SECCIÓN DE RECURSOS DESTACADOS
+           Materiales más populares y valorados
+           ============================================= -->
+      <section id="featured" class="py-5 featured-resources-section">
+        <div class="container">
+          <div class="row align-items-center mb-5">
+            <div class="col-lg-6">
+              <h2 class="display-6 fw-bold" data-aos="fade-right">
+                Recursos Destacados
+              </h2>
+              <p class="lead" data-aos="fade-right" data-aos-delay="100">
+                Los materiales más descargados y valorados por nuestra comunidad
+              </p>
+            </div>
+          </div>
+
+          <!-- Recurso principal destacado -->
+          <div class="row g-4 mb-5">
+            <div class="col-lg-8" data-aos="fade-up">
+              <div class="card border-0 shadow-lg featured-card">
+                <div class="row g-0">
+                  <div class="col-md-4">
+                    <img
+                      src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                      class="img-fluid rounded-start h-100 object-fit-cover"
+                      alt="Manual de Conservación"
+                    />
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body p-4">
+                      <span class="badge bg-primary mb-2">Más Popular</span>
+                      <h4 class="card-title">
+                        Manual Completo de Conservación Marina 2025
+                      </h4>
+                      <p class="card-text">
+                        La guía más completa sobre técnicas modernas de
+                        conservación marina, incluyendo estrategias de
+                        protección, restauración de ecosistemas y manejo
+                        sostenible de recursos.
+                      </p>
+                      <div class="d-flex align-items-center mb-3">
+                        <div class="me-4">
+                          <small class="text-muted"
+                            ><i class="bi bi-download me-1"></i>5,234
+                            descargas</small
+                          >
+                        </div>
+                        <div class="me-4">
+                          <small class="text-muted"
+                            ><i class="bi bi-star-fill text-warning me-1"></i
+                            >4.9/5</small
+                          >
+                        </div>
+                        <div>
+                          <small class="text-muted"
+                            ><i class="bi bi-file-earmark-pdf me-1"></i>128
+                            páginas</small
+                          >
+                        </div>
+                      </div>
+                      <button class="btn download-btn">
+                        <i class="bi bi-download me-2"></i>Descargar Gratis
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+              <div class="card border-0 shadow mb-4 featured-card">
+                <img
+                  src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                  class="card-img-top"
+                  alt="Infografía Océanos"
+                />
+                <div class="card-body">
+                  <span class="badge bg-success mb-2">Nuevo</span>
+                  <h5 class="card-title">
+                    Infografía: El Estado de Nuestros Océanos
+                  </h5>
+                  <p class="card-text">
+                    Visualización de datos actualizados sobre la salud de los
+                    océanos mundiales.
+                  </p>
+                  <button class="btn download-btn">Ver Online</button>
+                </div>
+              </div>
+
+              <div class="card border-0 shadow featured-card">
+                <img
+                  src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                  class="card-img-top"
+                  alt="Video Educativo"
+                />
+                <div class="card-body">
+                  <span class="badge bg-info mb-2">Video</span>
+                  <h5 class="card-title">Serie: Guardianes del Mar</h5>
+                  <p class="card-text">
+                    Documentales sobre conservacionistas marinos en América
+                    Latina.
+                  </p>
+                  <button class="btn download-btn">
+                    <i class="bi bi-play-circle me-1"></i>Reproducir
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid de recursos destacados adicionales -->
+          <h3 class="fw-bold mb-4 section-subtitle" data-aos="fade-up">
+            Explora Más Recursos
+          </h3>
+
+          <div
+            class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 featured-grid"
+          >
+            <!-- Recurso 1 -->
+            <div class="col" data-aos="fade-up">
+              <div class="card h-100 grid-featured-card">
+                <div class="card-image-wrapper">
+                  <img
+                    src="https://images.unsplash.com/photo-1583212292454-1fe6229603b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                    class="card-img-top"
+                    alt="Atlas de Biodiversidad"
+                  />
+                  <div class="card-overlay">
+                    <button class="btn download-btn btn-sm">
+                      <i class="bi bi-eye me-1"></i>Ver Detalles
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <span class="badge featured-badge">Atlas Digital</span>
+                  <h5 class="card-title">Atlas de Biodiversidad Marina</h5>
+                  <p class="card-text">
+                    Catálogo interactivo con mapas y datos de especies marinas
+                    en el Golfo de México.
+                  </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                  <small class="text-muted">
+                    <i class="bi bi-download me-1"></i>1,120 descargas
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recurso 2 -->
+            <div class="col" data-aos="fade-up" data-aos-delay="100">
+              <div class="card h-100 grid-featured-card">
+                <div class="card-image-wrapper">
+                  <img
+                    src="https://images.unsplash.com/photo-1551244072-5d12893278ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                    class="card-img-top"
+                    alt="Material Educativo"
+                  />
+                  <div class="card-overlay">
+                    <button class="btn download-btn btn-sm">
+                      <i class="bi bi-download me-1"></i>Descargar
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <span class="badge featured-badge">Educación</span>
+                  <h5 class="card-title">Plan de Estudios Marino</h5>
+                  <p class="card-text">
+                    Currículum educativo sobre océanos para escuelas primarias y
+                    secundarias.
+                  </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                  <small class="text-muted">
+                    <i class="bi bi-download me-1"></i>3,450 descargas
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recurso 3 -->
+            <div class="col" data-aos="fade-up" data-aos-delay="200">
+              <div class="card h-100 grid-featured-card">
+                <div class="card-image-wrapper">
+                  <img
+                    src="https://static.nationalgeographicla.com/files/styles/image_3200/public/nationalgeographic2679747.jpg?w=1600&h=1065"
+                    class="card-img-top"
+                    alt="Libro Digital"
+                  />
+                  <div class="card-overlay">
+                    <button class="btn download-btn btn-sm">
+                      <i class="bi bi-download me-1"></i>Descargar
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <span class="badge featured-badge">Investigación</span>
+                  <h5 class="card-title">Especies Amenazadas: Guía Completa</h5>
+                  <p class="card-text">
+                    Catálogo completo de especies marinas en peligro de
+                    extinción en América Latina.
+                  </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                  <small class="text-muted">
+                    <i class="bi bi-download me-1"></i>2,780 descargas
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recurso 4 -->
+            <div class="col" data-aos="fade-up">
+              <div class="card h-100 grid-featured-card">
+                <div class="card-image-wrapper">
+                  <img
+                    src="https://www.e-dea.co/hubfs/2021/Blog%202021/sistemas%20de%20monitoreo%20de%20red.jpeg"
+                    class="card-img-top"
+                    alt="Aplicación Móvil"
+                  />
+                  <div class="card-overlay">
+                    <button class="btn download-btn btn-sm">
+                      <i class="bi bi-phone me-1"></i>Descargar App
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <span class="badge featured-badge">Aplicación</span>
+                  <h5 class="card-title">OceanTrack: Monitoreo Marino</h5>
+                  <p class="card-text">
+                    Aplicación para dispositivos móviles para el seguimiento de
+                    especies marinas.
+                  </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                  <small class="text-muted">
+                    <i class="bi bi-download me-1"></i>8,905 descargas
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recurso 5 -->
+            <div class="col" data-aos="fade-up" data-aos-delay="100">
+              <div class="card h-100 grid-featured-card">
+                <div class="card-image-wrapper">
+                  <img
+                    src="https://s3.amazonaws.com/rtvc-assets-qa-sistemasenalcolombia.gov.co/noticias/podcast-tipos-existen.jpg"
+                    class="card-img-top"
+                    alt="Podcast"
+                  />
+                  <div class="card-overlay">
+                    <button class="btn download-btn btn-sm">
+                      <i class="bi bi-play-circle me-1"></i>Escuchar
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <span class="badge featured-badge">Podcast</span>
+                  <h5 class="card-title">Voces del Océano</h5>
+                  <p class="card-text">
+                    Serie de podcasts sobre conservación marina con expertos
+                    internacionales.
+                  </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                  <small class="text-muted">
+                    <i class="bi bi-headphones me-1"></i>15,230 reproducciones
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recurso 6 -->
+            <div class="col" data-aos="fade-up" data-aos-delay="200">
+              <div class="card h-100 grid-featured-card">
+                <div class="card-image-wrapper">
+                  <img
+                    src="https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                    class="card-img-top"
+                    alt="Kit de Ciencia Ciudadana"
+                  />
+                  <div class="card-overlay">
+                    <button class="btn download-btn btn-sm">
+                      <i class="bi bi-download me-1"></i>Obtener Kit
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <span class="badge featured-badge">Ciencia Ciudadana</span>
+                  <h5 class="card-title">Kit de Monitoreo de Playas</h5>
+                  <p class="card-text">
+                    Herramientas y guías para que ciudadanos participen en el
+                    monitoreo costero.
+                  </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                  <small class="text-muted">
+                    <i class="bi bi-download me-1"></i>4,120 descargas
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón para ver más recursos -->
+          <div class="text-center mt-5" data-aos="fade-up">
+            <button class="btn download-btn btn-lg px-5">
+              <i class="bi bi-grid me-2"></i>Ver Todos los Recursos
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script>
+      // Smooth scroll para los botones de explorar
+      document.addEventListener("DOMContentLoaded", function () {
+        const exploreButton = document.querySelector('a[href="#featured"]');
+        if (exploreButton) {
+          exploreButton.addEventListener("click", function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute("href");
+            const targetElement = document.querySelector(targetId);
+
+            if (targetElement) {
+              const headerOffset = 100;
+              const elementPosition = targetElement.getBoundingClientRect().top;
+              const offsetPosition =
+                elementPosition + window.pageYOffset - headerOffset;
+
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth",
+              });
+            }
+          });
+        }
+      });
+
+      // Initialize AOS
+      if (typeof AOS !== "undefined") {
+        AOS.init({
+          duration: 800,
+          easing: "slide",
+          once: true,
+        });
+      }
+    </script>
+
+    <!-- =============================================
+         FOOTER DE LA BIBLIOTECA
+         Información de contacto y enlaces útiles
+         ============================================= -->
+    <footer id="footer" class="footer">
+      <div class="footer-newsletter">
+        <div class="container">
+          <div class="row justify-content-center text-center">
+            <div class="col-lg-6">
+              <h4>Únete a nuestro newsletter</h4>
+              <p>
+                Subscríbete para obtener las últimas noticias y eventos más
+                importantes!
+              </p>
+              <div class="newsletter-form">
+                <input type="email" name="email" id="newsletter-email" />
+                <input
+                  type="submit"
+                  value="Subscribirse"
+                  onclick="showNewsletterConfirmation()"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- newletter Section -->
+      <div id="newsletter-popup" class="popup">
+        <div class="popup-content">
+          <span class="close-button" onclick="closeNewsletterPopup()"
+            >&times;</span
+          >
+          <p>¡Gracias por suscribirte a nuestro newsletter!</p>
+        </div>
+      </div>
+      <!-- /End nesletter Section -->
+
+      <div class="container footer-top">
+        <div class="row gy-4">
+          <div class="col-lg-4 col-md-6 footer-about">
+            <a href="index.html" class="d-flex align-items-center">
+              <span class="sitename">SWAY</span>
+            </a>
+            <div class="footer-contact pt-3">
+              <p>Carretera Estatal 420 S/N, El Rosario</p>
+              <p>76240, Santiago de Querétaro, Qro</p>
+              <p class="mt-3">
+                <strong>Telefóno:</strong> <span>+52 442 101 9000</span>
+              </p>
+              <p><strong>Email:</strong> <span>123046244@upq.edu.mx</span></p>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Links útiles</h4>
+            <ul>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="index.html">Home</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="index.html#about">Sobre Nosotros</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="index.html#donation">Donar</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#">Términos de Servicio</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Entérate de más</h4>
+            <ul>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="toma-accion.html">Toma acción</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="starter-page.html">Blog</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="starter-page.html">Casos de Éxito</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#">Patrocinadores</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-4 col-md-12">
+            <h4>Síguenos</h4>
+            <p>Mantente en contacto a través de nuestras redes sociales</p>
+            <div class="social-links d-flex">
+              <a href="https://x.com/UPQoficial"
+                ><i class="bi bi-twitter-x"></i
+              ></a>
+              <a href="https://www.facebook.com/UPQoficial?locale=es_LA"
+                ><i class="bi bi-facebook"></i
+              ></a>
+              <a href="https://www.instagram.com/soyupq/"
+                ><i class="bi bi-instagram"></i
+              ></a>
+              <a href="https://www.linkedin.com/school/upq/posts/?feedView=all"
+                ><i class="bi bi-linkedin"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container copyright text-center mt-4">
+        <p>
+          © <span>Copyright</span> <strong class="px-1 sitename">SWAY</strong>
+          <span>Todos los derechos reservados</span>
+        </p>
+      </div>
+    </footer>
+    <!-- /End footer Section -->
+
+    <!-- Scroll Top -->
+    <a
+      href="#"
+      id="scroll-top"
+      class="scroll-top d-flex align-items-center justify-content-center"
+      ><i class="bi bi-arrow-up-short"></i
+    ></a>
+    <!-- Preloader -->
+    <div id="preloader" class="biblioteca-preloader"></div>
+
+    <!-- Archivos JavaScript de librerías externas -->
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/waypoints/noframework.waypoints.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+    <!-- Archivos JavaScript principales de la biblioteca -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- Biblioteca JS File -->
+    <script src="{{ url_for('static', filename='js/biblioteca.js') }}"></script>
+
+    <!-- =============================================
+         SCRIPT DE OPTIMIZACIÓN DE CARGA
+         Funciones para mejorar la experiencia de usuario
+         ============================================= -->
+    <script>
+      // Función para eliminar el preloader
+      function removePreloader() {
+        const preloader = document.querySelector("#preloader");
+        if (preloader) {
+          preloader.style.opacity = "0";
+          setTimeout(() => {
+            preloader.remove();
+          }, 300);
+        }
+      }
+
+      // Eliminar preloader cuando la página esté completamente cargada
+      window.addEventListener("load", removePreloader);
+
+      // Fallback por si el evento load ya se ejecutó
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(removePreloader, 1000);
+      });
+
+      // Fallback adicional para asegurar que se elimine
+      setTimeout(removePreloader, 2000);
+    </script>
+  </body>
+</html>

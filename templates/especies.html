@@ -1,0 +1,2798 @@
+<!-- =============================================
+     PÁGINA DE CATÁLOGO DE ESPECIES MARINAS
+     Base de datos interactiva de especies marinas
+     con formularios para avistamientos y colaboradores
+     ============================================= -->
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Catálogo de Especies - SWAY</title>
+
+    <!-- Configuración de favicon del sitio -->
+    <link
+      href="{{ url_for('static', filename='img/SWAY (1).png') }}"
+      rel="icon"
+    />
+
+    <!-- Enlaces a fuentes externas de Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800&family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800"
+      rel="stylesheet"
+    />
+
+    <!-- Archivos CSS de librerías externas -->
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/aos/aos.css') }}"
+      rel="stylesheet"
+    />
+
+    <!-- Archivos CSS específicos de especies -->
+    <link
+      href="{{ url_for('static', filename='css/main.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/especies.css') }}"
+      rel="stylesheet"
+    />
+
+    <!-- =============================================
+         ESTILOS PERSONALIZADOS PARA MODALES
+         CSS específico para formularios y modales
+         ============================================= -->
+    <style>
+      /* Modal overlay - forzar visibilidad */
+      #collaborator-modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: rgba(0, 0, 0, 0.8) !important;
+        display: none !important;
+        justify-content: center !important;
+        align-items: center !important;
+        z-index: 9999 !important;
+      }
+
+      #collaborator-modal.show {
+        display: flex !important;
+      }
+
+      .collaborator-modal-content {
+        max-width: 1200px !important; /* Aumentado de 800px a 1200px */
+        width: 95vw !important; /* Usar 95% del ancho de viewport */
+        max-height: 95vh !important;
+        overflow-y: auto !important;
+        background: white !important;
+        border-radius: 8px !important;
+        position: relative !important;
+        margin: 20px !important;
+        padding: 0 !important;
+      }
+
+      /* Padding específico para el modal de colaboradores */
+      #collaborator-modal .modal-body {
+        padding: 2rem 3rem !important; /* Más padding horizontal */
+      }
+
+      /* Ajustar espaciado del contenido dentro del modal más grande */
+      .collaborator-form .form-section {
+        margin-bottom: 2.5rem;
+      }
+
+      .collaborator-form .form-section h3 {
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
+      }
+
+      .collaborator-header {
+        text-align: center;
+        padding: 2rem 0 1rem;
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 2rem;
+      }
+
+      .collaborator-icon {
+        font-size: 3rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+      }
+
+      .tab-navigation {
+        display: flex;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 1rem;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .tab-btn.active {
+        border-bottom-color: #0d6efd;
+        color: #0d6efd;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Estilos para mensajes de error y alerta */
+      .error-message {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin: 10px 0;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.1);
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .error-message i {
+        color: #dc3545;
+        font-size: 16px;
+      }
+
+      .success-message {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin: 10px 0;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.1);
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .success-message i {
+        color: #28a745;
+        font-size: 16px;
+      }
+
+      .warning-message {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        color: #856404;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin: 10px 0;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 4px rgba(255, 193, 7, 0.1);
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .warning-message i {
+        color: #ffc107;
+        font-size: 16px;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Contenedor para mensajes en formularios */
+      .message-container {
+        margin: 15px 0;
+      }
+
+      .collaborator-form .form-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+      }
+
+      .collaborator-form .form-section h3 {
+        margin-bottom: 1rem;
+        color: #495057;
+        font-size: 1.1rem;
+      }
+
+      .collaborator-form .form-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        align-items: flex-start;
+      }
+
+      /* Asegurar que los form-groups tengan la misma altura mínima para alineación */
+      .collaborator-form .form-group,
+      .sighting-form .form-group {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        min-height: 85px; /* Altura mínima fija para todos los form-groups */
+      }
+
+      .collaborator-form .form-group label,
+      .sighting-form .form-group label {
+        height: auto !important;
+        min-height: 2.8rem !important; /* Altura mínima para acomodar texto en dos líneas */
+        line-height: 1.2 !important;
+        display: flex !important;
+        align-items: flex-end !important; /* Alinear el texto del label al final */
+        padding-bottom: 0.5rem !important;
+        font-weight: 500 !important;
+        color: #495057 !important;
+        margin-bottom: 0 !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Alineación específica para inputs - forzar que todos estén en la misma línea */
+      .collaborator-form .form-group input,
+      .collaborator-form .form-group select,
+      .collaborator-form .form-group textarea,
+      .sighting-form .form-group input,
+      .sighting-form .form-group select,
+      .sighting-form .form-group textarea {
+        margin-top: auto !important; /* Empujar el input hacia abajo */
+        align-self: stretch !important;
+        flex-shrink: 0 !important;
+      }
+
+      .collaborator-form .form-group {
+        flex: 1;
+        margin-bottom: 1rem;
+        min-width: 0; /* Permite que los elementos se reduzcan si es necesario */
+      }
+
+      .collaborator-form .form-group.full-width {
+        flex: 100%;
+      }
+
+      /* Ajustes específicos para la primera fila de información personal */
+      .collaborator-form .form-section:first-child .form-row:first-child {
+        gap: 1.2rem;
+      }
+
+      .collaborator-form
+        .form-section:first-child
+        .form-row:first-child
+        .form-group:nth-child(1) {
+        flex: 1.2; /* Nombre un poco más ancho */
+      }
+
+      .collaborator-form
+        .form-section:first-child
+        .form-row:first-child
+        .form-group:nth-child(2) {
+        flex: 1.3; /* Apellido Paterno */
+      }
+
+      .collaborator-form
+        .form-section:first-child
+        .form-row:first-child
+        .form-group:nth-child(3) {
+        flex: 1.5; /* Apellido Materno más ancho */
+      }
+
+      .collaborator-form
+        .form-section:first-child
+        .form-row:first-child
+        .form-group:nth-child(4) {
+        flex: 2; /* Email el más ancho */
+      }
+
+      /* Estilos específicos para el formulario de avistamiento */
+      .sighting-form .form-section .form-row {
+        gap: 1.2rem;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Ajustes específicos para la fila de información del usuario en avistamiento */
+      .sighting-form .form-section .form-row .form-group:nth-child(1) {
+        flex: 1.2; /* Nombre */
+      }
+
+      .sighting-form .form-section .form-row .form-group:nth-child(2) {
+        flex: 1.3; /* Apellido Paterno */
+      }
+
+      .sighting-form .form-section .form-row .form-group:nth-child(3) {
+        flex: 1.5; /* Apellido Materno */
+      }
+
+      .sighting-form .form-section .form-row .form-group:nth-child(4) {
+        flex: 2.2; /* Email más ancho */
+      }
+
+      /* Estilos base para labels - ya definidos arriba con mejor alineación */
+
+      .collaborator-form input,
+      .collaborator-form select,
+      .collaborator-form textarea,
+      .sighting-form input,
+      .sighting-form select,
+      .sighting-form textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+      }
+
+      .collaborator-form input:focus,
+      .collaborator-form select:focus,
+      .collaborator-form textarea:focus,
+      .sighting-form input:focus,
+      .sighting-form select:focus,
+      .sighting-form textarea:focus {
+        outline: none;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+      }
+
+      .char-counter {
+        display: block;
+        text-align: right;
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+      }
+
+      .terms-section {
+        margin: 2rem 0;
+      }
+
+      .checkbox-container {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        cursor: pointer;
+      }
+
+      .checkbox-container input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+      }
+
+      .terms-text {
+        flex: 1;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+
+      .collaborator-footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+      }
+
+      .info-note {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: #e3f2fd;
+        border-radius: 0.375rem;
+        font-size: 0.9rem;
+        color: #1565c0;
+      }
+
+      .full-width {
+        width: 100% !important;
+      }
+
+      /* Prevenir interferencias de otros estilos */
+      body.modal-open {
+        overflow: hidden !important;
+      }
+
+      #collaborator-modal * {
+        box-sizing: border-box;
+      }
+
+      /* Asegurar que nada oculte el modal */
+      #collaborator-modal.show {
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+
+      @media (max-width: 768px) {
+        .collaborator-form .form-row {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .collaborator-form .form-group {
+          margin-bottom: 1.2rem;
+        }
+
+        .collaborator-modal-content {
+          margin: 1rem;
+          max-height: 90vh;
+          width: 95vw !important;
+          max-width: 95vw !important;
+        }
+
+        /* Reducir padding en móvil */
+        #collaborator-modal .modal-body {
+          padding: 1.5rem 1rem !important;
+        }
+
+        /* Resetear ajustes específicos en móvil */
+        .collaborator-form .form-section:first-child .form-row:first-child {
+          gap: 0;
+        }
+
+        .collaborator-form
+          .form-section:first-child
+          .form-row:first-child
+          .form-group {
+          flex: 1 !important;
+        }
+
+        /* Ajustes responsive para formulario de avistamiento */
+        .sighting-form .form-section .form-row {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .sighting-form .form-section .form-row .form-group {
+          flex: 1 !important;
+          margin-bottom: 1.2rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="especies-page">
+    <!-- =============================================
+         HEADER DE NAVEGACIÓN DE ESPECIES
+         Barra de navegación con enlaces principales
+         ============================================= -->
+    <header id="header" class="header d-flex align-items-center fixed-top">
+      <div
+        class="container-fluid container-xl position-relative d-flex align-items-center"
+      >
+        <a
+          href="{{ url_for('index') }}"
+          class="logo d-flex align-items-center me-auto"
+        >
+          <h1 class="sitename">SWAY</h1>
+        </a>
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#about">Nosotros</a></li>
+            <li><a href="{{ url_for('index') }}#portfolio">Novedades</a></li>
+            <li><a href="{{ url_for('index') }}#team">Equipo</a></li>
+            <li><a href="{{ url_for('index') }}#contact">Contacto</a></li>
+            <li class="dropdown">
+              <a href="#"
+                ><span>Más</span>
+                <i class="bi bi-chevron-down toggle-dropdown"></i
+              ></a>
+              <ul>
+                <li>
+                  <a href="{{ url_for('especies') }}" class="active"
+                    >Especies</a
+                  >
+                </li>
+                <li><a href="{{ url_for('eventos') }}">Eventos</a></li>
+                <li><a href="{{ url_for('biblioteca') }}">Biblioteca</a></li>
+                <li><a href="{{ url_for('tienda') }}">Tienda</a></li>
+              </ul>
+            </li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+        <a class="btn-getstarted" href="/#donation">Donar</a>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Hero Section -->
+      <section id="hero" class="hero section dark-background">
+        <div class="container">
+          <div class="row gy-4">
+            <div
+              class="col-lg-8 order-2 order-lg-1 d-flex flex-column justify-content-center"
+              data-aos="zoom-out"
+            >
+              <h1>Catálogo de Especies Marinas en Peligro</h1>
+              <p>
+                Descubre la increíble biodiversidad de nuestros océanos y
+                aprende sobre el estado de conservación de cada especie. Conoce
+                los esfuerzos de SWAY para proteger a estos magníficos
+                habitantes marinos y cómo puedes contribuir a su preservación.
+              </p>
+              <div class="d-flex">
+                <a href="#especies" class="btn-get-started"
+                  >Explorar Especies</a
+                >
+                <a
+                  href="#mapa"
+                  class="btn-watch-video d-flex align-items-center"
+                >
+                  <i class="bi bi-map"></i><span>Ver Mapa de Distribución</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Estadísticas Section -->
+      <section id="stats" class="section light-background">
+        <div class="container">
+          <div class="row gy-4">
+            <div class="col-lg-3 col-md-6">
+              <div class="stats-card" data-aos="fade-up">
+                <div class="stats-icon">
+                  <i class="bi bi-award"></i>
+                </div>
+                <div class="stats-content">
+                  <h3 class="stats-number">14,000 +</h3>
+                  <p>Especies Catalogadas</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+              <div class="stats-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="stats-icon threatened">
+                  <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="stats-content">
+                  <h3 class="stats-number">456</h3>
+                  <p>En Peligro de Extinción</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+              <div class="stats-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="stats-icon protected">
+                  <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="stats-content">
+                  <h3 class="stats-number">1,234</h3>
+                  <p>Especies Protegidas</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+              <div class="stats-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="stats-icon discovered">
+                  <i class="bi bi-search"></i>
+                </div>
+                <div class="stats-content">
+                  <h3 class="stats-number">89</h3>
+                  <p>Descubiertas este año</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filtros y Búsqueda -->
+      <section id="filtros" class="section">
+        <div class="container">
+          <div class="section-title" data-aos="fade-up">
+            <h2>Explorador de Vida Marina</h2>
+            <p>
+              Utiliza nuestras herramientas de búsqueda avanzada para descubrir
+              y aprender sobre miles de especies marinas
+            </p>
+          </div>
+          <div class="filtros-container">
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="busqueda-avanzada" data-aos="fade-up">
+                  <h4>Búsqueda de Especies</h4>
+                  <div class="search-box">
+                    <i class="bi bi-search search-icon"></i>
+                    <input
+                      type="text"
+                      placeholder="Nombre científico o común..."
+                      id="search-especies"
+                    />
+                  </div>
+
+                  <button class="btn-toggle-filters" id="toggle-filters">
+                    <i class="bi bi-funnel"></i> Filtros Avanzados
+                    <i class="bi bi-chevron-down" id="filter-arrow"></i>
+                  </button>
+
+                  <div class="advanced-filters" id="advanced-filters">
+                    <div class="filter-group">
+                      <label><i class="bi bi-house-heart"></i> Hábitat</label>
+                      <select id="habitat-filter">
+                        <option value="">Todos los hábitats</option>
+                        <option value="arrecife">Arrecifes de Coral</option>
+                        <option value="aguas-profundas">Aguas Profundas</option>
+                        <option value="aguas-abiertas">Aguas Abiertas</option>
+                        <option value="costero">Zona Costera</option>
+                        <option value="polar">Aguas Polares</option>
+                        <option value="manglar">Manglares</option>
+                        <option value="estuario">Estuarios</option>
+                      </select>
+                    </div>
+
+                    <div class="filter-group">
+                      <label
+                        ><i class="bi bi-shield"></i> Estado de
+                        Conservación</label
+                      >
+                      <select id="conservation-filter">
+                        <option value="">Todos los estados</option>
+                        <option value="extincion-critica">
+                          Extinción Crítica
+                        </option>
+                        <option value="peligro">En Peligro</option>
+                        <option value="vulnerable">Vulnerable</option>
+                        <option value="casi-amenazada">Casi Amenazada</option>
+                        <option value="preocupacion-menor">
+                          Preocupación Menor
+                        </option>
+                      </select>
+                    </div>
+
+                  </div>
+
+                  <button class="btn-search w-100">
+                    <i class="bi bi-search"></i> Buscar Especies
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-lg-8">
+                <div class="vista-opciones" data-aos="fade-up">
+                  <div class="vista-buttons">
+                    <button class="vista-btn active" data-vista="grid">
+                      <i class="bi bi-grid-3x3-gap"></i> Vista Grid
+                    </button>
+                    <button class="vista-btn" data-vista="list">
+                      <i class="bi bi-list-ul"></i> Vista Lista
+                    </button>
+                    <button class="vista-btn" data-vista="mapa">
+                      <i class="bi bi-map"></i> Vista Mapa
+                    </button>
+                  </div>
+
+                  <div class="ordenar">
+                    <label
+                      ><i class="bi bi-sort-alpha-down"></i> Ordenar por:</label
+                    >
+                    <select id="sort-especies">
+                      <option value="nombre">Nombre</option>
+                      <option value="conservation">
+                        Estado de Conservación
+                      </option>
+                      <option value="size">Tamaño</option>
+                      <option value="habitat">Hábitat</option>
+                      <option value="added">Recién Agregados</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="especies-encontradas" data-aos="fade-up">
+                  <h4>
+                    <span id="especies-count">123</span> Especies encontradas
+                  </h4>
+                  <p>
+                    Explora nuestra base de datos actualizada regularmente con
+                    información científica verificada.
+                  </p>
+                  <div class="tags-activos">
+                    <span class="tag-filter"
+                      >Reptiles Marinos <i class="bi bi-x"></i
+                    ></span>
+                    <span class="tag-filter"
+                      >Vulnerable <i class="bi bi-x"></i
+                    ></span>
+                    <span class="tag-filter"
+                      >Océano Pacífico <i class="bi bi-x"></i
+                    ></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Especies Grid -->
+      <section id="especies" class="section light-background">
+        <div class="container">
+          <div class="especies-grid" id="especies-grid">
+            <!-- Las especies se cargarán dinámicamente desde la base de datos -->
+          </div>
+
+          <!-- Paginación -->
+          <div class="pagination-container">
+            <button class="pagination-btn" id="prev-page" disabled>
+              <i class="bi bi-chevron-left"></i> Anterior
+            </button>
+            <div class="pagination-info">
+              Página <span id="current-page">1</span> de
+              <span id="total-pages">12</span>
+            </div>
+            <button class="pagination-btn" id="next-page">
+              Siguiente <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mapa Interactivo -->
+      <section id="mapa-section" class="section" style="display: none">
+        <div class="container-fluid">
+          <div class="mapa-header">
+            <h2>Distribución Global de Especies Marinas</h2>
+            <p>
+              Explora la ubicación de especies marinas alrededor del mundo y su
+              estado de conservación
+            </p>
+          </div>
+
+          <div class="mapa-container">
+            <!-- Controles del Mapa -->
+            <div class="map-controls">
+              <div class="control-group">
+                <h5><i class="bi bi-sliders"></i> Controles del Mapa</h5>
+
+                <!-- Zoom Controls -->
+                <div class="zoom-controls">
+                  <button id="zoom-in" class="control-btn" title="Acercar zoom">
+                    <i class="bi bi-zoom-in"></i>
+                  </button>
+                  <button id="zoom-out" class="control-btn" title="Alejar zoom">
+                    <i class="bi bi-zoom-out"></i>
+                  </button>
+                  <button
+                    id="reset-zoom"
+                    class="control-btn"
+                    title="Restablecer vista"
+                  >
+                    <i class="bi bi-house"></i>
+                  </button>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="filter-controls">
+                  <h6>Filtrar por Estado</h6>
+                  <div class="conservation-filters">
+                    <label class="filter-checkbox">
+                      <input
+                        type="checkbox"
+                        id="filter-extincion-critica"
+                        value="extincion-critica"
+                        checked
+                      />
+                      <span class="checkmark extincion-critica"></span>
+                      <span class="filter-label">Extinción Crítica</span>
+                    </label>
+                    <label class="filter-checkbox">
+                      <input
+                        type="checkbox"
+                        id="filter-peligro"
+                        value="peligro"
+                        checked
+                      />
+                      <span class="checkmark peligro"></span>
+                      <span class="filter-label">En Peligro</span>
+                    </label>
+                    <label class="filter-checkbox">
+                      <input
+                        type="checkbox"
+                        id="filter-vulnerable"
+                        value="vulnerable"
+                        checked
+                      />
+                      <span class="checkmark vulnerable"></span>
+                      <span class="filter-label">Vulnerable</span>
+                    </label>
+                    <label class="filter-checkbox">
+                      <input
+                        type="checkbox"
+                        id="filter-casi-amenazada"
+                        value="casi-amenazada"
+                        checked
+                      />
+                      <span class="checkmark casi-amenazada"></span>
+                      <span class="filter-label">Casi Amenazada</span>
+                    </label>
+                    <label class="filter-checkbox">
+                      <input
+                        type="checkbox"
+                        id="filter-preocupacion-menor"
+                        value="preocupacion-menor"
+                        checked
+                      />
+                      <span class="checkmark preocupacion-menor"></span>
+                      <span class="filter-label">Preocupación Menor</span>
+                    </label>
+                  </div>
+
+                  <div class="filter-actions">
+                    <button
+                      id="select-all-conservation"
+                      class="btn-sm btn-outline-primary"
+                    >
+                      Seleccionar Todo
+                    </button>
+                    <button
+                      id="clear-all-conservation"
+                      class="btn-sm btn-outline-secondary"
+                    >
+                      Limpiar Todo
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Map Stats -->
+                <div class="map-stats">
+                  <div class="stat-item">
+                    <span class="stat-number" id="visible-species-count"
+                      >0</span
+                    >
+                    <span class="stat-label">Especies Visibles</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number" id="total-locations">0</span>
+                    <span class="stat-label">Ubicaciones</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mapa Principal -->
+            <div class="map-main">
+              <div id="species-map" class="species-map">
+                <!-- Contenedor del SVG del mapa mundial -->
+                <div class="world-map-container">
+                  <svg
+                    id="world-map-svg"
+                    viewBox="0 0 1000 500"
+                    class="world-map"
+                  >
+                    <!-- El mapa mundial se generará dinámicamente aquí -->
+                    <defs>
+                      <pattern
+                        id="ocean-pattern"
+                        patternUnits="userSpaceOnUse"
+                        width="4"
+                        height="4"
+                      >
+                        <rect width="4" height="4" fill="#e8f4f8" />
+                        <path
+                          d="M0,4l4,-4M-1,1l2,-2M3,5l2,-2"
+                          stroke="#d4edda"
+                          stroke-width="0.5"
+                        />
+                      </pattern>
+                    </defs>
+
+                    <!-- Océanos de fondo -->
+                    <rect
+                      width="100%"
+                      height="100%"
+                      fill="url(#ocean-pattern)"
+                      class="ocean-bg"
+                    />
+
+                    <!-- Continentes simplificados -->
+                    <g id="continents">
+                      <!-- América del Norte -->
+                      <path
+                        d="M150,100 L300,100 L320,150 L280,200 L200,180 L150,140 Z"
+                        fill="#f8f9fa"
+                        stroke="#dee2e6"
+                        stroke-width="1"
+                        class="continent"
+                      />
+
+                      <!-- América del Sur -->
+                      <path
+                        d="M200,220 L280,220 L300,300 L280,380 L220,400 L180,350 L200,280 Z"
+                        fill="#f8f9fa"
+                        stroke="#dee2e6"
+                        stroke-width="1"
+                        class="continent"
+                      />
+
+                      <!-- Europa -->
+                      <path
+                        d="M450,80 L520,80 L540,120 L500,140 L450,120 Z"
+                        fill="#f8f9fa"
+                        stroke="#dee2e6"
+                        stroke-width="1"
+                        class="continent"
+                      />
+
+                      <!-- África -->
+                      <path
+                        d="M480,150 L550,150 L570,250 L550,350 L480,350 L460,250 Z"
+                        fill="#f8f9fa"
+                        stroke="#dee2e6"
+                        stroke-width="1"
+                        class="continent"
+                      />
+
+                      <!-- Asia -->
+                      <path
+                        d="M580,60 L750,60 L800,120 L780,180 L650,200 L580,150 Z"
+                        fill="#f8f9fa"
+                        stroke="#dee2e6"
+                        stroke-width="1"
+                        class="continent"
+                      />
+
+                      <!-- Australia -->
+                      <path
+                        d="M720,300 L820,300 L830,350 L780,380 L720,360 Z"
+                        fill="#f8f9fa"
+                        stroke="#dee2e6"
+                        stroke-width="1"
+                        class="continent"
+                      />
+                    </g>
+
+                    <!-- Contenedor para marcadores de especies -->
+                    <g id="species-markers">
+                      <!-- Los marcadores se generarán dinámicamente aquí -->
+                    </g>
+                  </svg>
+
+                  <!-- Loading overlay -->
+                  <div
+                    id="map-loading"
+                    class="map-loading"
+                    style="display: none"
+                  >
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Cargando mapa...</span>
+                    </div>
+                    <p>Cargando ubicaciones...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Leyenda Mejorada -->
+            <div class="map-legend">
+              <h4><i class="bi bi-info-circle"></i> Información del Mapa</h4>
+
+              <div class="legend-section">
+                <h5>Estado de Conservación</h5>
+                <div class="legend-items">
+                  <div
+                    class="legend-item"
+                    data-conservation="extincion-critica"
+                  >
+                    <span class="legend-marker extincion-critica"></span>
+                    <div class="legend-info">
+                      <span class="legend-title">Extinción Crítica</span>
+                      <span class="legend-count" id="count-extincion-critica"
+                        >0</span
+                      >
+                    </div>
+                  </div>
+                  <div class="legend-item" data-conservation="peligro">
+                    <span class="legend-marker peligro"></span>
+                    <div class="legend-info">
+                      <span class="legend-title">En Peligro</span>
+                      <span class="legend-count" id="count-peligro">0</span>
+                    </div>
+                  </div>
+                  <div class="legend-item" data-conservation="vulnerable">
+                    <span class="legend-marker vulnerable"></span>
+                    <div class="legend-info">
+                      <span class="legend-title">Vulnerable</span>
+                      <span class="legend-count" id="count-vulnerable">0</span>
+                    </div>
+                  </div>
+                  <div class="legend-item" data-conservation="casi-amenazada">
+                    <span class="legend-marker casi-amenazada"></span>
+                    <div class="legend-info">
+                      <span class="legend-title">Casi Amenazada</span>
+                      <span class="legend-count" id="count-casi-amenazada"
+                        >0</span
+                      >
+                    </div>
+                  </div>
+                  <div
+                    class="legend-item"
+                    data-conservation="preocupacion-menor"
+                  >
+                    <span class="legend-marker preocupacion-menor"></span>
+                    <div class="legend-info">
+                      <span class="legend-title">Preocupación Menor</span>
+                      <span class="legend-count" id="count-preocupacion-menor"
+                        >0</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="legend-section">
+                <h5>Instrucciones</h5>
+                <div class="legend-instructions">
+                  <div class="instruction">
+                    <i class="bi bi-cursor"></i>
+                    <span>Haz clic en un marcador para ver detalles</span>
+                  </div>
+                  <div class="instruction">
+                    <i class="bi bi-zoom-in"></i>
+                    <span>Usa los controles para hacer zoom</span>
+                  </div>
+                  <div class="instruction">
+                    <i class="bi bi-funnel"></i>
+                    <span>Filtra por estado de conservación</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tooltip para información hover -->
+          <div id="map-tooltip" class="map-tooltip" style="display: none">
+            <div class="tooltip-header">
+              <img class="tooltip-image" src="" alt="" />
+              <div class="tooltip-info">
+                <h6 class="tooltip-title"></h6>
+                <p class="tooltip-scientific"></p>
+              </div>
+            </div>
+            <div class="tooltip-body">
+              <div class="tooltip-stat">
+                <i class="bi bi-geo-alt"></i>
+                <span class="tooltip-location"></span>
+              </div>
+              <div class="tooltip-stat">
+                <i class="bi bi-shield"></i>
+                <span class="tooltip-conservation"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Conservation Success Stories Section -->
+      <section class="py-5 bg-light">
+        <div class="container">
+          <div class="row align-items-center mb-5">
+            <div class="col-lg-6">
+              <h2 class="display-6 fw-bold" data-aos="fade-right">
+                Historias de Éxito
+              </h2>
+              <p class="lead" data-aos="fade-right" data-aos-delay="100">
+                Casos reales de conservación exitosa que nos inspiran a
+                continuar
+              </p>
+            </div>
+            <div class="col-lg-6 text-end" data-aos="fade-left">
+              <button class="btn btn-outline-primary">
+                Ver Todas las Historias
+              </button>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-up">
+              <div class="card success-story-card h-100">
+                <img
+                  src="https://blog.waterfronthotel.com.mx/wp-content/uploads/2022/10/P19-96036.jpg"
+                  class="card-img-top"
+                  alt="Ballena Gris"
+                />
+                <div class="card-body">
+                  <span class="badge bg-success mb-2">Éxito Total</span>
+                  <h5 class="card-title">Ballena Gris del Pacífico</h5>
+                  <p class="card-text">
+                    De estar en peligro crítico a una población estable de más
+                    de 20,000 individuos.
+                  </p>
+                  <div class="progress mb-3">
+                    <div
+                      class="progress-bar bg-success"
+                      style="width: 95%"
+                    ></div>
+                  </div>
+                  <small class="text-muted">Población recuperada: 95%</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+              <div class="card success-story-card h-100">
+                <img
+                  src="https://www.dresseldivers.com/wp-content/uploads/hawksbill-turtle-facts-and-pictures.jpg"
+                  class="card-img-top"
+                  alt="Tortuga Marina"
+                />
+                <div class="card-body">
+                  <span class="badge bg-warning mb-2">En Progreso</span>
+                  <h5 class="card-title">Tortuga Carey</h5>
+                  <p class="card-text">
+                    Programas de protección de nidos han incrementado
+                    significativamente las poblaciones.
+                  </p>
+                  <div class="progress mb-3">
+                    <div
+                      class="progress-bar bg-warning"
+                      style="width: 60%"
+                    ></div>
+                  </div>
+                  <small class="text-muted">Población recuperada: 60%</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+              <div class="card success-story-card h-100">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/0/09/Underwater_photography_of_mammal_manatee.jpg"
+                  class="card-img-top"
+                  alt="Manatí"
+                />
+                <div class="card-body">
+                  <span class="badge bg-info mb-2">Estable</span>
+                  <h5 class="card-title">Manatí del Caribe</h5>
+                  <p class="card-text">
+                    Esfuerzos conjuntos han logrado estabilizar la población en
+                    áreas protegidas.
+                  </p>
+                  <div class="progress mb-3">
+                    <div class="progress-bar bg-info" style="width: 75%"></div>
+                  </div>
+                  <small class="text-muted">Población estable: 75%</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Marine Ecosystem Health Section -->
+      <section class="py-5">
+        <div class="container">
+          <div class="row align-items-center mb-5">
+            <div class="col-lg-8">
+              <h2 class="display-6 fw-bold" data-aos="fade-up">
+                Salud de los Ecosistemas Marinos
+              </h2>
+              <p class="lead" data-aos="fade-up" data-aos-delay="100">
+                Monitoreo en tiempo real del estado de nuestros océanos
+              </p>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-lg-6" data-aos="fade-right">
+              <div class="ecosystem-chart">
+                <h4 class="mb-4">Indicadores de Salud Oceánica</h4>
+
+                <div class="health-indicator mb-4">
+                  <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                  >
+                    <span>Calidad del Agua</span>
+                    <span class="badge bg-success">Buena</span>
+                  </div>
+                  <div class="progress">
+                    <div
+                      class="progress-bar bg-success"
+                      style="width: 78%"
+                    ></div>
+                  </div>
+                  <small class="text-muted"
+                    >78% de los océanos monitoreados</small
+                  >
+                </div>
+
+                <div class="health-indicator mb-4">
+                  <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                  >
+                    <span>Biodiversidad</span>
+                    <span class="badge bg-warning">Moderada</span>
+                  </div>
+                  <div class="progress">
+                    <div
+                      class="progress-bar bg-warning"
+                      style="width: 65%"
+                    ></div>
+                  </div>
+                  <small class="text-muted"
+                    >65% de especies en rangos seguros</small
+                  >
+                </div>
+
+                <div class="health-indicator mb-4">
+                  <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                  >
+                    <span>Cobertura de Corales</span>
+                    <span class="badge bg-danger">Crítica</span>
+                  </div>
+                  <div class="progress">
+                    <div
+                      class="progress-bar bg-danger"
+                      style="width: 45%"
+                    ></div>
+                  </div>
+                  <small class="text-muted">45% de cobertura saludable</small>
+                </div>
+
+                <div class="health-indicator mb-4">
+                  <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                  >
+                    <span>Temperatura Oceánica</span>
+                    <span class="badge bg-warning">Elevada</span>
+                  </div>
+                  <div class="progress">
+                    <div
+                      class="progress-bar bg-warning"
+                      style="width: 72%"
+                    ></div>
+                  </div>
+                  <small class="text-muted"
+                    >+1.2°C por encima del promedio histórico</small
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-left">
+              <div class="ecosystem-threats">
+                <h4 class="mb-4">Principales Amenazas</h4>
+
+                <div class="threat-item">
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="threat-icon bg-danger text-white rounded-circle me-3"
+                    >
+                      <i class="bi bi-thermometer-high"></i>
+                    </div>
+                    <div>
+                      <h6 class="mb-1">Cambio Climático</h6>
+                      <small class="text-muted"
+                        >Aumento de temperatura y acidificación</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="threat-item">
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="threat-icon bg-warning text-white rounded-circle me-3"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </div>
+                    <div>
+                      <h6 class="mb-1">Contaminación Plástica</h6>
+                      <small class="text-muted"
+                        >8 millones de toneladas anuales en océanos</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="threat-item">
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="threat-icon bg-info text-white rounded-circle me-3"
+                    >
+                      <i class="bi bi-fish"></i>
+                    </div>
+                    <div>
+                      <h6 class="mb-1">Sobrepesca</h6>
+                      <small class="text-muted"
+                        >90% de las pesquerías sobreexplotadas</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="threat-item">
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="threat-icon bg-secondary text-white rounded-circle me-3"
+                    >
+                      <i class="bi bi-building"></i>
+                    </div>
+                    <div>
+                      <h6 class="mb-1">Desarrollo Costero</h6>
+                      <small class="text-muted"
+                        >Destrucción de hábitats naturales</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-4">
+                  <button class="btn btn-outline-primary">
+                    Ver Informe Completo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- footer Section -->
+    <footer id="footer" class="footer">
+      <div class="footer-newsletter">
+        <div class="container">
+          <div class="row justify-content-center text-center">
+            <div class="col-lg-6">
+              <h4>Únete a nuestro newsletter</h4>
+              <p>
+                Subscríbete para obtener las últimas noticias y eventos más
+                importantes!
+              </p>
+              <div class="newsletter-form">
+                <input type="email" name="email" id="newsletter-email" />
+                <input
+                  type="submit"
+                  value="Subscribirse"
+                  onclick="showNewsletterConfirmation()"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- newletter Section -->
+      <div id="newsletter-popup" class="popup">
+        <div class="popup-content">
+          <span class="close-button" onclick="closeNewsletterPopup()"
+            >&times;</span
+          >
+          <p>¡Gracias por suscribirte a nuestro newsletter!</p>
+        </div>
+      </div>
+      <!-- /End nesletter Section -->
+
+      <div class="container footer-top">
+        <div class="row gy-4">
+          <div class="col-lg-4 col-md-6 footer-about">
+            <a href="index.html" class="d-flex align-items-center">
+              <span class="sitename">SWAY</span>
+            </a>
+            <div class="footer-contact pt-3">
+              <p>Carretera Estatal 420 S/N, El Rosario</p>
+              <p>76240, Santiago de Querétaro, Qro</p>
+              <p class="mt-3">
+                <strong>Telefóno:</strong> <span>+52 442 101 9000</span>
+              </p>
+              <p><strong>Email:</strong> <span>123046244@upq.edu.mx</span></p>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Links útiles</h4>
+            <ul>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Home</a></li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#about">Sobre Nosotros</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#donation">Donar</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#">Términos de Servicio</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Entérate de más</h4>
+            <ul>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="toma-accion.html">Toma acción</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="starter-page.html">Blog</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="starter-page.html">Casos de Éxito</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#">Patrocinadores</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Colaboradores</h4>
+            <ul>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openCollaboratorModal(event, 'register')"
+                  >Registrarse como Colaborador</a
+                >
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openCollaboratorModal(event, 'login')"
+                  >Acceso Colaboradores</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-12">
+            <h4>Síguenos</h4>
+            <p>Mantente en contacto a través de nuestras redes sociales</p>
+            <div class="social-links d-flex">
+              <a href="https://x.com/UPQoficial"
+                ><i class="bi bi-twitter-x"></i
+              ></a>
+              <a href="https://www.facebook.com/UPQoficial?locale=es_LA"
+                ><i class="bi bi-facebook"></i
+              ></a>
+              <a href="https://www.instagram.com/soyupq/"
+                ><i class="bi bi-instagram"></i
+              ></a>
+              <a href="https://www.linkedin.com/school/upq/posts/?feedView=all"
+                ><i class="bi bi-linkedin"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container copyright text-center mt-4">
+        <p>
+          © <span>Copyright</span> <strong class="px-1 sitename">SWAY</strong>
+          <span>Todos los derechos reservados</span>
+        </p>
+      </div>
+    </footer>
+    <!-- /End footer Section -->
+
+    <!-- Scroll Top -->
+    <a
+      href="#"
+      id="scroll-top"
+      class="scroll-top d-flex align-items-center justify-content-center"
+      ><i class="bi bi-arrow-up-short"></i
+    ></a>
+
+    <!-- Preloader -->
+    <div id="preloader"></div>
+
+    <!-- Modal Detalles de Especie -->
+    <div class="modal-overlay" id="species-modal" onclick="closeSpeciesModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeSpeciesModal()">
+          &times;
+        </button>
+        <div class="modal-body" id="species-modal-content">
+          <!-- Contenido dinámico de la especie -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Reportar Avistamiento -->
+    <div
+      class="modal-overlay"
+      id="sighting-modal"
+      onclick="closeSightingModal()"
+    >
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeSightingModal()">
+          &times;
+        </button>
+        <div class="modal-body">
+          <div class="sighting-form-header">
+            <h2><i class="bi bi-camera"></i> Reportar Avistamiento</h2>
+            <p>
+              Ayúdanos a documentar la biodiversidad marina compartiendo tu
+              avistamiento
+            </p>
+          </div>
+
+          <form id="sighting-form" class="sighting-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="especie-nombre">
+                  <i class="bi bi-fish"></i> Especie Seleccionada *
+                </label>
+                <input
+                  type="text"
+                  id="especie-nombre"
+                  name="especie_nombre"
+                  readonly
+                  class="form-control-readonly"
+                  placeholder="Especie será auto-rellenada"
+                />
+                <input
+                  type="hidden"
+                  id="id-especie"
+                  name="id_especie"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fecha-avistamiento">
+                  <i class="bi bi-calendar"></i> Fecha del Avistamiento *
+                </label>
+                <input
+                  type="datetime-local"
+                  id="fecha-avistamiento"
+                  name="fecha_avistamiento"
+                  required
+                  max=""
+                  data-validation="fechaPasada"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="latitud">
+                  <i class="bi bi-geo-alt"></i> Latitud *
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  id="latitud"
+                  name="latitud"
+                  required
+                  min="-90"
+                  max="90"
+                  placeholder="Ej: 20.6296"
+                  data-validation="latitud"
+                />
+              </div>
+              <div class="form-group">
+                <label for="longitud">
+                  <i class="bi bi-geo-alt"></i> Longitud *
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  id="longitud"
+                  name="longitud"
+                  required
+                  min="-180"
+                  max="180"
+                  placeholder="Ej: -87.0739"
+                  data-validation="longitud"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="notas">
+                  <i class="bi bi-journal-text"></i> Notas del Avistamiento
+                </label>
+                <textarea
+                  id="notas"
+                  name="notas"
+                  rows="4"
+                  maxlength="500"
+                  placeholder="Describe tu avistamiento: comportamiento observado, condiciones del agua, número de individuos, etc."
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3><i class="bi bi-person"></i> Información del Usuario</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="nombre-usuario">
+                    <i class="bi bi-person-fill"></i> Nombre *
+                  </label>
+                  <input
+                    type="text"
+                    id="nombre-usuario"
+                    name="nombre_usuario"
+                    required
+                    minlength="2"
+                    maxlength="50"
+                    placeholder="Juan"
+                    data-validation="soloTexto"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="apellido-paterno-usuario">
+                    <i class="bi bi-person-fill"></i> Apellido Paterno *
+                  </label>
+                  <input
+                    type="text"
+                    id="apellido-paterno-usuario"
+                    name="apellido_paterno_usuario"
+                    required
+                    minlength="2"
+                    maxlength="50"
+                    placeholder="Pérez"
+                    data-validation="soloTexto"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="apellido-materno-usuario">
+                    <i class="bi bi-person-fill"></i> Apellido Materno
+                  </label>
+                  <input
+                    type="text"
+                    id="apellido-materno-usuario"
+                    name="apellido_materno_usuario"
+                    minlength="2"
+                    maxlength="50"
+                    placeholder="García (opcional)"
+                    data-validation="soloTexto"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="email-usuario">
+                    <i class="bi bi-envelope"></i> Correo Electrónico *
+                  </label>
+                  <input
+                    type="email"
+                    id="email-usuario"
+                    name="email_usuario"
+                    required
+                    maxlength="150"
+                    placeholder="juan.perez@gmail.com"
+                    data-validation="email"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-secondary"
+                onclick="closeSightingModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn-primary">
+                <i class="bi bi-send"></i> Reportar Avistamiento
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Colaboradores -->
+    <div class="modal-overlay" id="collaborator-modal" style="display: none">
+      <div class="modal-content collaborator-modal-content">
+        <button class="modal-close" type="button">&times;</button>
+        <div class="modal-body">
+          <div class="collaborator-header">
+            <div class="collaborator-icon">
+              <i class="bi bi-person-badge"></i>
+            </div>
+            <h2>Portal de Colaboradores Científicos</h2>
+            <p>
+              Únete a nuestro equipo de especialistas marinos para contribuir al
+              registro y documentación de especies
+            </p>
+          </div>
+
+          <!-- Pestañas -->
+          <div class="tab-navigation">
+            <button
+              class="tab-btn active"
+              type="button"
+              onclick="switchCollaboratorTab('login')"
+            >
+              <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+            </button>
+            <button
+              class="tab-btn"
+              type="button"
+              onclick="switchCollaboratorTab('register')"
+            >
+              <i class="bi bi-person-plus"></i> Registrarse
+            </button>
+          </div>
+
+          <!-- Formulario de Login -->
+          <div id="login-tab" class="tab-content active">
+            <div id="login-message-container" class="message-container"></div>
+            <form id="collaborator-login-form" class="collaborator-form">
+              <div class="form-group">
+                <label for="login-email">
+                  <i class="bi bi-envelope"></i> Correo Electrónico *
+                </label>
+                <input
+                  type="email"
+                  id="login-email"
+                  name="email"
+                  required
+                  placeholder="tu@email.com"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="login-password">
+                  <i class="bi bi-lock"></i> Contraseña *
+                </label>
+                <input
+                  type="password"
+                  id="login-password"
+                  name="password"
+                  required
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-primary full-width">
+                  <i class="bi bi-box-arrow-in-right"></i> Acceder al Panel
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Formulario de Registro -->
+          <div id="register-tab" class="tab-content">
+            <div
+              id="register-message-container"
+              class="message-container"
+            ></div>
+            <form id="collaborator-register-form" class="collaborator-form">
+              <div class="form-section">
+                <h3><i class="bi bi-person"></i> Información Personal</h3>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="reg-nombre">
+                      <i class="bi bi-person-fill"></i> Nombre *
+                    </label>
+                    <input
+                      type="text"
+                      id="reg-nombre"
+                      name="nombre"
+                      required
+                      minlength="2"
+                      maxlength="50"
+                      placeholder="Juan"
+                      data-validation="soloTexto"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="reg-apellido-paterno">
+                      <i class="bi bi-person-fill"></i> Apellido Paterno *
+                    </label>
+                    <input
+                      type="text"
+                      id="reg-apellido-paterno"
+                      name="apellidoPaterno"
+                      required
+                      minlength="2"
+                      maxlength="50"
+                      placeholder="Pérez"
+                      data-validation="soloTexto"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="reg-apellido-materno">
+                      <i class="bi bi-person-fill"></i> Apellido Materno
+                    </label>
+                    <input
+                      type="text"
+                      id="reg-apellido-materno"
+                      name="apellidoMaterno"
+                      minlength="2"
+                      maxlength="50"
+                      placeholder="García (opcional)"
+                      data-validation="soloTexto"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="reg-email">
+                      <i class="bi bi-envelope"></i> Correo Electrónico *
+                    </label>
+                    <input
+                      type="email"
+                      id="reg-email"
+                      name="email"
+                      required
+                      placeholder="juan.perez@universidad.edu"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="reg-password">
+                      <i class="bi bi-lock"></i> Contraseña *
+                    </label>
+                    <input
+                      type="password"
+                      id="reg-password"
+                      name="password"
+                      required
+                      minlength="8"
+                      placeholder="Mínimo 8 caracteres"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="reg-confirm-password">
+                      <i class="bi bi-lock-fill"></i> Confirmar Contraseña *
+                    </label>
+                    <input
+                      type="password"
+                      id="reg-confirm-password"
+                      name="confirm_password"
+                      required
+                      placeholder="Repetir contraseña"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>
+                  <i class="bi bi-mortarboard"></i> Acreditación Académica
+                </h3>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="reg-especialidad">
+                      <i class="bi bi-bookmark"></i> Especialidad *
+                    </label>
+                    <select id="reg-especialidad" name="especialidad" required>
+                      <option value="">Selecciona tu especialidad</option>
+                      <option value="biologia-marina">Biología Marina</option>
+                      <option value="oceanografia">Oceanografía</option>
+                      <option value="ictiologia">Ictiología</option>
+                      <option value="conservacion-marina">
+                        Conservación Marina
+                      </option>
+                      <option value="ecologia-marina">Ecología Marina</option>
+                      <option value="taxonomia">Taxonomía Marina</option>
+                      <option value="otra">Otra especialidad</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="reg-grado-academico">
+                      <i class="bi bi-award"></i> Grado Académico *
+                    </label>
+                    <select
+                      id="reg-grado-academico"
+                      name="grado_academico"
+                      required
+                    >
+                      <option value="">Selecciona tu grado</option>
+                      <option value="licenciatura">Licenciatura</option>
+                      <option value="maestria">Maestría</option>
+                      <option value="doctorado">Doctorado</option>
+                      <option value="postdoctorado">Postdoctorado</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="reg-institucion">
+                      <i class="bi bi-building"></i> Institución *
+                    </label>
+                    <input
+                      type="text"
+                      id="reg-institucion"
+                      name="institucion"
+                      required
+                      maxlength="200"
+                      placeholder="Universidad o Centro de Investigación"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="reg-anos-experiencia">
+                      <i class="bi bi-clock-history"></i> Años de Experiencia *
+                    </label>
+                    <input
+                      type="number"
+                      id="reg-anos-experiencia"
+                      name="años_experiencia"
+                      required
+                      min="0"
+                      max="100"
+                      placeholder="Ingresa tus años de experiencia (0-100)"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3><i class="bi bi-file-earmark-text"></i> Documentación</h3>
+
+                <div class="form-group">
+                  <label for="reg-numero-cedula">
+                    <i class="bi bi-card-text"></i> Número de Cédula Profesional
+                  </label>
+                  <input
+                    type="text"
+                    id="reg-numero-cedula"
+                    name="numero_cedula"
+                    maxlength="20"
+                    placeholder="Número de cédula (si aplica)"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="reg-orcid">
+                    <i class="bi bi-link-45deg"></i> ORCID ID
+                  </label>
+                  <input
+                    type="text"
+                    id="reg-orcid"
+                    name="orcid"
+                    maxlength="50"
+                    placeholder="0000-0000-0000-0000 (opcional)"
+                  />
+                </div>
+
+                <div class="form-group full-width">
+                  <label for="reg-motivacion">
+                    <i class="bi bi-chat-text"></i> Motivación para colaborar *
+                  </label>
+                  <textarea
+                    id="reg-motivacion"
+                    name="motivacion"
+                    rows="4"
+                    required
+                    minlength="50"
+                    maxlength="500"
+                    placeholder="Describe tu motivación para colaborar en el proyecto y tu experiencia relevante en especies marinas..."
+                  ></textarea>
+                  <small class="char-counter">0/500 caracteres</small>
+                </div>
+              </div>
+
+              <div class="terms-section">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="reg-terms" name="terms" required />
+                  <span class="checkmark"></span>
+                  <span class="terms-text">
+                    Acepto los
+                    <a href="#" target="_blank">términos y condiciones</a>
+                    para colaboradores científicos y confirmo que la información
+                    proporcionada es veraz
+                  </span>
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-primary full-width">
+                  <i class="bi bi-person-plus"></i> Enviar Solicitud
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="collaborator-footer">
+            <div class="info-note">
+              <i class="bi bi-info-circle"></i>
+              <span
+                >Las solicitudes son revisadas en un plazo de 48-72 horas por
+                nuestro equipo académico</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor JS Files -->
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/waypoints/noframework.waypoints.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+
+    <!-- Main JS File -->
+    <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/especies.js') }}?v=2025080207"></script>
+
+    <!-- Colaboradores JavaScript -->
+    <script>
+      // Variables globales para el modal
+      let collaboratorModal = null;
+      let modalInitialized = false;
+
+      // Funciones de utilidad para mostrar mensajes estilizados
+      function showMessage(containerId, type, message, icon = null) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        // Limpiar mensajes anteriores
+        container.innerHTML = "";
+
+        // Crear elemento de mensaje
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `${type}-message`;
+
+        // Icono por defecto según tipo
+        if (!icon) {
+          switch (type) {
+            case "error":
+              icon = "bi-exclamation-triangle-fill";
+              break;
+            case "success":
+              icon = "bi-check-circle-fill";
+              break;
+            case "warning":
+              icon = "bi-exclamation-circle-fill";
+              break;
+            default:
+              icon = "bi-info-circle-fill";
+          }
+        }
+
+        messageDiv.innerHTML = `<i class="bi ${icon}"></i> ${message}`;
+        container.appendChild(messageDiv);
+
+        // Auto-ocultar después de 5 segundos para mensajes de éxito
+        if (type === "success" || type === "warning") {
+          setTimeout(() => {
+            if (messageDiv.parentNode) {
+              messageDiv.style.opacity = "0";
+              setTimeout(() => {
+                if (messageDiv.parentNode) {
+                  messageDiv.remove();
+                }
+              }, 300);
+            }
+          }, 5000);
+        }
+      }
+
+      function clearMessages(containerId) {
+        const container = document.getElementById(containerId);
+        if (container) {
+          container.innerHTML = "";
+        }
+      }
+
+      // Inicializar modal cuando el DOM esté listo
+      document.addEventListener("DOMContentLoaded", function () {
+        collaboratorModal = document.getElementById("collaborator-modal");
+        initializeCollaboratorModal();
+        modalInitialized = true;
+      });
+
+      // Funciones principales del modal
+      function openCollaboratorModal(event, initialTab = "login") {
+        console.log("Opening collaborator modal with tab:", initialTab);
+
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+        }
+
+        if (!modalInitialized) {
+          console.log("Modal not initialized yet, trying to initialize...");
+          setTimeout(() => {
+            initializeCollaboratorModal();
+            modalInitialized = true;
+            openCollaboratorModal(null, initialTab);
+          }, 100);
+          return;
+        }
+
+        try {
+          collaboratorModal = document.getElementById("collaborator-modal");
+          if (collaboratorModal) {
+            // Establecer la pestaña inicial antes de mostrar el modal
+            switchCollaboratorTab(initialTab);
+
+            // Usar clases CSS en lugar de style.display
+            collaboratorModal.classList.add("show");
+            collaboratorModal.style.display = "flex";
+            document.body.style.overflow = "hidden";
+            document.body.classList.add("modal-open");
+
+            console.log("Modal opened successfully with tab:", initialTab);
+            console.log("Modal classes:", collaboratorModal.className);
+            console.log(
+              "Modal display:",
+              window.getComputedStyle(collaboratorModal).display
+            );
+
+            // Verificar si el modal sigue visible después de un momento
+            setTimeout(() => {
+              const stillVisible =
+                window.getComputedStyle(collaboratorModal).display !== "none";
+              console.log("Modal still visible after 500ms:", stillVisible);
+              if (!stillVisible) {
+                console.error("Modal was hidden by something else!");
+              }
+            }, 500);
+          } else {
+            console.error("Modal element not found");
+          }
+        } catch (error) {
+          console.error("Error opening modal:", error);
+        }
+      }
+
+      function closeCollaboratorModal(event) {
+        console.log("Closing collaborator modal...");
+
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+        }
+
+        try {
+          if (collaboratorModal) {
+            collaboratorModal.classList.remove("show");
+            collaboratorModal.style.display = "none";
+            document.body.style.overflow = "auto";
+            document.body.classList.remove("modal-open");
+
+            // Reset formularios
+            const loginForm = document.getElementById(
+              "collaborator-login-form"
+            );
+            const registerForm = document.getElementById(
+              "collaborator-register-form"
+            );
+
+            if (loginForm) loginForm.reset();
+            if (registerForm) registerForm.reset();
+
+            // Reset pestañas
+            switchCollaboratorTab("login");
+            console.log("Modal closed successfully");
+          }
+        } catch (error) {
+          console.error("Error closing modal:", error);
+        }
+      }
+
+      function switchCollaboratorTab(tabName) {
+        try {
+          // Ocultar todas las pestañas
+          const allTabs = document.querySelectorAll(".tab-content");
+          const allBtns = document.querySelectorAll(".tab-btn");
+
+          allTabs.forEach((tab) => tab.classList.remove("active"));
+          allBtns.forEach((btn) => btn.classList.remove("active"));
+
+          // Mostrar pestaña seleccionada
+          const selectedTab = document.getElementById(tabName + "-tab");
+          const selectedBtn = document.querySelector(
+            `[onclick*="switchCollaboratorTab('${tabName}')"]`
+          );
+
+          if (selectedTab) selectedTab.classList.add("active");
+          if (selectedBtn) selectedBtn.classList.add("active");
+
+          console.log("Switched to tab:", tabName);
+        } catch (error) {
+          console.error("Error switching tabs:", error);
+        }
+      }
+
+      // Funciones de validación usando el sistema existente
+      function validateLoginForm() {
+        const loginForm = document.getElementById("collaborator-login-form");
+
+        const configLogin = {
+          "login-email": { tipo: "email" },
+          "login-password": { tipo: "password" },
+        };
+
+        return validacionesSway.validarFormularioCompleto(
+          loginForm,
+          configLogin
+        );
+      }
+
+      function validateRegisterForm() {
+        const registerForm = document.getElementById(
+          "collaborator-register-form"
+        );
+        const passwordField = document.getElementById("reg-password");
+
+        const configRegister = {
+          "reg-nombre": { tipo: "soloTexto" },
+          "reg-apellido-paterno": { tipo: "soloTexto" },
+          "reg-apellido-materno": { tipo: "soloTexto" },
+          "reg-email": { tipo: "email" },
+          "reg-password": { tipo: "password" },
+          "reg-confirm-password": {
+            tipo: "confirmPassword",
+            opciones: { passwordField: passwordField },
+          },
+          "reg-especialidad": { tipo: "requerido" },
+          "reg-grado-academico": { tipo: "requerido" },
+          "reg-institucion": { tipo: "soloTexto" },
+          "reg-anos-experiencia": { tipo: "anosExperiencia" },
+          "reg-numero-cedula": { tipo: "cedula" },
+          "reg-orcid": { tipo: "orcid" },
+          "reg-motivacion": { tipo: "motivacion" },
+          "reg-terms": { tipo: "checkbox" },
+        };
+
+        // Validaciones personalizadas para campos especiales
+        let isValid = true;
+
+        // Cédula profesional (opcional)
+        const cedula = document.getElementById("reg-numero-cedula");
+        if (cedula.value.trim() && !isValidCedula(cedula.value)) {
+          validacionesSway.mostrarError(
+            cedula,
+            "Formato de cédula profesional inválido (7-8 dígitos)"
+          );
+          isValid = false;
+        } else if (cedula.value.trim()) {
+          validacionesSway.mostrarExito(cedula);
+        }
+
+        // ORCID (opcional)
+        const orcid = document.getElementById("reg-orcid");
+        if (orcid.value.trim() && !isValidOrcid(orcid.value)) {
+          validacionesSway.mostrarError(
+            orcid,
+            "Formato de ORCID inválido (0000-0000-0000-0000)"
+          );
+          isValid = false;
+        } else if (orcid.value.trim()) {
+          validacionesSway.mostrarExito(orcid);
+        }
+
+        // Motivación (longitud específica)
+        const motivacion = document.getElementById("reg-motivacion");
+        if (!motivacion.value.trim()) {
+          validacionesSway.mostrarError(
+            motivacion,
+            "La motivación para colaborar es obligatoria"
+          );
+          isValid = false;
+        } else if (motivacion.value.trim().length < 50) {
+          validacionesSway.mostrarError(
+            motivacion,
+            "La motivación debe tener al menos 50 caracteres"
+          );
+          isValid = false;
+        } else if (motivacion.value.trim().length > 500) {
+          validacionesSway.mostrarError(
+            motivacion,
+            "La motivación no puede exceder 500 caracteres"
+          );
+          isValid = false;
+        } else {
+          validacionesSway.mostrarExito(motivacion);
+        }
+
+        // Términos y condiciones
+        const terms = document.getElementById("reg-terms");
+        if (!terms.checked) {
+          validacionesSway.mostrarError(
+            terms,
+            "Debes aceptar los términos y condiciones"
+          );
+          isValid = false;
+        } else {
+          validacionesSway.mostrarExito(terms);
+        }
+
+        // Validar campos básicos con el sistema existente
+        const basicValid = validacionesSway.validarFormularioCompleto(
+          registerForm,
+          {
+            "reg-nombre": { tipo: "soloTexto" },
+            "reg-apellido-paterno": { tipo: "soloTexto" },
+            "reg-apellido-materno": { tipo: "soloTexto" },
+            "reg-email": { tipo: "email" },
+            "reg-password": { tipo: "password" },
+            "reg-confirm-password": {
+              tipo: "confirmPassword",
+              opciones: { passwordField: passwordField },
+            },
+            "reg-institucion": { tipo: "soloTexto" },
+          }
+        );
+
+        // Validar selects obligatorios
+        const especialidad = document.getElementById("reg-especialidad");
+        if (!especialidad.value) {
+          validacionesSway.mostrarError(
+            especialidad,
+            "La especialidad es obligatoria"
+          );
+          isValid = false;
+        } else {
+          validacionesSway.mostrarExito(especialidad);
+        }
+
+        const gradoAcademico = document.getElementById("reg-grado-academico");
+        if (!gradoAcademico.value) {
+          validacionesSway.mostrarError(
+            gradoAcademico,
+            "El grado académico es obligatorio"
+          );
+          isValid = false;
+        } else {
+          validacionesSway.mostrarExito(gradoAcademico);
+        }
+
+        const anosExperiencia = document.getElementById("reg-anos-experiencia");
+        const valorAnosExperiencia = parseInt(anosExperiencia.value);
+        if (!anosExperiencia.value) {
+          validacionesSway.mostrarError(
+            anosExperiencia,
+            "Los años de experiencia son obligatorios"
+          );
+          isValid = false;
+        } else if (isNaN(valorAnosExperiencia) || valorAnosExperiencia < 0 || valorAnosExperiencia > 100) {
+          validacionesSway.mostrarError(
+            anosExperiencia,
+            "Los años de experiencia deben ser un número entre 0 y 100"
+          );
+          isValid = false;
+        } else {
+          validacionesSway.mostrarExito(anosExperiencia);
+        }
+
+        return basicValid && isValid;
+      }
+
+      // Funciones auxiliares específicas
+      function isValidCedula(cedula) {
+        const cedulaRegex = /^\d{7,8}$/;
+        return cedulaRegex.test(cedula.replace(/\s/g, ""));
+      }
+
+      function isValidOrcid(orcid) {
+        const orcidRegex = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
+        return orcidRegex.test(orcid.replace(/\s/g, ""));
+      }
+
+      // Función para verificar email duplicado
+      async function checkEmailExists(email) {
+        try {
+          const response = await fetch("/api/colaboradores/check-email", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: email }),
+          });
+
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error("Error checking email:", error);
+          return { exists: false, can_register: true };
+        }
+      }
+
+      // Inicialización del modal
+      function initializeCollaboratorModal() {
+        try {
+          // Configurar overlay para cerrar al hacer clic fuera
+          const overlay = document.getElementById("collaborator-modal");
+          if (overlay) {
+            overlay.addEventListener("click", function (e) {
+              if (e.target === overlay) {
+                closeCollaboratorModal(e);
+              }
+            });
+          }
+
+          // Configurar botón de cerrar
+          const closeBtn = overlay.querySelector(".modal-close");
+          if (closeBtn) {
+            closeBtn.addEventListener("click", function (e) {
+              closeCollaboratorModal(e);
+            });
+          }
+
+          // Evitar que el contenido del modal cierre el modal
+          const modalContent = overlay.querySelector(".modal-content");
+          if (modalContent) {
+            modalContent.addEventListener("click", function (e) {
+              e.stopPropagation();
+            });
+          }
+
+          // Configurar contador de caracteres
+          const motivacionTextarea = document.getElementById("reg-motivacion");
+          const charCounter = document.querySelector(".char-counter");
+
+          if (motivacionTextarea && charCounter) {
+            motivacionTextarea.addEventListener("input", function () {
+              const currentLength = this.value.length;
+              charCounter.textContent = `${currentLength}/500 caracteres`;
+
+              if (currentLength > 450) {
+                charCounter.style.color = "#dc3545";
+              } else if (currentLength > 400) {
+                charCounter.style.color = "#fd7e14";
+              } else {
+                charCounter.style.color = "#6c757d";
+              }
+            });
+          }
+
+          // Configurar validación de email con verificación de duplicados
+          const regEmail = document.getElementById("reg-email");
+          if (regEmail) {
+            regEmail.addEventListener("blur", async function () {
+              if (validacionesSway.validarCampo(this, "email")) {
+                const emailCheck = await checkEmailExists(this.value);
+                if (emailCheck.exists && !emailCheck.can_register) {
+                  validacionesSway.mostrarError(
+                    this,
+                    "Este email ya está registrado"
+                  );
+                } else {
+                  validacionesSway.mostrarExito(this);
+                }
+              }
+            });
+          }
+
+          // Configurar validación de campos especiales
+          const cedula = document.getElementById("reg-cedula");
+          if (cedula) {
+            cedula.addEventListener("blur", function () {
+              if (this.value.trim()) {
+                if (isValidCedula(this.value)) {
+                  validacionesSway.mostrarExito(this);
+                } else {
+                  validacionesSway.mostrarError(
+                    this,
+                    "Formato de cédula inválido (7-8 dígitos)"
+                  );
+                }
+              }
+            });
+          }
+
+          const orcid = document.getElementById("reg-orcid");
+          if (orcid) {
+            orcid.addEventListener("blur", function () {
+              if (this.value.trim()) {
+                if (isValidOrcid(this.value)) {
+                  validacionesSway.mostrarExito(this);
+                } else {
+                  validacionesSway.mostrarError(
+                    this,
+                    "Formato de ORCID inválido (0000-0000-0000-0000)"
+                  );
+                }
+              }
+            });
+          }
+
+          const motivacion = document.getElementById("reg-motivacion");
+          if (motivacion) {
+            motivacion.addEventListener("blur", function () {
+              const length = this.value.trim().length;
+              if (length === 0) {
+                validacionesSway.mostrarError(
+                  this,
+                  "La motivación para colaborar es obligatoria"
+                );
+              } else if (length < 50) {
+                validacionesSway.mostrarError(
+                  this,
+                  "La motivación debe tener al menos 50 caracteres"
+                );
+              } else if (length > 500) {
+                validacionesSway.mostrarError(
+                  this,
+                  "La motivación no puede exceder 500 caracteres"
+                );
+              } else {
+                validacionesSway.mostrarExito(this);
+              }
+            });
+          }
+
+          // Validación en tiempo real para años de experiencia
+          const anosExp = document.getElementById("reg-anos-experiencia");
+          if (anosExp) {
+            anosExp.addEventListener("blur", function () {
+              const valor = parseInt(this.value);
+              if (!this.value.trim()) {
+                validacionesSway.mostrarError(
+                  this,
+                  "Los años de experiencia son obligatorios"
+                );
+              } else if (isNaN(valor) || valor < 0 || valor > 100) {
+                validacionesSway.mostrarError(
+                  this,
+                  "Los años de experiencia deben ser un número entre 0 y 100"
+                );
+              } else {
+                validacionesSway.mostrarExito(this);
+              }
+            });
+
+            // Limpiar error mientras escribe
+            anosExp.addEventListener("input", function () {
+              const valor = parseInt(this.value);
+              if (this.value.trim() && !isNaN(valor) && valor >= 0 && valor <= 100) {
+                validacionesSway.mostrarExito(this);
+              }
+            });
+          }
+
+          // Configurar formularios con validaciones
+          const loginForm = document.getElementById("collaborator-login-form");
+          if (loginForm) {
+            loginForm.addEventListener("submit", function (e) {
+              e.preventDefault();
+
+              if (!validateLoginForm()) {
+                return;
+              }
+
+              // Limpiar mensajes anteriores
+              clearMessages("login-message-container");
+
+              const formData = new FormData(this);
+              const loginData = {
+                email: formData.get("email"),
+                password: formData.get("password"),
+              };
+
+              // Deshabilitar botón mientras se procesa
+              const submitBtn = this.querySelector('button[type="submit"]');
+              const originalText = submitBtn.innerHTML;
+              submitBtn.disabled = true;
+              submitBtn.innerHTML =
+                '<i class="bi bi-hourglass-split"></i> Iniciando sesión...';
+
+              // Enviar datos al servidor
+              fetch("/api/colaboradores/login", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(loginData),
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.success) {
+                    showMessage(
+                      "login-message-container",
+                      "success",
+                      `¡Bienvenido ${data.user.nombre}! Redirigiendo al portal de colaboradores...`
+                    );
+
+                    // Guardar datos del colaborador en sessionStorage
+                    sessionStorage.setItem(
+                      "colaborador-session",
+                      JSON.stringify({
+                        id: data.user.id,
+                        nombre: data.user.nombre,
+                        especialidad: data.user.especialidad,
+                        institucion: data.user.institucion,
+                        email: data.user.email,
+                      })
+                    );
+
+                    setTimeout(() => {
+                      window.location.href = "/portal-colaboradores";
+                    }, 1500);
+                  } else {
+                    showMessage(
+                      "login-message-container",
+                      "error",
+                      data.error || "Error desconocido al iniciar sesión"
+                    );
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error:", error);
+                  showMessage(
+                    "login-message-container",
+                    "error",
+                    "Error de conexión. Por favor intenta de nuevo."
+                  );
+                })
+                .finally(() => {
+                  // Restaurar botón
+                  submitBtn.disabled = false;
+                  submitBtn.innerHTML = originalText;
+                });
+            });
+          }
+
+          const registerForm = document.getElementById(
+            "collaborator-register-form"
+          );
+          if (registerForm) {
+            registerForm.addEventListener("submit", function (e) {
+              e.preventDefault();
+
+              if (!validateRegisterForm()) {
+                return;
+              }
+
+              // Limpiar mensajes anteriores
+              clearMessages("register-message-container");
+
+              const formData = new FormData(this);
+              const nombre = formData.get("nombre");
+              const apellidoPaterno = formData.get("apellidoPaterno");
+              const apellidoMaterno = formData.get("apellidoMaterno");
+
+              const registerData = {
+                nombre:
+                  nombre +
+                  " " +
+                  apellidoPaterno +
+                  (apellidoMaterno ? " " + apellidoMaterno : ""),
+                apellidoPaterno: apellidoPaterno,
+                apellidoMaterno: apellidoMaterno,
+                email: formData.get("email"),
+                password: formData.get("password"),
+                especialidad: formData.get("especialidad"),
+                grado_academico: formData.get("grado_academico"),
+                institucion: formData.get("institucion"),
+                años_experiencia: formData.get("años_experiencia"),
+                numero_cedula: formData.get("numero_cedula") || null,
+                orcid: formData.get("orcid") || null,
+                motivacion: formData.get("motivacion"),
+              };
+
+              // Deshabilitar botón mientras se procesa
+              const submitBtn = this.querySelector('button[type="submit"]');
+              const originalText = submitBtn.innerHTML;
+              submitBtn.disabled = true;
+              submitBtn.innerHTML =
+                '<i class="bi bi-hourglass-split"></i> Enviando solicitud...';
+
+              // Enviar datos al servidor
+              fetch("/api/colaboradores/register", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(registerData),
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.success) {
+                    showMessage(
+                      "register-message-container",
+                      "success",
+                      `¡Registro exitoso! ${data.message}. Ya puedes iniciar sesión como colaborador.`
+                    );
+
+                    // Limpiar formulario y cambiar a pestaña de login después de un momento
+                    setTimeout(() => {
+                      this.reset();
+                      switchCollaboratorTab("login");
+
+                      // Opcional: rellenar el email en el formulario de login
+                      const loginEmail = document.getElementById("login-email");
+                      if (loginEmail) {
+                        loginEmail.value = registerData.email;
+                      }
+                    }, 2000);
+                  } else {
+                    showMessage(
+                      "register-message-container",
+                      "error",
+                      `Error en el registro: ${
+                        data.error || "Error desconocido"
+                      }`
+                    );
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error:", error);
+                  showMessage(
+                    "register-message-container",
+                    "error",
+                    "Error de conexión. Por favor intenta de nuevo."
+                  );
+                })
+                .finally(() => {
+                  // Restaurar botón
+                  submitBtn.disabled = false;
+                  submitBtn.innerHTML = originalText;
+                });
+            });
+          }
+
+          // Tecla Escape para cerrar
+          document.addEventListener("keydown", function (event) {
+            if (
+              event.key === "Escape" &&
+              collaboratorModal &&
+              collaboratorModal.classList.contains("show")
+            ) {
+              closeCollaboratorModal(event);
+            }
+          });
+
+          console.log("Collaborator modal initialized successfully");
+        } catch (error) {
+          console.error("Error initializing modal:", error);
+        }
+      }
+
+      // Debug: Función para probar el modal
+      window.testCollaboratorModal = function (tab = "login") {
+        console.log("Testing modal with tab:", tab);
+        openCollaboratorModal(null, tab);
+      };
+    </script>
+  </body>
+</html>

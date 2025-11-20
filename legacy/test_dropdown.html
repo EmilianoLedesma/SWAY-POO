@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dropdown</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            margin: -30px -30px 30px -30px;
+            border-radius: 10px 10px 0 0;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #17a2b8;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Test Dropdown de Usuario - SWAY</h1>
+            <p>Prueba de funcionalidad del dropdown de usuario</p>
+        </div>
+
+        <div class="test-section">
+            <h3>1. Test de Elementos del DOM</h3>
+            <button class="btn" onclick="testElementos()">Verificar Elementos</button>
+            <div id="test-elementos-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Test de Estado del Usuario</h3>
+            <button class="btn" onclick="testUserStatus()">Verificar Estado</button>
+            <div id="test-status-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Test de Dropdown</h3>
+            <button class="btn" onclick="testDropdown()">Mostrar/Ocultar Dropdown</button>
+            <div id="test-dropdown-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Simular Dropdown Real</h3>
+            <div style="position: relative; display: inline-block;">
+                <div class="user-menu" style="position: relative;">
+                    <button class="btn" id="test-btn-user">
+                        <i>👤</i> <span id="test-user-name">Iniciar Sesión</span>
+                    </button>
+                    <div id="test-user-dropdown" style="
+                        position: absolute;
+                        top: 100%;
+                        right: 0;
+                        background: white;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                        min-width: 180px;
+                        display: none;
+                        z-index: 1000;
+                        margin-top: 5px;
+                    ">
+                        <a href="#" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; border-bottom: 1px solid #f0f0f0;">Iniciar Sesión</a>
+                        <a href="#" style="display: block; padding: 12px 16px; color: #333; text-decoration: none; border-bottom: 1px solid #f0f0f0;">Registrarse</a>
+                        <a href="#" style="display: block; padding: 12px 16px; color: #333; text-decoration: none;">Mis Pedidos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. Logs de Consola</h3>
+            <button class="btn" onclick="showConsoleLog()">Mostrar Logs</button>
+            <div id="console-log" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Capturar logs de consola
+        let consoleLogs = [];
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            consoleLogs.push({type: 'log', message: args.join(' '), time: new Date().toISOString()});
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            consoleLogs.push({type: 'error', message: args.join(' '), time: new Date().toISOString()});
+            originalError.apply(console, args);
+        };
+
+        function testElementos() {
+            const result = document.getElementById('test-elementos-result');
+            let html = '<strong>Verificación de Elementos:</strong><br>';
+            
+            const elementos = [
+                'btn-user',
+                'user-dropdown', 
+                'user-menu',
+                'user-name',
+                'btn-login',
+                'btn-register',
+                'btn-my-orders',
+                'btn-logout'
+            ];
+            
+            elementos.forEach(id => {
+                const elemento = document.getElementById(id);
+                if (elemento) {
+                    html += `✅ ${id}: Encontrado<br>`;
+                } else {
+                    html += `❌ ${id}: No encontrado<br>`;
+                }
+            });
+            
+            result.innerHTML = html;
+            result.style.display = 'block';
+        }
+
+        async function testUserStatus() {
+            const result = document.getElementById('test-status-result');
+            result.innerHTML = '<strong>Verificando estado del usuario...</strong>';
+            result.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/user/status');
+                const data = await response.json();
+                
+                result.innerHTML = `
+                    <strong>Estado del Usuario:</strong><br>
+                    ✅ Respuesta exitosa<br>
+                    📊 Datos: ${JSON.stringify(data, null, 2)}<br>
+                `;
+                result.className = 'result success';
+            } catch (error) {
+                result.innerHTML = `
+                    <strong>Error:</strong><br>
+                    ❌ ${error.message}
+                `;
+                result.className = 'result error';
+            }
+        }
+
+        function testDropdown() {
+            const result = document.getElementById('test-dropdown-result');
+            const testDropdown = document.getElementById('test-user-dropdown');
+            
+            if (testDropdown.style.display === 'none') {
+                testDropdown.style.display = 'block';
+                result.innerHTML = '✅ Dropdown mostrado';
+                result.className = 'result success';
+            } else {
+                testDropdown.style.display = 'none';
+                result.innerHTML = '✅ Dropdown ocultado';
+                result.className = 'result success';
+            }
+            
+            result.style.display = 'block';
+        }
+
+        function showConsoleLog() {
+            const result = document.getElementById('console-log');
+            let html = '<strong>Logs de Consola:</strong><br>';
+            
+            if (consoleLogs.length === 0) {
+                html += 'No hay logs disponibles';
+            } else {
+                consoleLogs.forEach(log => {
+                    const icon = log.type === 'error' ? '❌' : '📝';
+                    html += `${icon} [${log.time}] ${log.message}<br>`;
+                });
+            }
+            
+            result.innerHTML = html;
+            result.style.display = 'block';
+        }
+
+        // Simular click en el dropdown de prueba
+        document.getElementById('test-btn-user').addEventListener('click', function() {
+            testDropdown();
+        });
+
+        console.log('Test page loaded successfully');
+    </script>
+</body>
+</html>

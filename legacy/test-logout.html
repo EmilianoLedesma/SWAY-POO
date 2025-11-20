@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Logout Persistente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .danger {
+            background: #dc3545;
+        }
+        .danger:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Prueba de Logout Persistente - SWAY</h1>
+        
+        <div class="status info">
+            <strong>Estado del Sistema:</strong> Verificando localStorage...
+        </div>
+
+        <div id="status-display"></div>
+
+        <h2>Acciones de Prueba</h2>
+        <button onclick="checkStatus()">🔍 Verificar Estado</button>
+        <button onclick="simulateLogin()">👤 Simular Login</button>
+        <button onclick="simulateLogout()" class="danger">🚪 Simular Logout</button>
+        <button onclick="clearStorage()">🗑️ Limpiar Storage</button>
+        <button onclick="reloadPage()">🔄 Recargar Página</button>
+        
+        <h2>Navegación</h2>
+        <button onclick="window.location.href='/tienda'">🛒 Ir a Tienda</button>
+        <button onclick="window.location.href='/mis-pedidos'">📋 Ir a Mis Pedidos</button>
+
+        <h2>Contenido de localStorage</h2>
+        <pre id="localStorage-content"></pre>
+    </div>
+
+    <script>
+        function updateDisplay() {
+            const statusDiv = document.getElementById('status-display');
+            const storageDiv = document.getElementById('localStorage-content');
+            
+            // Verificar estado
+            const manualLogout = localStorage.getItem('manual-logout');
+            const logoutFlag = localStorage.getItem('logout-flag');
+            const usuarioSway = localStorage.getItem('usuario-sway');
+            
+            let status = '';
+            if (manualLogout === 'true') {
+                status = '<div class="status error">❌ Sesión cerrada manualmente - No debe auto-restaurar</div>';
+            } else if (usuarioSway) {
+                status = '<div class="status success">✅ Sesión activa</div>';
+            } else {
+                status = '<div class="status info">ℹ️ Sin sesión activa</div>';
+            }
+            
+            statusDiv.innerHTML = status;
+            
+            // Mostrar contenido de localStorage
+            const storageContent = {
+                'manual-logout': manualLogout,
+                'logout-flag': logoutFlag,
+                'usuario-sway': usuarioSway,
+                'carrito-sway': localStorage.getItem('carrito-sway')
+            };
+            
+            storageDiv.textContent = JSON.stringify(storageContent, null, 2);
+        }
+        
+        function checkStatus() {
+            updateDisplay();
+            console.log('Estado verificado');
+        }
+        
+        function simulateLogin() {
+            localStorage.removeItem('manual-logout');
+            localStorage.removeItem('logout-flag');
+            localStorage.setItem('usuario-sway', JSON.stringify({
+                id: 1,
+                nombre: 'Usuario Prueba',
+                email: 'test@example.com'
+            }));
+            updateDisplay();
+            console.log('Login simulado');
+        }
+        
+        function simulateLogout() {
+            localStorage.removeItem('usuario-sway');
+            localStorage.removeItem('carrito-sway');
+            localStorage.setItem('manual-logout', 'true');
+            localStorage.setItem('logout-flag', Date.now().toString());
+            updateDisplay();
+            console.log('Logout simulado');
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            updateDisplay();
+            console.log('Storage limpiado');
+        }
+        
+        function reloadPage() {
+            window.location.reload();
+        }
+        
+        // Inicializar
+        updateDisplay();
+        
+        // Actualizar cada 2 segundos
+        setInterval(updateDisplay, 2000);
+    </script>
+</body>
+</html>

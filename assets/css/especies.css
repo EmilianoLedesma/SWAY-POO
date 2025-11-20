@@ -1,0 +1,2504 @@
+/* =============================================
+   ESTILOS PARA PÁGINA DE ESPECIES MARINAS
+   Sistema de búsqueda, filtrado y visualización de biodiversidad marina
+   ============================================= */
+/* Configuración del header para página de especies */
+.especies-page .header {
+  --background-color: #37517e;  /* Fondo azul marino */
+  --heading-color: #ffffff;     /* Títulos en blanco */
+  --nav-color: #ffffff;         /* Navegación en blanco */
+}
+
+/* =============================================
+   FUNCIONALIDAD DE BÚSQUEDA Y FILTROS
+   Componentes interactivos para exploración de especies
+   ============================================= */
+
+/* Estados de carga durante búsquedas */
+/* Contenedor principal para estado de carga */
+.loading-container {
+  display: flex;              /* Flexbox para centrado */
+  flex-direction: column;     /* Dirección vertical */
+  align-items: center;        /* Centrado horizontal */
+  justify-content: center;    /* Centrado vertical */
+  min-height: 300px;          /* Altura mínima */
+  text-align: center;         /* Texto centrado */
+}
+
+/* Spinner de carga en contenedor */
+.loading-container .spinner-border {
+  width: 3rem;   /* Ancho del spinner */
+  height: 3rem;  /* Alto del spinner */
+}
+
+/* Estado cuando no se encuentran resultados */
+/* Contenedor para mensaje de sin resultados */
+.no-results-container {
+  display: flex;              /* Flexbox para centrado */
+  align-items: center;        /* Centrado vertical */
+  justify-content: center;    /* Centrado horizontal */
+  min-height: 400px;          /* Altura mínima */
+}
+
+/* Contenido del mensaje de sin resultados */
+.no-results-content {
+  text-align: center;   /* Texto centrado */
+  max-width: 500px;     /* Ancho máximo */
+}
+
+/* Icono en mensaje de sin resultados */
+.no-results-content i {
+  color: #6c757d;       /* Color gris neutro */
+  margin-bottom: 1rem;  /* Margen inferior */
+}
+
+/* Título en mensaje de sin resultados */
+.no-results-content h3 {
+  color: #495057;       /* Color gris oscuro */
+  margin-bottom: 1rem;  /* Margen inferior */
+}
+
+.no-results-actions {
+  margin-top: 2rem;
+}
+
+/* Estados de error en búsquedas */
+/* Contenedor para mensajes de error */
+.error-container {
+  display: flex;              /* Flexbox para centrado */
+  align-items: center;        /* Centrado vertical */
+  justify-content: center;    /* Centrado horizontal */
+  min-height: 400px;          /* Altura mínima */
+}
+
+.error-container .alert {
+  max-width: 500px;
+  text-align: center;
+}
+
+/* Active filters tags */
+.tags-activos {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-filter {
+  display: inline-flex;
+  align-items: center;
+  background: var(--accent-color, #47b2e4);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.tag-filter:hover {
+  background: #3a9bc1;
+  transform: translateY(-1px);
+}
+
+.tag-filter i {
+  margin-left: 0.5rem;
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.tag-filter i:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Search improvements */
+.search-box {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  z-index: 2;
+}
+
+#search-especies {
+  padding-left: 45px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+#search-especies:focus {
+  border-color: var(--accent-color, #47b2e4);
+  box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+}
+
+/* Button improvements */
+.btn-search {
+  background: linear-gradient(135deg, var(--accent-color, #47b2e4), #5a67d8);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-search:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(71, 178, 228, 0.4);
+}
+
+.btn-search:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Pagination improvements */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3rem;
+  gap: 1rem;
+}
+
+.pagination-btn {
+  padding: 10px 18px;
+  border: 2px solid var(--accent-color, #47b2e4);
+  background: white;
+  color: var(--accent-color, #47b2e4);
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--accent-color, #47b2e4);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #dee2e6;
+  color: #6c757d;
+}
+
+.pagination-info {
+  font-weight: 600;
+  color: #495057;
+  padding: 0 1rem;
+}
+
+/* Species card improvements */
+.especie-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+}
+
+.especie-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent-color, #47b2e4);
+}
+
+.especie-image img {
+  transition: transform 0.3s ease;
+}
+
+.especie-card:hover .especie-image img {
+  transform: scale(1.05);
+}
+
+/* Toggle button for advanced filters */
+.btn-toggle-filters {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.btn-toggle-filters:hover {
+  background: #37517e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(71, 178, 228, 0.3);
+}
+
+.btn-toggle-filters i {
+  transition: transform 0.3s ease;
+}
+
+.btn-toggle-filters.expanded #filter-arrow {
+  transform: rotate(180deg);
+}
+
+/* Advanced filters container */
+.advanced-filters {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.advanced-filters.show {
+  max-height: 800px;
+  opacity: 1;
+}
+
+/* Filter group improvements */
+.filter-group {
+  margin-bottom: 1.5rem;
+}
+
+.filter-group label {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.filter-group label i {
+  margin-right: 0.5rem;
+  color: var(--accent-color, #47b2e4);
+}
+
+.filter-group select {
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 10px 15px;
+  transition: all 0.3s ease;
+}
+
+.filter-group select:focus {
+  border-color: var(--accent-color, #47b2e4);
+  box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .tags-activos {
+    justify-content: center;
+  }
+  
+  .no-results-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .pagination-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .pagination-info {
+    order: -1;
+    padding: 0;
+  }
+}
+
+.hero {
+  background: linear-gradient(rgba(55, 81, 126, 0.8), rgba(71, 178, 228, 0.6)), 
+              url('https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=1200') center/cover;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="white" fill-opacity="1" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,234.7C960,235,1056,181,1152,176C1248,171,1344,213,1392,234.7L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+  background-size: cover;
+  z-index: 1;
+}
+
+.hero .container {
+  position: relative;
+  z-index: 2;
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  margin-bottom: 1.5rem;
+}
+
+.hero p {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  text-shadow: 0 1px 5px rgba(0,0,0,0.2);
+  margin-bottom: 2rem;
+}
+
+.hero .btn-get-started {
+  padding: 12px 30px;
+  font-weight: 600;
+  border-radius: 30px;
+  transition: all 0.4s ease;
+  background: var(--accent-color);
+  color: #fff;
+  border: 2px solid var(--accent-color);
+}
+
+.hero .btn-get-started:hover {
+  background: #ffffff;
+  color: var(--accent-color);
+}
+
+.hero .btn-watch-video {
+  padding: 12px 30px;
+  font-weight: 600;
+  border-radius: 30px;
+  margin-left: 15px;
+  transition: all 0.4s ease;
+  background: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+.hero .btn-watch-video:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.hero .btn-watch-video i {
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+.hero-img {
+  position: relative;
+  transition: all 0.5s ease;
+}
+
+.hero-img img {
+  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  border-radius: 15px;
+  transition: all 0.5s ease;
+}
+
+.hero-img:hover img {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+/* Estadísticas */
+.stats-card {
+  background: var(--surface-color);
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+}
+
+.stats-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 30px;
+}
+
+.stats-icon.threatened {
+  background: #dc3545;
+}
+
+.stats-icon.protected {
+  background: #28a745;
+}
+
+.stats-icon.discovered {
+  background: #ffc107;
+}
+
+.stats-number {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--heading-color);
+  margin-bottom: 10px;
+}
+
+/* Filtros */
+.filtros-container {
+  background: var(--surface-color);
+  padding: 35px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(55, 81, 126, 0.1);
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.filtros-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(71, 178, 228, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+}
+
+.busqueda-avanzada h4 {
+  color: var(--heading-color);
+  margin-bottom: 25px;
+  font-size: 22px;
+  position: relative;
+  display: inline-block;
+}
+
+.busqueda-avanzada h4::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+.busqueda-avanzada input[type="text"] {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  transition: 0.3s;
+}
+
+.busqueda-avanzada input[type="text"]:focus {
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+.filter-group {
+  margin-bottom: 20px;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--heading-color);
+}
+
+.filter-group select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  background: white;
+  transition: 0.3s;
+}
+
+.filter-group select:focus {
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+.vista-opciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.vista-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.vista-btn {
+  padding: 12px 20px;
+  border: 2px solid var(--accent-color);
+  background: transparent;
+  color: var(--accent-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.vista-btn.active,
+.vista-btn:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+.ordenar select {
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  background: white;
+}
+
+/* Especies Grid - Vista por defecto (Grid) */
+.especies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 35px;
+  margin-bottom: 60px;
+  transition: all 0.4s ease;
+}
+
+/* Vista Lista - Layout vertical en formato lista */
+.especies-grid.vista-lista,
+.especies-grid.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  grid-template-columns: none;
+}
+
+.especies-grid.vista-lista .especie-card,
+.especies-grid.list-view .especie-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 0;
+}
+
+.especies-grid.vista-lista .especie-image,
+.especies-grid.list-view .especie-image {
+  width: 250px;
+  min-width: 250px;
+  height: 200px;
+  flex-shrink: 0;
+}
+
+.especies-grid.vista-lista .especie-content,
+.especies-grid.list-view .especie-content {
+  flex: 1;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.especies-grid.vista-lista .especie-content h3,
+.especies-grid.list-view .especie-content h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.especies-grid.vista-lista .scientific-name,
+.especies-grid.list-view .scientific-name {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.especies-grid.vista-lista .especie-stats,
+.especies-grid.list-view .especie-stats {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  gap: 15px;
+}
+
+.especies-grid.vista-lista .especie-description,
+.especies-grid.list-view .especie-description {
+  height: 60px;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.especies-grid.vista-lista .especie-actions,
+.especies-grid.list-view .especie-actions {
+  gap: 8px;
+  margin-top: auto;
+}
+
+.especies-grid.vista-lista .btn-primary,
+.especies-grid.vista-lista .btn-secondary,
+.especies-grid.list-view .btn-primary,
+.especies-grid.list-view .btn-secondary {
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+/* Vista Mapa - Ocultar grid cuando se muestra el mapa */
+.especies-grid.vista-mapa {
+  display: none;
+}
+
+/* Mostrar/ocultar el contenedor del mapa según la vista */
+.mapa-container {
+  display: none;
+  height: 70vh;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(55,81,126,0.1);
+  transition: all 0.4s ease;
+}
+
+.mapa-container.vista-mapa {
+  display: flex;
+}
+
+/* Transiciones suaves para cambios de vista */
+.especies-grid,
+.especies-grid .especie-card,
+.especies-grid .especie-image,
+.especies-grid .especie-content {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estados de carga para transiciones de vista */
+.especies-container {
+  position: relative;
+}
+
+.especies-container.changing-view {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.especies-container.changing-view::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Mejoras para efectos hover en vista lista */
+.especies-grid.vista-lista .especie-card:hover {
+  transform: translateX(10px);
+  box-shadow: 0 15px 40px rgba(55,81,126,0.15);
+}
+
+.especies-grid.vista-lista .especie-card:hover .especie-image img {
+  transform: scale(1.05);
+}
+
+/* Indicador visual para vista activa */
+.vista-btn.active {
+  position: relative;
+  background: var(--accent-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(71, 178, 228, 0.3);
+}
+
+.vista-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--accent-color);
+}
+
+/* Animación de entrada para las cards */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.especie-card {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.especies-grid.vista-lista .especie-card {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Delay escalonado para las animaciones */
+.especie-card:nth-child(1) { animation-delay: 0.1s; }
+.especie-card:nth-child(2) { animation-delay: 0.2s; }
+.especie-card:nth-child(3) { animation-delay: 0.3s; }
+.especie-card:nth-child(4) { animation-delay: 0.4s; }
+.especie-card:nth-child(5) { animation-delay: 0.5s; }
+.especie-card:nth-child(6) { animation-delay: 0.6s; }
+
+.especie-card {
+  background: var(--surface-color);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(55,81,126,0.1);
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.especie-card:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 18px 45px rgba(55,81,126,0.18);
+}
+
+.especie-card:before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--accent-color);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.especie-card:hover:before {
+  transform: scaleX(1);
+}
+
+.especie-image {
+  position: relative;
+  height: 260px;
+  overflow: hidden;
+}
+
+.especie-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.especie-card:hover .especie-image img {
+  transform: scale(1.1) translateY(-5px);
+}
+
+.conservation-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 6px 14px;
+  border-radius: 30px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  letter-spacing: 0.5px;
+}
+
+.conservation-badge.extincion-critica {
+  background: linear-gradient(to right, #dc3545, #ff6b6b);
+}
+
+.conservation-badge.peligro {
+  background: linear-gradient(to right, #fd7e14, #ffb142);
+}
+
+.conservation-badge.vulnerable {
+  background: linear-gradient(to right, #ffc107, #ffdd59);
+  color: #000;
+}
+
+.conservation-badge.casi-amenazada {
+  background: linear-gradient(to right, #20c997, #0be881);
+}
+
+.conservation-badge.preocupacion-menor {
+  background: linear-gradient(to right, #28a745, #26de81);
+}
+
+.especie-content {
+  padding: 30px;
+}
+
+.especie-content h3 {
+  font-size: 24px;
+  color: var(--heading-color);
+  margin-bottom: 5px;
+  transition: color 0.3s ease;
+}
+
+.especie-card:hover .especie-content h3 {
+  color: var(--accent-color);
+}
+
+.scientific-name {
+  font-style: italic;
+  color: var(--accent-color);
+  margin-bottom: 18px;
+  font-weight: 500;
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+.especie-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px dashed rgba(0,0,0,0.1);
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.stat i {
+  color: var(--accent-color);
+  font-size: 17px;
+}
+
+.especie-description {
+  color: #666;
+  line-height: 1.7;
+  margin-bottom: 25px;
+  font-size: 15px;
+  height: 80px;
+  overflow: hidden;
+  position: relative;
+}
+
+.especie-description:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+}
+
+.especie-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 14px 22px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  flex: 1;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background: #37517e;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(71, 178, 228, 0.3);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  padding: 12px 18px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.btn-secondary:hover {
+  background: var(--accent-color);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(71, 178, 228, 0.3);
+}
+
+/* Paginación */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  margin-top: 60px;
+}
+
+.pagination-btn {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #37517e;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(71, 178, 228, 0.3);
+}
+
+.pagination-btn:disabled {
+  background: #e1e6e8;
+  cursor: not-allowed;
+  color: #a7aeb2;
+}
+
+.pagination-info {
+  font-weight: 600;
+  color: var(--heading-color);
+  font-size: 18px;
+  background: #f5f9fb;
+  padding: 10px 20px;
+  border-radius: 50px;
+}
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(24, 36, 51, 0.9);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: all 0.4s ease;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  max-width: 900px;
+  width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  animation: modalAppear 0.5s ease forwards;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 1;
+  color: #666;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.modal-close:hover {
+  background: var(--accent-color);
+  color: white;
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 60px 40px 40px;
+}
+
+/* Estilos para campos readonly */
+.form-control-readonly {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  border-color: #ced4da !important;
+}
+
+.form-control-readonly:focus {
+  box-shadow: none !important;
+  border-color: #ced4da !important;
+}
+
+/* Estilos mejorados para el contenido del modal de especies */
+.species-detail-header {
+  position: relative;
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  margin: -40px -40px 30px -40px;
+  padding: 40px;
+  color: var(--heading-color);
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+
+.species-detail-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+.species-detail-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid var(--accent-color);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  margin: 0 auto 2rem auto;
+  background: transparent !important;
+  display: block;
+  /* Eliminar cualquier fondo azul */
+  background-color: transparent !important;
+  /* Asegurar que no haya background-image */
+  background-image: none !important;
+  /* Efecto hover para mayor interactividad */
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.species-detail-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.species-detail-header h2 {
+  font-family: var(--heading-font);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--heading-color);
+  text-shadow: none;
+}
+
+.species-detail-header h3 {
+  font-family: var(--heading-font);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--heading-color);
+  text-shadow: none;
+}
+
+.scientific-name {
+  font-family: var(--default-font);
+  font-size: 1.2rem;
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: #666;
+  opacity: 1;
+}
+
+.conservation-badge {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--nav-font);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  margin-top: 1rem;
+}
+
+.conservation-badge.extincion-critica {
+  background: #dc267f;
+  color: white;
+  border-color: #dc267f;
+}
+
+.conservation-badge.peligro {
+  background: #e74c3c;
+  color: white;
+  border-color: #e74c3c;
+}
+
+.conservation-badge.vulnerable {
+  background: #f39c12;
+  color: white;
+  border-color: #f39c12;
+}
+
+.conservation-badge.casi-amenazada {
+  background: #ffc107;
+  color: var(--heading-color);
+  border-color: #ffc107;
+}
+
+.conservation-badge.preocupacion-menor {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+
+.species-detail-content {
+  background: var(--surface-color);
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(55, 81, 126, 0.1);
+}
+
+.species-detail-content h4 {
+  font-family: var(--heading-font);
+  color: var(--heading-color);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--accent-color);
+  display: inline-block;
+}
+
+.species-detail-content h5 {
+  font-family: var(--heading-font);
+  color: var(--heading-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.8rem 0;
+}
+
+.species-detail-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.species-detail-content li {
+  background: rgba(71, 178, 228, 0.05);
+  margin-bottom: 0.8rem;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 4px solid var(--accent-color);
+  font-family: var(--default-font);
+  color: var(--default-color);
+  transition: all 0.3s ease;
+}
+
+.species-detail-content li:hover {
+  background: rgba(71, 178, 228, 0.1);
+  transform: translateX(5px);
+}
+
+.species-detail-content li strong {
+  color: var(--heading-color);
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.species-detail-content p {
+  font-family: var(--default-font);
+  color: var(--default-color);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* Mejoras en el overlay y centrado */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(24, 36, 51, 0.95);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.4s ease;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  animation: modalAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  margin: auto;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalDisappear {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8) translateY(30px);
+  }
+}
+
+.modal-overlay:not(.show) .modal-content {
+  animation: modalDisappear 0.4s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+}
+
+/* Estilos del formulario de avistamiento */
+.sighting-form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--accent-color);
+}
+
+.sighting-form-header h2 {
+  font-family: var(--heading-font);
+  color: var(--heading-color);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.sighting-form-header h2 i {
+  color: var(--accent-color);
+}
+
+.sighting-form-header p {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.sighting-form {
+  max-width: 100%;
+}
+
+.form-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.form-section h3 {
+  font-family: var(--heading-font);
+  color: var(--heading-color);
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-section h3 i {
+  color: var(--accent-color);
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full-width {
+  width: 100%;
+}
+
+.form-group label {
+  font-family: var(--nav-font);
+  color: var(--heading-color);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-group label i {
+  color: var(--accent-color);
+  font-size: 1.1rem;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: var(--default-font);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(71, 178, 228, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #999;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: var(--nav-font);
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: var(--accent-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #3a9bc1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(71, 178, 228, 0.3);
+}
+
+.btn-secondary {
+  background: #f8f9fa;
+  color: var(--heading-color);
+  border: 2px solid #e0e0e0;
+}
+
+.btn-secondary:hover {
+  background: #e9ecef;
+  border-color: #bbb;
+}
+
+/* Estados de envío del formulario */
+.form-loading {
+  pointer-events: none;
+}
+
+.form-loading .btn-primary {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.form-success {
+  border-color: #28a745 !important;
+  background: rgba(40, 167, 69, 0.05) !important;
+}
+
+.form-error {
+  border-color: #dc3545 !important;
+  background: rgba(220, 53, 69, 0.05) !important;
+}
+
+.success-message,
+.error-message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-family: var(--default-font);
+  font-weight: 500;
+}
+
+.success-message {
+  background: rgba(40, 167, 69, 0.1);
+  color: #155724;
+  border: 1px solid #28a745;
+}
+
+.error-message {
+  background: rgba(220, 53, 69, 0.1);
+  color: #721c24;
+  border: 1px solid #dc3545;
+}
+
+/* Responsivo para móviles */
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: 95%;
+    margin: 10px;
+    max-height: 95vh;
+  }
+  
+  .species-detail-header {
+    margin: -20px -20px 20px -20px;
+    padding: 30px 20px;
+  }
+  
+  .species-detail-header h3 {
+    font-size: 2rem;
+  }
+  
+  .species-detail-content {
+    padding: 20px;
+  }
+  
+  .modal-body {
+    padding: 40px 20px 20px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .sighting-form-header h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Mapa Interactivo - Estilos Completos */
+
+/* Header del Mapa */
+.mapa-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+
+.mapa-header h2 {
+  color: var(--heading-color);
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.mapa-header p {
+  color: #666;
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Contenedor Principal del Mapa */
+.mapa-container {
+  display: flex;
+  height: 80vh;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(55, 81, 126, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Controles del Mapa */
+.map-controls {
+  width: 300px;
+  background: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.control-group h5 {
+  color: var(--heading-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control-group h5 i {
+  color: var(--accent-color);
+}
+
+/* Controles de Zoom */
+.zoom-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.control-btn {
+  background: var(--accent-color);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.control-btn:hover:not(:disabled) {
+  background: #37517e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(71, 178, 228, 0.3);
+}
+
+.control-btn:disabled {
+  background: #dee2e6;
+  color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Filtros de Conservación */
+.filter-controls {
+  margin-bottom: 2rem;
+}
+
+.filter-controls h6 {
+  color: var(--heading-color);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.conservation-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.filter-checkbox:hover {
+  background: rgba(71, 178, 228, 0.1);
+}
+
+.filter-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.checkmark {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #dee2e6;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.checkmark.extincion-critica {
+  background: linear-gradient(to right, #dc3545, #ff6b6b);
+  border-color: #dc3545;
+}
+
+.checkmark.peligro {
+  background: linear-gradient(to right, #fd7e14, #ffb142);
+  border-color: #fd7e14;
+}
+
+.checkmark.vulnerable {
+  background: linear-gradient(to right, #ffc107, #ffdd59);
+  border-color: #ffc107;
+}
+
+.checkmark.casi-amenazada {
+  background: linear-gradient(to right, #20c997, #0be881);
+  border-color: #20c997;
+}
+
+.checkmark.preocupacion-menor {
+  background: linear-gradient(to right, #28a745, #26de81);
+  border-color: #28a745;
+}
+
+.filter-checkbox input:checked + .checkmark::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.filter-checkbox input:not(:checked) + .checkmark {
+  background: transparent !important;
+}
+
+.filter-label {
+  font-size: 0.9rem;
+  color: var(--heading-color);
+  font-weight: 500;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.btn-outline-primary {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+.btn-outline-secondary {
+  color: #6c757d;
+  border-color: #6c757d;
+  background: transparent;
+}
+
+.btn-outline-secondary:hover {
+  background: #6c757d;
+  color: white;
+}
+
+/* Estadísticas del Mapa */
+.map-stats {
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+}
+
+.stat-item {
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.stat-item:last-child {
+  margin-bottom: 0;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Mapa Principal */
+.map-main {
+  flex: 1;
+  position: relative;
+  background: #e8f4f8;
+}
+
+.species-map {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.world-map-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.world-map {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  transition: transform 0.3s ease;
+  transform-origin: center center;
+}
+
+.world-map:active {
+  cursor: grabbing;
+}
+
+.world-map .continent {
+  transition: fill 0.3s ease;
+}
+
+.world-map .continent:hover {
+  fill: #e9ecef;
+}
+
+.ocean-bg {
+  opacity: 0.8;
+}
+
+/* Marcadores de Especies */
+.species-marker {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  transform-origin: center center;
+  transform-box: fill-box;
+}
+
+.species-marker:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 2;
+}
+
+/* Contenedor de marcadores estabilizado */
+#species-markers {
+  pointer-events: auto;
+}
+
+#species-markers .species-marker {
+  vector-effect: non-scaling-stroke;
+}
+
+.species-marker.extincion-critica {
+  fill: #dc3545;
+}
+
+.species-marker.peligro {
+  fill: #fd7e14;
+}
+
+.species-marker.vulnerable {
+  fill: #ffc107;
+}
+
+.species-marker.casi-amenazada {
+  fill: #20c997;
+}
+
+.species-marker.preocupacion-menor {
+  fill: #28a745;
+}
+
+/* Loading del Mapa */
+.map-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.map-loading p {
+  margin-top: 1rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Leyenda Mejorada */
+.map-legend {
+  width: 320px;
+  background: white;
+  border-left: 1px solid #e9ecef;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.map-legend h4 {
+  color: var(--heading-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.map-legend h4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: var(--accent-color);
+  border-radius: 2px;
+}
+
+.map-legend h4 i {
+  color: var(--accent-color);
+}
+
+.legend-section {
+  margin-bottom: 2rem;
+}
+
+.legend-section:last-child {
+  margin-bottom: 0;
+}
+
+.legend-section h5 {
+  color: var(--heading-color);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.legend-item:hover {
+  background: #f8f9fa;
+  transform: translateX(3px);
+}
+
+.legend-marker {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.legend-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.legend-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--heading-color);
+  line-height: 1.2;
+}
+
+.legend-count {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.legend-instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.instruction {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.instruction i {
+  color: var(--accent-color);
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Tooltip del Mapa */
+.map-tooltip {
+  position: absolute;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  padding: 1rem;
+  z-index: 1000;
+  max-width: 280px;
+  pointer-events: none;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.map-tooltip.show {
+  opacity: 1;
+}
+
+.tooltip-header {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.tooltip-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.tooltip-info {
+  flex: 1;
+}
+
+.tooltip-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--heading-color);
+  margin: 0 0 0.25rem 0;
+  line-height: 1.2;
+}
+
+.tooltip-scientific {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--accent-color);
+  margin: 0;
+}
+
+.tooltip-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tooltip-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.tooltip-stat i {
+  color: var(--accent-color);
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Success Stories Styles */
+.success-story-card {
+  border: none;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.success-story-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.success-story-card .card-img-top {
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.success-story-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+/* Ecosystem Health Styles */
+.ecosystem-chart {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.health-indicator {
+  padding: 15px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.health-indicator:last-child {
+  border-bottom: none;
+}
+
+.progress {
+  height: 8px;
+  border-radius: 10px;
+  background-color: #f0f2f5;
+}
+
+.progress-bar {
+  border-radius: 10px;
+}
+
+.ecosystem-threats {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.threat-item {
+  padding: 15px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.threat-item:last-child {
+  border-bottom: none;
+}
+
+.threat-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* Take Action Section Styles */
+.action-card {
+  background: rgba(255,255,255,0.1);
+  padding: 30px 20px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.action-card:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-5px);
+}
+
+.action-card i {
+  opacity: 0.9;
+}
+
+.action-card .btn {
+  color: var(--accent-color);
+  border-color: white;
+}
+
+.action-card .btn:hover {
+  background: white;
+  color: var(--accent-color);
+}
+
+@media (max-width: 768px) {
+  .especies-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Vista Lista Responsiva */
+  .especies-grid.vista-lista .especie-card,
+  .especies-grid.list-view .especie-card {
+    flex-direction: column;
+    max-width: 100%;
+  }
+  
+  .especies-grid.vista-lista .especie-image,
+  .especies-grid.list-view .especie-image {
+    width: 100%;
+    min-width: auto;
+    height: 200px;
+  }
+  
+  .especies-grid.vista-lista .especie-content,
+  .especies-grid.list-view .especie-content {
+    padding: 20px;
+  }
+  
+  .especies-grid.vista-lista .especie-description,
+  .especies-grid.list-view .especie-description {
+    height: auto;
+    max-height: 80px;
+    overflow: hidden;
+  }
+  
+  .especies-grid.vista-lista .especie-actions,
+  .especies-grid.list-view .especie-actions {
+    flex-direction: row;
+    gap: 10px;
+  }
+  
+  /* Vista Botones Responsiva */
+  .vista-opciones {
+    flex-direction: column;
+    gap: 20px;
+    align-items: stretch;
+  }
+  
+  .vista-buttons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .vista-btn {
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  /* Mapa Responsivo */
+  .mapa-container {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .mapa-container.vista-mapa {
+    height: 50vh;
+  }
+  
+  /* Mapa Responsive */
+  .mapa-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 90vh;
+  }
+  
+  .map-controls {
+    width: 100%;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem;
+  }
+  
+  .control-group h5 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .zoom-controls {
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .conservation-filters {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .filter-checkbox {
+    padding: 0.4rem;
+  }
+  
+  .filter-label {
+    font-size: 0.8rem;
+  }
+  
+  .filter-actions {
+    justify-content: center;
+  }
+  
+  .map-stats {
+    margin-top: 1rem;
+  }
+  
+  .map-main {
+    min-height: 50vh;
+  }
+  
+  .map-legend {
+    width: 100%;
+    padding: 1rem;
+    border-left: none;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .legend-items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .legend-item {
+    padding: 0.5rem;
+  }
+  
+  .legend-instructions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .instruction {
+    font-size: 0.8rem;
+  }
+  
+  .map-tooltip {
+    max-width: 250px;
+    padding: 0.75rem;
+  }
+  
+  .tooltip-header {
+    gap: 0.5rem;
+  }
+  
+  .tooltip-image {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .tooltip-title {
+    font-size: 0.9rem;
+  }
+  
+  .tooltip-scientific {
+    font-size: 0.75rem;
+  }
+  
+  .mapa-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .mapa-header p {
+    font-size: 1rem;
+  }
+  
+  /* Otros responsive existentes */
+  .especie-actions {
+    flex-direction: column;
+  }
+  
+  .success-story-card .card-img-top {
+    height: 150px;
+  }
+  
+  .ecosystem-chart,
+  .ecosystem-threats {
+    margin-bottom: 30px;
+  }
+  
+  .action-card {
+    margin-bottom: 20px;
+  }
+}
+
+/* Media Query para tablets */
+@media (max-width: 992px) and (min-width: 769px) {
+  .especies-grid.vista-lista .especie-image {
+    width: 200px;
+    min-width: 200px;
+    height: 180px;
+  }
+  
+  .especies-grid.vista-lista .especie-content {
+    padding: 20px;
+  }
+  
+  .especies-grid.vista-lista .especie-content h3 {
+    font-size: 18px;
+  }
+  
+  .vista-buttons {
+    gap: 8px;
+  }
+  
+  .vista-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Media Query para móviles */
+@media (max-width: 480px) {
+  .mapa-container {
+    border-radius: 10px;
+    min-height: 80vh;
+  }
+  
+  .conservation-filters {
+    grid-template-columns: 1fr;
+  }
+  
+  .legend-items {
+    grid-template-columns: 1fr;
+  }
+  
+  .zoom-controls {
+    gap: 0.25rem;
+  }
+  
+  .control-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+  
+  .mapa-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .map-stats .stat-number {
+    font-size: 1.2rem;
+  }
+}
+
+/* Colores adicionales para marcadores de leyenda */
+.legend-marker.extincion-critica {
+  background: linear-gradient(to right, #dc3545, #ff6b6b);
+}
+
+.legend-marker.peligro {
+  background: linear-gradient(to right, #fd7e14, #ffb142);
+}
+
+.legend-marker.vulnerable {
+  background: linear-gradient(to right, #ffc107, #ffdd59);
+}
+
+.legend-marker.casi-amenazada {
+  background: linear-gradient(to right, #20c997, #0be881);
+}
+
+.legend-marker.preocupacion-menor {
+  background: linear-gradient(to right, #28a745, #26de81);
+}

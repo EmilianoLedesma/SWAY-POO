@@ -1,0 +1,702 @@
+<!-- =============================================
+     PÁGINA DE PROCESO DE PAGO
+     Formulario seguro para donaciones y compras
+     con múltiples métodos de pago
+     ============================================= -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Donación - SWAY</title>
+    <meta
+      content="Completa tu donación para apoyar la conservación marina"
+      name="description"
+    />
+    <meta content="donación, conservación marina, pago" name="keywords" />
+
+    <!-- Configuración de favicon del sitio -->
+    <link
+      href="{{ url_for('static', filename='img/SWAY (1).png') }}"
+      rel="icon"
+    />
+
+    <!-- Enlaces a fuentes externas de Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Archivos CSS de librerías externas -->
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/aos/aos.css') }}"
+      rel="stylesheet"
+    />
+
+    <!-- Main CSS File -->
+    <link
+      href="{{ url_for('static', filename='css/main.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="payment-page">
+    <!-- Header -->
+    <header id="header" class="header d-flex align-items-center fixed-top">
+      <div
+        class="container-fluid container-xl position-relative d-flex align-items-center"
+      >
+        <a
+          href="{{ url_for('index') }}"
+          class="logo d-flex align-items-center me-auto"
+        >
+          <h1 class="sitename">SWAY</h1>
+        </a>
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('index') }}#about">Nosotros</a></li>
+            <li>
+              <a href="{{ url_for('index') }}#donation" class="active"
+                >Donaciones</a
+              >
+            </li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Payment Section -->
+      <section id="payment" class="payment section">
+        <div class="container" style="padding-top: 120px">
+          <div class="section-title" data-aos="fade-up">
+            <h2>Completa tu Donación</h2>
+            <p>
+              Tu apoyo es fundamental para la conservación de nuestros océanos.
+              Complete los datos de pago de forma segura.
+            </p>
+            <div class="donation-amount-display">
+              <span class="amount-label">Monto seleccionado:</span>
+              <span class="amount-value" id="donation-display-amount">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+              <div class="payment-container" data-aos="fade-up">
+                <form id="payment-form" class="payment-form" novalidate>
+                  <!-- Payment Method Selection -->
+                  <div class="payment-methods">
+                    <h4><i class="bi bi-credit-card"></i> Método de Pago</h4>
+                    <div class="payment-options">
+                      <label class="payment-option">
+                        <input
+                          type="radio"
+                          name="payment_method"
+                          value="credit_card"
+                          checked
+                        />
+                        <span class="payment-option-content">
+                          <i class="bi bi-credit-card-2-front"></i>
+                          Tarjeta de Crédito/Débito
+                        </span>
+                      </label>
+                      <label class="payment-option">
+                        <input
+                          type="radio"
+                          name="payment_method"
+                          value="paypal"
+                        />
+                        <span class="payment-option-content">
+                          <i class="bi bi-paypal"></i>
+                          PayPal
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Credit Card Form -->
+                  <div class="card-details" id="card-details">
+                    <h4>
+                      <i class="bi bi-shield-check"></i> Datos de la Tarjeta
+                    </h4>
+
+                    <div class="form-row">
+                      <div class="form-group full-width">
+                        <label for="card-number">
+                          <i class="bi bi-credit-card"></i> Número de Tarjeta *
+                        </label>
+                        <input
+                          type="text"
+                          id="card-number"
+                          name="card_number"
+                          required
+                          placeholder="1234 5678 9012 3456"
+                          maxlength="19"
+                          data-validation="tarjeta"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="card-name">
+                          <i class="bi bi-person"></i> Nombre en la Tarjeta *
+                        </label>
+                        <input
+                          type="text"
+                          id="card-name"
+                          name="card_name"
+                          required
+                          placeholder="Juan Pérez"
+                          data-validation="soloTexto"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="card-expiry">
+                          <i class="bi bi-calendar-date"></i> Vencimiento *
+                        </label>
+                        <input
+                          type="text"
+                          id="card-expiry"
+                          name="card_expiry"
+                          required
+                          placeholder="MM/YY"
+                          maxlength="5"
+                          data-validation="fechaVencimiento"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="card-cvv">
+                          <i class="bi bi-shield-lock"></i> CVV *
+                        </label>
+                        <input
+                          type="text"
+                          id="card-cvv"
+                          name="card_cvv"
+                          required
+                          placeholder="123"
+                          maxlength="4"
+                          data-validation="cvv"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- PayPal Section -->
+                  <div
+                    class="paypal-details"
+                    id="paypal-details"
+                    style="display: none"
+                  >
+                    <div class="paypal-info">
+                      <i class="bi bi-paypal paypal-icon"></i>
+                      <h4>Pagar con PayPal</h4>
+                      <p>
+                        Serás redirigido a PayPal para completar el pago de
+                        forma segura.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Contact Information -->
+                  <div class="contact-info">
+                    <h4>
+                      <i class="bi bi-person-check"></i> Información de Contacto
+                    </h4>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="contact-nombre">
+                          <i class="bi bi-person-fill"></i> Nombre *
+                        </label>
+                        <input
+                          type="text"
+                          id="contact-nombre"
+                          name="contact_nombre"
+                          required
+                          placeholder="Juan"
+                          data-validation="soloTexto"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="contact-apellido-paterno">
+                          <i class="bi bi-person-fill"></i> Apellido Paterno *
+                        </label>
+                        <input
+                          type="text"
+                          id="contact-apellido-paterno"
+                          name="contact_apellido_paterno"
+                          required
+                          placeholder="Pérez"
+                          data-validation="soloTexto"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="contact-apellido-materno">
+                          <i class="bi bi-person-fill"></i> Apellido Materno
+                        </label>
+                        <input
+                          type="text"
+                          id="contact-apellido-materno"
+                          name="contact_apellido_materno"
+                          placeholder="García (opcional)"
+                          data-validation="soloTexto"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="contact-email">
+                          <i class="bi bi-envelope"></i> Correo Electrónico *
+                        </label>
+                        <input
+                          type="email"
+                          id="contact-email"
+                          name="contact_email"
+                          required
+                          placeholder="juan@email.com"
+                          data-validation="email"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Security Notice -->
+                  <div class="security-notice">
+                    <i class="bi bi-shield-check"></i>
+                    <div class="security-text">
+                      <strong>Pago 100% Seguro</strong>
+                      <p>
+                        Tus datos están protegidos con encriptación SSL de 256
+                        bits
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <div class="form-actions">
+                    <button
+                      type="button"
+                      class="btn-secondary"
+                      onclick="window.history.back()"
+                    >
+                      <i class="bi bi-arrow-left"></i> Volver
+                    </button>
+                    <button type="submit" class="btn-payment">
+                      <i class="bi bi-lock"></i>
+                      <span class="payment-button-text"
+                        >Completar Donación</span
+                      >
+                      <span class="payment-amount" id="payment-button-amount"
+                        >$0</span
+                      >
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer with Payment Methods -->
+    <footer id="footer" class="footer payment-footer">
+      <div class="container">
+        <div class="payment-methods-footer">
+          <h5>Métodos de Pago Aceptados</h5>
+          <div class="payment-logos">
+            <img
+              src="{{ url_for('static', filename='img/payment/visa.png') }}"
+              alt="Visa"
+              class="payment-logo"
+            />
+            <img
+              src="{{ url_for('static', filename='img/payment/mastercard.png') }}"
+              alt="Mastercard"
+              class="payment-logo"
+            />
+            <img
+              src="{{ url_for('static', filename='img/payment/paypal.png') }}"
+              alt="PayPal"
+              class="payment-logo"
+            />
+            <img
+              src="{{ url_for('static', filename='img/payment/amex.png') }}"
+              alt="American Express"
+              class="payment-logo"
+            />
+          </div>
+          <div class="security-badges">
+            <span class="security-badge">
+              <i class="bi bi-shield-check"></i> SSL Seguro
+            </span>
+            <span class="security-badge">
+              <i class="bi bi-lock"></i> Encriptado
+            </span>
+            <span class="security-badge">
+              <i class="bi bi-check-circle"></i> Verificado
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="container copyright text-center mt-4">
+        <p>
+          © <span>Copyright</span> <strong class="px-1 sitename">SWAY</strong>
+          <span>Todos los derechos reservados</span>
+        </p>
+      </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="payment-success-modal" class="popup">
+      <div class="popup-content">
+        <span class="close-button" onclick="closePaymentModal()">&times;</span>
+        <div class="success-content">
+          <i class="bi bi-check-circle-fill success-icon"></i>
+          <h3>¡Donación Completada!</h3>
+          <p>
+            Gracias por tu generosa contribución de
+            <span id="success-amount">$0</span> para la conservación marina.
+          </p>
+          <p>Recibirás un recibo por correo electrónico en unos minutos.</p>
+          <button onclick="redirectToHome()" class="btn-primary">
+            <i class="bi bi-house"></i> Volver al Inicio
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor JS Files -->
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+
+    <!-- Validation JS -->
+    <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+
+    <!-- Payment JS -->
+    <script>
+      // Initialize AOS
+      AOS.init();
+
+      // Payment form functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("Payment page loaded, initializing...");
+
+        // Get donation amount - prioritize URL parameter over localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlAmount = urlParams.get("amount");
+        const storageAmount = localStorage.getItem("donationAmount");
+        let donationAmount = urlAmount || storageAmount || "50";
+
+        console.log("URL amount:", urlAmount);
+        console.log("Storage amount:", storageAmount);
+        console.log("Selected amount:", donationAmount);
+
+        // Clean amount string (remove any existing formatting)
+        donationAmount = donationAmount.toString().replace(/[,$]/g, "");
+
+        // Parse and validate amount
+        donationAmount = parseFloat(donationAmount);
+        if (isNaN(donationAmount) || donationAmount <= 0) {
+          console.error("Invalid amount detected, using fallback");
+          donationAmount = 50;
+        }
+
+        console.log("Parsed donation amount:", donationAmount);
+
+        // Format amount with proper locale formatting for display
+        const formattedAmount = donationAmount.toLocaleString("en-US", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        });
+
+        console.log("Formatted amount for display:", formattedAmount);
+
+        // Update amount displays dynamically
+        updateAmountDisplays(formattedAmount);
+
+        // Store clean amount for later use
+        window.currentDonationAmount = donationAmount;
+
+        console.log("Amount displays updated successfully");
+
+        // Fallback: try updating again after a short delay to ensure DOM is ready
+        setTimeout(() => {
+          console.log("Fallback update attempt...");
+          updateAmountDisplays(formattedAmount);
+        }, 100);
+
+        // Configure form validations
+        if (typeof validacionesSway !== "undefined") {
+          validacionesSway.configurarFormulario(
+            document.getElementById("payment-form"),
+            {
+              card_number: { tipo: "tarjeta" },
+              card_name: { tipo: "soloTexto" },
+              card_expiry: { tipo: "fechaVencimiento" },
+              card_cvv: { tipo: "cvv" },
+              contact_nombre: { tipo: "soloTexto" },
+              contact_apellido_paterno: { tipo: "soloTexto" },
+              contact_apellido_materno: { tipo: "soloTexto" },
+              contact_email: { tipo: "email" },
+            }
+          );
+        }
+
+        // Payment method toggle
+        const paymentMethods = document.querySelectorAll(
+          'input[name="payment_method"]'
+        );
+        paymentMethods.forEach((method) => {
+          method.addEventListener("change", togglePaymentMethod);
+        });
+
+        // Form submission
+        document
+          .getElementById("payment-form")
+          .addEventListener("submit", handlePaymentSubmission);
+      });
+
+      function updateAmountDisplays(formattedAmount) {
+        console.log("Updating amount displays with:", formattedAmount);
+
+        // Update all amount displays
+        const displayElement = document.getElementById(
+          "donation-display-amount"
+        );
+        const buttonElement = document.getElementById("payment-button-amount");
+        const successElement = document.getElementById("success-amount");
+
+        if (displayElement) {
+          displayElement.textContent = `$${formattedAmount}`;
+          console.log("Updated donation-display-amount");
+        }
+
+        if (buttonElement) {
+          buttonElement.textContent = `$${formattedAmount}`;
+          console.log("Updated payment-button-amount");
+        }
+
+        if (successElement) {
+          successElement.textContent = `$${formattedAmount}`;
+          console.log("Updated success-amount");
+        }
+      }
+
+      function togglePaymentMethod() {
+        const selectedMethod = document.querySelector(
+          'input[name="payment_method"]:checked'
+        ).value;
+        const cardDetails = document.getElementById("card-details");
+        const paypalDetails = document.getElementById("paypal-details");
+        const paymentButtonText = document.querySelector(
+          ".payment-button-text"
+        );
+
+        if (selectedMethod === "credit_card") {
+          cardDetails.style.display = "block";
+          paypalDetails.style.display = "none";
+          paymentButtonText.textContent = "Completar Donación";
+        } else {
+          cardDetails.style.display = "none";
+          paypalDetails.style.display = "block";
+          paymentButtonText.textContent = "Continuar con PayPal";
+        }
+      }
+
+      function handlePaymentSubmission(event) {
+        event.preventDefault();
+
+        const selectedMethod = document.querySelector(
+          'input[name="payment_method"]:checked'
+        ).value;
+        const donationAmount = window.currentDonationAmount || 50;
+
+        if (selectedMethod === "paypal") {
+          // For PayPal, only validate contact info
+          if (typeof validacionesSway !== "undefined") {
+            const isValid = validacionesSway.validarFormularioCompleto(
+              document.getElementById("payment-form"),
+              {
+                contact_nombre: { tipo: "soloTexto" },
+                contact_apellido_paterno: { tipo: "soloTexto" },
+                contact_apellido_materno: { tipo: "soloTexto" },
+                contact_email: { tipo: "email" },
+              }
+            );
+
+            if (isValid) {
+              processPayment("paypal", donationAmount);
+            }
+          } else {
+            processPayment("paypal", donationAmount);
+          }
+        } else {
+          // Validate credit card form
+          if (typeof validacionesSway !== "undefined") {
+            const isValid = validacionesSway.validarFormularioCompleto(
+              document.getElementById("payment-form"),
+              {
+                card_number: { tipo: "tarjeta" },
+                card_name: { tipo: "soloTexto" },
+                card_expiry: { tipo: "fechaVencimiento" },
+                card_cvv: { tipo: "cvv" },
+                contact_nombre: { tipo: "soloTexto" },
+                contact_apellido_paterno: { tipo: "soloTexto" },
+                contact_apellido_materno: { tipo: "soloTexto" },
+                contact_email: { tipo: "email" },
+              }
+            );
+
+            if (isValid) {
+              processPayment("credit_card", donationAmount);
+            }
+          } else {
+            // Fallback if validation system not available
+            processPayment("credit_card", donationAmount);
+          }
+        }
+      }
+
+      function processPayment(paymentMethod, amount) {
+        const submitButton = document.querySelector(".btn-payment");
+        const originalText = submitButton.innerHTML;
+
+        submitButton.innerHTML =
+          '<i class="bi bi-hourglass-split"></i> Procesando...';
+        submitButton.disabled = true;
+
+        // Collect form data
+        const nombre = document.getElementById("contact-nombre").value;
+        const apellidoPaterno = document.getElementById(
+          "contact-apellido-paterno"
+        ).value;
+        const apellidoMaterno = document.getElementById(
+          "contact-apellido-materno"
+        ).value;
+
+        const formData = {
+          amount: amount,
+          contact_name:
+            nombre +
+            " " +
+            apellidoPaterno +
+            (apellidoMaterno ? " " + apellidoMaterno : ""),
+          contact_nombre: nombre,
+          contact_apellido_paterno: apellidoPaterno,
+          contact_apellido_materno: apellidoMaterno,
+          contact_email: document.getElementById("contact-email").value,
+          payment_method: paymentMethod,
+        };
+
+        // Add credit card data if applicable
+        if (paymentMethod === "credit_card") {
+          formData.card_number = document.getElementById("card-number").value;
+          formData.card_name = document.getElementById("card-name").value;
+          formData.card_expiry = document.getElementById("card-expiry").value;
+          formData.card_cvv = document.getElementById("card-cvv").value;
+        }
+
+        // Send to server
+        fetch("/api/procesar-donacion", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              showPaymentSuccess();
+            } else {
+              alert(
+                "Error al procesar la donación: " + (data.error || data.message)
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Error de conexión. Por favor, inténtalo de nuevo.");
+          })
+          .finally(() => {
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+          });
+      }
+
+      function showPaymentSuccess() {
+        // Amount is already set by updateAmountDisplays, no need to change it
+        document.getElementById("payment-success-modal").style.display = "flex";
+      }
+
+      function closePaymentModal() {
+        document.getElementById("payment-success-modal").style.display = "none";
+      }
+
+      function redirectToHome() {
+        window.location.href = "{{ url_for('index') }}";
+      }
+
+      // Keyboard accessibility
+      document.addEventListener("keydown", function (event) {
+        const modal = document.getElementById("payment-success-modal");
+        if (modal.style.display === "flex" && event.key === "Escape") {
+          closePaymentModal();
+        }
+      });
+
+      // Debug function - you can call this in browser console to check current values
+      window.debugDonationAmount = function () {
+        console.log("=== DONATION DEBUG INFO ===");
+        console.log("Full URL:", window.location.href);
+        console.log(
+          "URL Parameters:",
+          new URLSearchParams(window.location.search).get("amount")
+        );
+        console.log("LocalStorage:", localStorage.getItem("donationAmount"));
+        console.log("Current stored amount:", window.currentDonationAmount);
+        console.log(
+          "Display element value:",
+          document.getElementById("donation-display-amount")?.textContent
+        );
+        console.log(
+          "Button element value:",
+          document.getElementById("payment-button-amount")?.textContent
+        );
+        console.log(
+          "Success element value:",
+          document.getElementById("success-amount")?.textContent
+        );
+        console.log("=========================");
+      };
+
+      // Test function to manually set amount - call with testSetAmount(1000)
+      window.testSetAmount = function (amount) {
+        console.log("Testing with amount:", amount);
+        const formatted = amount.toLocaleString("en-US", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        });
+        updateAmountDisplays(formatted);
+        window.currentDonationAmount = amount;
+        console.log("Test amount set successfully");
+      };
+    </script>
+  </body>
+</html>

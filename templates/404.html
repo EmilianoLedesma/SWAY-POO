@@ -1,0 +1,87 @@
+<!-- =============================================
+     PÁGINA DE ERROR 404
+     Página mostrada cuando un recurso no se encuentra
+     Incluye navegación para regresar al sitio principal
+     ============================================= -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Error 404 - Página no encontrada - SWAY</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .error-container {
+        text-align: center;
+        max-width: 600px;
+        padding: 2rem;
+      }
+
+      .error-code {
+        font-size: 8rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+      }
+
+      .error-message {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+      }
+
+      .error-description {
+        font-size: 1rem;
+        margin-bottom: 3rem;
+        opacity: 0.8;
+      }
+
+      .btn-home {
+        display: inline-block;
+        padding: 1rem 2rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-home:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="error-container">
+      <div class="error-code">404</div>
+      <div class="error-message">¡Oops! Página no encontrada</div>
+      <div class="error-description">
+        La página que estás buscando no existe o ha sido movida.
+      </div>
+      <a href="/" class="btn-home">Volver al Inicio</a>
+    </div>
+  </body>
+</html>

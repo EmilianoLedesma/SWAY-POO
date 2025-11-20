@@ -1,0 +1,2813 @@
+<!-- =============================================
+     PORTAL DE COLABORADORES SWAY
+     Panel administrativo para colaboradores
+     con gestión de contenido y estadísticas
+     ============================================= -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portal de Colaboradores - SWAY</title>
+
+    <!-- Archivos CSS de librerías externas -->
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/main.css') }}"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* Usar las variables de colores del sistema SWAY existente */
+      :root {
+        --primary-color: #37517e;
+        --accent-color: #47b2e4;
+        --heading-color: #37517e;
+        --default-color: #444444;
+        --background-color: #ffffff;
+        --surface-color: #ffffff;
+        --light-background: #f5f6f8;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+      }
+
+      /* Usar tipografías del sistema SWAY */
+      body {
+        background-color: var(--light-background);
+        font-family: var(--default-font);
+        color: var(--default-color);
+        min-height: 100vh;
+      }
+
+      /* Navigation Header */
+      .nav-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          #2c4468 100%
+        );
+        box-shadow: 0 4px 20px rgba(55, 81, 126, 0.15);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 3px solid var(--accent-color);
+      }
+
+      .nav-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 80px;
+      }
+
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: white;
+        text-decoration: none;
+        font-family: var(--heading-font);
+        font-weight: 700;
+        font-size: 1.5rem;
+      }
+
+      .nav-brand i {
+        font-size: 2rem;
+        color: var(--accent-color);
+        padding: 0.5rem;
+        background: rgba(71, 178, 228, 0.2);
+        border-radius: 12px;
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: white;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .user-avatar {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-color) 0%,
+          #3a9bc1 100%
+        );
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .user-details {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .user-details p {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .logout-btn {
+        background: rgba(220, 53, 69, 0.9);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+      }
+
+      .logout-btn:hover {
+        background: var(--danger-color);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+      }
+
+      /* Header del Portal con estilos SWAY mejorado */
+      .portal-header {
+        background: linear-gradient(
+          135deg,
+          var(--surface-color) 0%,
+          rgba(71, 178, 228, 0.02) 100%
+        );
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin: 2rem auto;
+        max-width: 1400px;
+        box-shadow: 0 8px 32px rgba(55, 81, 126, 0.12);
+        border: 1px solid rgba(55, 81, 126, 0.08);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .portal-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-color),
+          var(--primary-color)
+        );
+      }
+
+      .portal-title {
+        color: var(--heading-color);
+        font-family: var(--heading-font);
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        text-align: center;
+        letter-spacing: -0.03em;
+      }
+
+      .portal-subtitle {
+        color: var(--default-color);
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        opacity: 0.8;
+      }
+
+      .colaborador-info {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 2rem;
+        background: linear-gradient(
+          135deg,
+          rgba(71, 178, 228, 0.08) 0%,
+          rgba(55, 81, 126, 0.04) 100%
+        );
+        border-radius: 16px;
+        border: 1px solid rgba(71, 178, 228, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .colaborador-info::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(
+          180deg,
+          var(--accent-color),
+          var(--primary-color)
+        );
+      }
+
+      .colaborador-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-color) 0%,
+          var(--primary-color) 100%
+        );
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: 800;
+        box-shadow: 0 4px 20px rgba(55, 81, 126, 0.3);
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+      }
+
+      .colaborador-avatar::before {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border-radius: 50%;
+        padding: 2px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-color),
+          var(--primary-color)
+        );
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask-composite: xor;
+      }
+
+      .colaborador-details h3 {
+        color: var(--heading-color);
+        font-family: var(--heading-font);
+        margin: 0 0 0.75rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .colaborador-details p {
+        margin: 0.5rem 0;
+        color: var(--default-color);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 500;
+      }
+
+      .colaborador-details p i {
+        color: var(--accent-color);
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+      }
+
+      /* Secciones principales */
+      .portal-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      .portal-sections {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .portal-section {
+        background: var(--surface-color);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 32px rgba(55, 81, 126, 0.12);
+        border: 1px solid rgba(55, 81, 126, 0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .portal-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-color),
+          var(--primary-color)
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .portal-section:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 48px rgba(55, 81, 126, 0.18);
+      }
+
+      .portal-section:hover::before {
+        opacity: 1;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 3px solid rgba(71, 178, 228, 0.15);
+        position: relative;
+      }
+
+      .section-header::after {
+        content: "";
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-color),
+          var(--primary-color)
+        );
+        border-radius: 2px;
+      }
+
+      .section-title {
+        color: var(--heading-color);
+        font-family: var(--heading-font);
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        letter-spacing: -0.02em;
+      }
+
+      .section-title i {
+        font-size: 1.5rem;
+        color: var(--accent-color);
+        padding: 0.5rem;
+        background: rgba(71, 178, 228, 0.1);
+        border-radius: 10px;
+      }
+
+      /* Botones siguiendo el sistema SWAY mejorado */
+      .btn-sway-primary {
+        background: linear-gradient(
+          135deg,
+          var(--accent-color) 0%,
+          #3a9bc1 100%
+        );
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        box-shadow: 0 4px 16px rgba(71, 178, 228, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .btn-sway-primary:hover {
+        background: linear-gradient(
+          135deg,
+          #3a9bc1 0%,
+          var(--accent-color) 100%
+        );
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(71, 178, 228, 0.4);
+      }
+
+      .btn-sway-primary i {
+        font-size: 1.1rem;
+      }
+
+      .btn-sway-success {
+        background: var(--success-color);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .btn-sway-success:hover {
+        background: #218838;
+      }
+
+      .btn-sway-danger {
+        background: var(--danger-color);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .btn-sway-danger:hover {
+        background: #c82333;
+      }
+
+      /* Grid de especies - Expandido para mejor uso del espacio */
+      .especies-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        max-height: none;
+        margin-top: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        .especies-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .especies-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      @media (min-width: 1400px) {
+        .especies-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      .especie-card {
+        background: var(--surface-color);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(55, 81, 126, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(55, 81, 126, 0.08);
+        position: relative;
+        overflow: hidden;
+        padding: 0;
+        height: fit-content;
+      }
+
+      .especie-image {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+        border-radius: 20px 20px 0 0;
+        background: linear-gradient(
+          135deg,
+          rgba(71, 178, 228, 0.1) 0%,
+          rgba(71, 178, 228, 0.05) 100%
+        );
+      }
+
+      .especie-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      .especie-card:hover .especie-image img {
+        transform: scale(1.05);
+      }
+
+      .conservation-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(10px);
+        color: white;
+      }
+
+      .conservation-badge.extincion-critica {
+        background: rgba(220, 53, 69, 0.9);
+      }
+
+      .conservation-badge.peligro {
+        background: rgba(255, 193, 7, 0.9);
+      }
+
+      .conservation-badge.vulnerable {
+        background: rgba(255, 152, 0, 0.9);
+      }
+
+      .conservation-badge.casi-amenazada {
+        background: rgba(40, 167, 69, 0.9);
+      }
+
+      .conservation-badge.preocupacion-menor {
+        background: rgba(32, 201, 151, 0.9);
+      }
+
+      .especie-content {
+        padding: 2rem;
+      }
+
+      .especie-content h3 {
+        color: var(--heading-color);
+        font-family: var(--heading-font);
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.3;
+      }
+
+      .scientific-name {
+        color: var(--default-color);
+        font-style: italic;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+      }
+
+      .especie-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .especie-stats .stat {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--light-background);
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        color: var(--default-color);
+        border: 1px solid rgba(55, 81, 126, 0.1);
+      }
+
+      .especie-stats .stat i {
+        color: var(--accent-color);
+        font-size: 0.9rem;
+      }
+
+      .especie-description {
+        color: var(--default-color);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+      }
+
+      .especie-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-color),
+          var(--primary-color)
+        );
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+      }
+
+      .especie-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 16px 64px rgba(55, 81, 126, 0.15);
+      }
+
+      .especie-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .especie-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+      }
+
+      .especie-info h4 {
+        color: var(--heading-color);
+        font-family: var(--heading-font);
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0 0 0.25rem 0;
+      }
+
+      .especie-scientific {
+        color: var(--default-color);
+        font-style: italic;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .especie-description {
+        color: var(--default-color);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+      }
+
+      .especie-stats {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .especie-stat {
+        background: var(--light-background);
+        padding: 0.5rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        color: var(--default-color);
+        font-weight: 500;
+        border: 1px solid rgba(55, 81, 126, 0.1);
+      }
+
+      .especie-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 1.5rem 2rem 0.5rem 2rem;
+        border-top: 2px solid rgba(55, 81, 126, 0.08);
+        margin-top: 1rem;
+      }
+
+      .especie-actions button {
+        padding: 0.8rem 1.2rem;
+        font-size: 0.85rem;
+        min-width: 140px;
+        white-space: nowrap;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        flex: 1;
+        max-width: 180px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .especie-actions button i {
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+      }
+
+      .especie-actions .btn-sway-success {
+        background: linear-gradient(
+          135deg,
+          var(--success-color) 0%,
+          #20c997 100%
+        );
+        color: white;
+      }
+
+      .especie-actions .btn-sway-success:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        background: linear-gradient(
+          135deg,
+          #20c997 0%,
+          var(--success-color) 100%
+        );
+      }
+
+      .especie-actions .btn-sway-danger {
+        background: linear-gradient(
+          135deg,
+          var(--danger-color) 0%,
+          #e74c3c 100%
+        );
+        color: white;
+      }
+
+      .especie-actions .btn-sway-danger:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+        background: linear-gradient(
+          135deg,
+          #e74c3c 0%,
+          var(--danger-color) 100%
+        );
+      }
+
+      /* Estilos para multi-select dropdown */
+      .multi-select-container {
+        position: relative;
+      }
+
+      .multi-select-dropdown {
+        position: relative;
+        background: var(--surface-color);
+        border: 1px solid rgba(55, 81, 126, 0.2);
+        border-radius: 8px;
+      }
+
+      .multi-select-selected {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--surface-color);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .multi-select-selected:hover {
+        border-color: var(--accent-color);
+        background: rgba(71, 178, 228, 0.05);
+      }
+
+      .multi-select-selected i {
+        transition: transform 0.3s ease;
+      }
+
+      .multi-select-dropdown.active .multi-select-selected i {
+        transform: rotate(180deg);
+      }
+
+      .multi-select-options {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--surface-color);
+        border: 1px solid rgba(55, 81, 126, 0.2);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        max-height: 250px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 4px 20px rgba(55, 81, 126, 0.15);
+      }
+
+      .multi-select-dropdown.active .multi-select-options {
+        display: block;
+      }
+
+      .multi-select-option {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s ease;
+        font-size: 0.9rem;
+      }
+
+      .multi-select-option:hover {
+        background: rgba(71, 178, 228, 0.1);
+      }
+
+      .multi-select-option.selected {
+        background: rgba(71, 178, 228, 0.2);
+        color: var(--primary-color);
+        font-weight: 500;
+      }
+
+      .multi-select-option input[type="checkbox"] {
+        margin: 0;
+        width: 16px;
+        height: 16px;
+      }
+
+      .selected-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .selected-tag {
+        background: var(--accent-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .selected-tag .remove-tag {
+        cursor: pointer;
+        font-weight: bold;
+        opacity: 0.8;
+      }
+
+      .selected-tag .remove-tag:hover {
+        opacity: 1;
+      }
+
+      /* Lista de avistamientos */
+      .avistamientos-list {
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      .avistamiento-item {
+        background: var(--surface-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(55, 81, 126, 0.05);
+        border-left: 4px solid var(--accent-color);
+        transition: all 0.3s ease;
+      }
+
+      .avistamiento-item:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 20px rgba(55, 81, 126, 0.1);
+      }
+
+      .avistamiento-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+      }
+
+      .avistamiento-especie {
+        color: var(--heading-color);
+        font-family: var(--heading-font);
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+
+      .avistamiento-fecha {
+        color: var(--default-color);
+        font-size: 0.9rem;
+        background: var(--light-background);
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+      }
+
+      .avistamiento-ubicacion {
+        color: var(--default-color);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .avistamiento-notas {
+        color: var(--default-color);
+        font-size: 0.9rem;
+        line-height: 1.4;
+        font-style: italic;
+      }
+
+      /* Estados vacíos */
+      .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--default-color);
+      }
+
+      .empty-state i {
+        font-size: 4rem;
+        color: rgba(55, 81, 126, 0.3);
+        margin-bottom: 1rem;
+      }
+
+      .empty-state h4 {
+        color: var(--heading-color);
+        font-family: var(--heading-font);
+        margin-bottom: 0.5rem;
+      }
+
+      /* Modal estilo SWAY colaboradores mejorado */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.75);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        backdrop-filter: blur(4px);
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-content {
+        background: var(--surface-color);
+        border-radius: 20px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 85vh;
+        overflow-y: auto;
+        position: relative;
+        transform: scale(0.8) translateY(20px);
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        box-shadow: 0 25px 60px rgba(55, 81, 126, 0.25),
+          0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .modal-overlay.active .modal-content {
+        transform: scale(1) translateY(0);
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        background: rgba(220, 53, 69, 0.1);
+        color: var(--danger-color);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 1.3rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 300;
+      }
+
+      .modal-close:hover {
+        background: var(--danger-color);
+        color: white;
+        transform: scale(1.1);
+      }
+
+      .modal-body {
+        padding: 2.5rem;
+        text-align: center;
+      }
+
+      .collaborator-form-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid rgba(71, 178, 228, 0.15);
+        position: relative;
+      }
+
+      .collaborator-form-header::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-color),
+          var(--primary-color)
+        );
+        border-radius: 2px;
+      }
+
+      .collaborator-form-header h2 {
+        color: var(--heading-color);
+        font-family: var(--heading-font);
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        letter-spacing: -0.02em;
+      }
+
+      .collaborator-form-header h2 i {
+        font-size: 1.5rem;
+        opacity: 0.8;
+      }
+
+      .collaborator-form-header p {
+        color: var(--default-color);
+        font-size: 1rem;
+        margin: 0;
+        opacity: 0.8;
+        font-weight: 500;
+      }
+
+      /* Estilos específicos para contenido del modal */
+      .modal-content-text {
+        font-size: 1.1rem;
+        color: var(--default-color);
+        margin: 2rem 0;
+        line-height: 1.5;
+      }
+
+      .modal-highlight-text {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--heading-color);
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: rgba(71, 178, 228, 0.08);
+        border-radius: 12px;
+        border-left: 4px solid var(--accent-color);
+      }
+
+      /* Botones del modal mejorados */
+      .modal-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2.5rem;
+        flex-wrap: wrap;
+      }
+
+      .modal-btn {
+        padding: 0.875rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 140px;
+        justify-content: center;
+        text-decoration: none;
+        font-family: var(--default-font);
+      }
+
+      .modal-btn-cancel {
+        background: #6c757d;
+        color: white;
+        border: 2px solid transparent;
+      }
+
+      .modal-btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+      }
+
+      .modal-btn-danger {
+        background: linear-gradient(
+          135deg,
+          var(--danger-color) 0%,
+          #c82333 100%
+        );
+        color: white;
+        border: 2px solid transparent;
+      }
+
+      .modal-btn-danger:hover {
+        background: linear-gradient(
+          135deg,
+          #c82333 0%,
+          var(--danger-color) 100%
+        );
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+      }
+
+      /* Estilos de formulario colaboradores SWAY */
+      .collaborator-form .form-row {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .collaborator-form .form-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .collaborator-form .form-group label {
+        color: var(--heading-color);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+      }
+
+      .collaborator-form input,
+      .collaborator-form select,
+      .collaborator-form textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-family: var(--default-font);
+      }
+
+      .collaborator-form input:focus,
+      .collaborator-form select:focus,
+      .collaborator-form textarea:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+      }
+
+      .collaborator-form textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      /* Mensajes estilo SWAY */
+      .alert-message {
+        padding: 1rem 1.5rem;
+        border-radius: 4px;
+        margin: 1rem 0;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .alert-warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .nav-container {
+          padding: 0 1rem;
+          height: 70px;
+        }
+
+        .nav-brand {
+          font-size: 1.2rem;
+        }
+
+        .nav-brand i {
+          font-size: 1.5rem;
+          padding: 0.4rem;
+        }
+
+        .user-info {
+          display: none;
+        }
+
+        .logout-btn {
+          padding: 0.6rem 1rem;
+          font-size: 0.8rem;
+        }
+
+        .portal-container {
+          padding: 0 1rem;
+        }
+
+        .portal-header {
+          margin: 1rem auto;
+          padding: 2rem 1.5rem;
+        }
+
+        .portal-title {
+          font-size: 2rem;
+        }
+
+        .colaborador-info {
+          flex-direction: column;
+          text-align: center;
+          gap: 1rem;
+          padding: 1.5rem;
+        }
+
+        .section-header {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: stretch;
+        }
+
+        .especies-grid {
+          grid-template-columns: 1fr !important;
+          gap: 1.5rem;
+        }
+
+        .collaborator-form .form-row {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .modal-content {
+          width: 95%;
+          margin: 1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .nav-container {
+          flex-direction: column;
+          height: auto;
+          padding: 1rem;
+          gap: 1rem;
+        }
+
+        .nav-actions {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Header -->
+    <nav class="nav-header">
+      <div class="nav-container">
+        <a href="#" class="nav-brand">
+          <i class="bi bi-person-workspace"></i>
+          Portal de Colaboradores SWAY
+        </a>
+
+        <div class="nav-actions">
+          <div class="user-info" id="user-info-nav">
+            <div class="user-avatar" id="nav-avatar">
+              <i class="bi bi-person"></i>
+            </div>
+            <div class="user-details">
+              <p id="nav-rol">Colaborador Científico</p>
+            </div>
+          </div>
+          <button class="logout-btn" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="portal-container">
+      <!-- Header del Portal -->
+      <div class="portal-header">
+        <h1 class="portal-title">Bienvenido a tu Portal de Colaboración</h1>
+        <p class="portal-subtitle">
+          Gestiona especies marinas y revisa tus reportes de avistamientos de
+          manera eficiente
+        </p>
+
+        <div class="colaborador-info">
+          <div class="colaborador-avatar" id="colaborador-avatar">
+            <i class="bi bi-person"></i>
+          </div>
+          <div class="colaborador-details">
+            <h3 id="colaborador-nombre">Cargando información...</h3>
+            <p>
+              <i class="bi bi-mortarboard"></i>
+              <span id="colaborador-especialidad">-</span>
+            </p>
+            <p>
+              <i class="bi bi-building"></i>
+              <span id="colaborador-institucion">-</span>
+            </p>
+            <p>
+              <i class="bi bi-award"></i>
+              <span id="colaborador-experiencia">-</span> años de experiencia
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secciones del Portal -->
+      <div class="portal-sections">
+        <!-- Gestión de Especies -->
+        <div class="portal-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="bi bi-fish"></i> Gestión de Especies Marinas
+            </h2>
+            <button class="btn-sway-primary" onclick="openEspecieModal()">
+              <i class="bi bi-plus-circle"></i> Nueva Especie
+            </button>
+          </div>
+
+          <div id="especies-container" class="especies-grid">
+            <div class="empty-state">
+              <i class="bi bi-hourglass-split"></i>
+              <h4>Cargando especies...</h4>
+              <p>Por favor espera mientras obtenemos la información</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mis Reportes de Avistamientos -->
+        <div class="portal-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="bi bi-binoculars"></i> Mis Reportes de Avistamientos
+            </h2>
+            <div style="display: flex; align-items: center; gap: 0.5rem">
+              <span style="color: var(--primary-blue); font-weight: 600"
+                >Total:</span
+              >
+              <span
+                id="reportes-count"
+                style="
+                  background: var(--primary-blue);
+                  color: white;
+                  padding: 0.25rem 0.75rem;
+                  border-radius: 15px;
+                  font-weight: 600;
+                "
+                >0</span
+              >
+            </div>
+          </div>
+
+          <div id="avistamientos-container" class="avistamientos-list">
+            <div class="empty-state">
+              <i class="bi bi-hourglass-split"></i>
+              <h4>Cargando reportes...</h4>
+              <p>Por favor espera mientras obtenemos tus avistamientos</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Crear/Editar Especie -->
+    <div class="modal-overlay" id="especieModal">
+      <div
+        class="modal-content"
+        onclick="event.stopPropagation()"
+        style="max-width: 1200px; width: 95%; text-align: left"
+      >
+        <button class="modal-close" onclick="closeEspecieModal()">
+          &times;
+        </button>
+        <div class="modal-body">
+          <div class="collaborator-form-header">
+            <h2 id="especieModalTitle">
+              <i class="bi bi-fish"></i> Nueva Especie Marina
+            </h2>
+            <p>Registra una nueva especie en el catálogo marino</p>
+          </div>
+
+          <div id="especie-messages"></div>
+
+          <form id="especieForm" class="collaborator-form">
+            <input type="hidden" id="especie-id" name="id" />
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nombre-comun">
+                  <i class="bi bi-tag"></i> Nombre Común *
+                </label>
+                <input
+                  type="text"
+                  id="nombre-comun"
+                  name="nombre_comun"
+                  required
+                  maxlength="100"
+                  placeholder="Ej: Tortuga Marina Verde"
+                />
+              </div>
+              <div class="form-group">
+                <label for="nombre-cientifico">
+                  <i class="bi bi-bookmark"></i> Nombre Científico *
+                </label>
+                <input
+                  type="text"
+                  id="nombre-cientifico"
+                  name="nombre_cientifico"
+                  required
+                  maxlength="100"
+                  placeholder="Ej: Chelonia mydas"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="descripcion">
+                  <i class="bi bi-text-paragraph"></i> Descripción de la Especie
+                </label>
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  rows="4"
+                  placeholder="Describe las características principales de la especie..."
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="esperanza-vida">
+                  <i class="bi bi-clock-history"></i> Esperanza de Vida (años)
+                </label>
+                <input
+                  type="number"
+                  id="esperanza-vida"
+                  name="esperanza_vida"
+                  min="1"
+                  max="500"
+                  placeholder="50"
+                />
+              </div>
+              <div class="form-group">
+                <label for="poblacion-estimada">
+                  <i class="bi bi-people"></i> Población Estimada
+                </label>
+                <input
+                  type="number"
+                  id="poblacion-estimada"
+                  name="poblacion_estimada"
+                  min="0"
+                  placeholder="10000"
+                />
+              </div>
+              <div class="form-group">
+                <label for="estado-conservacion">
+                  <i class="bi bi-shield-exclamation"></i> Estado de
+                  Conservación *
+                </label>
+                <select
+                  id="estado-conservacion"
+                  name="id_estado_conservacion"
+                  required
+                >
+                  <option value="">Selecciona estado...</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="imagen-url">
+                  <i class="bi bi-image"></i> URL de Imagen
+                </label>
+                <input
+                  type="url"
+                  id="imagen-url"
+                  name="imagen_url"
+                  maxlength="255"
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="amenazas-select">
+                  <i class="bi bi-exclamation-triangle"></i> Amenazas
+                  Principales
+                </label>
+                <div class="multi-select-container">
+                  <div class="multi-select-dropdown" id="amenazas-dropdown">
+                    <div
+                      class="multi-select-selected"
+                      onclick="toggleDropdown('amenazas')"
+                    >
+                      <span id="amenazas-selected-text"
+                        >Seleccionar amenazas...</span
+                      >
+                      <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="multi-select-options" id="amenazas-options">
+                      <!-- Las opciones se cargarán dinámicamente -->
+                    </div>
+                  </div>
+                  <input type="hidden" id="amenazas-selected" name="amenazas" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="habitats-select">
+                  <i class="bi bi-geo"></i> Hábitats Naturales
+                </label>
+                <div class="multi-select-container">
+                  <div class="multi-select-dropdown" id="habitats-dropdown">
+                    <div
+                      class="multi-select-selected"
+                      onclick="toggleDropdown('habitats')"
+                    >
+                      <span id="habitats-selected-text"
+                        >Seleccionar hábitats...</span
+                      >
+                      <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="multi-select-options" id="habitats-options">
+                      <!-- Las opciones se cargarán dinámicamente -->
+                    </div>
+                  </div>
+                  <input type="hidden" id="habitats-selected" name="habitats" />
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="form-row"
+              style="justify-content: center; margin-top: 2rem"
+            >
+              <button
+                type="button"
+                onclick="closeEspecieModal()"
+                style="
+                  background: #6c757d;
+                  color: white;
+                  border: none;
+                  padding: 0.75rem 2rem;
+                  border-radius: 10px;
+                  font-weight: 600;
+                  margin-right: 1rem;
+                  cursor: pointer;
+                "
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onclick="saveEspecie()"
+                class="btn-sway-primary"
+              >
+                <i class="bi bi-check-circle"></i> Guardar Especie
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmación para Eliminar -->
+    <div class="modal-overlay" id="deleteModal">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeDeleteModal()">
+          &times;
+        </button>
+        <div class="modal-body">
+          <div class="collaborator-form-header">
+            <h2 style="color: var(--danger-color)">
+              <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+            </h2>
+            <p>Esta acción no se puede deshacer</p>
+          </div>
+
+          <p class="modal-content-text">
+            ¿Estás seguro de que deseas eliminar esta especie?
+          </p>
+
+          <div class="modal-highlight-text">
+            <strong id="delete-especie-name"></strong>
+          </div>
+
+          <div class="modal-buttons">
+            <button
+              type="button"
+              onclick="closeDeleteModal()"
+              class="modal-btn modal-btn-cancel"
+            >
+              <i class="bi bi-x-circle"></i> Cancelar
+            </button>
+            <button
+              type="button"
+              onclick="confirmDelete()"
+              class="modal-btn modal-btn-danger"
+            >
+              <i class="bi bi-trash"></i> Eliminar Especie
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmación para Cerrar Sesión -->
+    <div class="modal-overlay" id="logoutModal">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeLogoutModal()">
+          &times;
+        </button>
+        <div class="modal-body">
+          <div class="collaborator-form-header">
+            <h2 style="color: var(--primary-color)">
+              <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            </h2>
+            <p>¿Estás seguro de que deseas cerrar tu sesión?</p>
+          </div>
+
+          <p class="modal-content-text">
+            Se perderán los datos no guardados y tendrás que volver a iniciar
+            sesión
+          </p>
+
+          <div class="modal-buttons">
+            <button
+              type="button"
+              onclick="closeLogoutModal()"
+              class="modal-btn modal-btn-cancel"
+            >
+              <i class="bi bi-x-circle"></i> Cancelar
+            </button>
+            <button
+              type="button"
+              onclick="confirmLogout()"
+              class="modal-btn modal-btn-danger"
+            >
+              <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script>
+      // Variables globales
+      let currentColaborador = null;
+      let especieToDelete = null;
+
+      console.log("Variables globales inicializadas:");
+      console.log("currentColaborador:", currentColaborador);
+      console.log("especieToDelete:", especieToDelete);
+
+      // Inicializar página
+      document.addEventListener("DOMContentLoaded", async function () {
+        console.log("Portal de colaboradores iniciando...");
+        await loadColaboradorInfo();
+        await loadFormData();
+        await loadEspecies();
+        await loadAvistamientos();
+      });
+
+      // Cargar información del colaborador desde sessionStorage o API
+      async function loadColaboradorInfo() {
+        try {
+          // TEMPORAL: Limpiar cache para debug - forzar llamada a API
+          // sessionStorage.removeItem("colaborador-session"); 
+          
+          // Intentar cargar desde sessionStorage primero
+          const colaboradorData = sessionStorage.getItem("colaborador-session");
+
+          if (colaboradorData) {
+            const colaborador = JSON.parse(colaboradorData);
+            
+            // Verificar si los datos tienen el campo años_experiencia válido
+            if (!colaborador.años_experiencia || colaborador.años_experiencia === "0") {
+              console.log("Datos en cache parecen incorrectos, recargando desde API...");
+              await loadColaboradorFromAPI();
+              return;
+            }
+            
+            currentColaborador = colaborador;
+            displayColaboradorInfo(colaborador);
+            console.log(
+              "Colaborador cargado desde sessionStorage:",
+              colaborador
+            );
+          } else {
+            // Si no hay datos en sessionStorage, intentar cargar desde la API
+            console.log(
+              "No hay datos en sessionStorage, intentando cargar desde API..."
+            );
+            await loadColaboradorFromAPI();
+          }
+        } catch (error) {
+          console.error("Error loading colaborador info:", error);
+          await loadColaboradorFromAPI(); // Intentar API como respaldo
+        }
+      }
+
+      // Cargar información del colaborador desde la API
+      async function loadColaboradorFromAPI() {
+        try {
+          const response = await fetch("/api/colaboradores/profile", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.colaborador) {
+              currentColaborador = data.colaborador;
+              displayColaboradorInfo(data.colaborador);
+              console.log("Colaborador cargado desde API:", data.colaborador);
+              // Guardar en sessionStorage para próximas visitas
+              sessionStorage.setItem(
+                "colaborador-session",
+                JSON.stringify(data.colaborador)
+              );
+            } else {
+              throw new Error("Datos de colaborador no válidos");
+            }
+          } else {
+            throw new Error("Error en la respuesta del servidor");
+          }
+        } catch (error) {
+          console.error("Error cargando colaborador desde API:", error);
+          // Si todo falla, mostrar datos de ejemplo
+          const colaboradorEjemplo = {
+            id: 1,
+            nombre: "Diego",
+            apellido_paterno: "Jiménez",
+            apellido_materno: "García",
+            nombre_completo: "Dr. Diego Jiménez García",
+            email: "diegojimenes@upq.edu.mx",
+            especialidad: "Biología Marina",
+            grado_academico: "Doctorado",
+            institucion: "Universidad Politécnica de Querétaro",
+            años_experiencia: "12",
+            estado_solicitud: "aprobada",
+          };
+          currentColaborador = colaboradorEjemplo;
+          displayColaboradorInfo(colaboradorEjemplo);
+          console.log("Usando datos de ejemplo del colaborador");
+        }
+      }
+
+      // Mostrar información del colaborador
+      function displayColaboradorInfo(colaborador) {
+        // Elementos del header principal
+        const avatar = document.getElementById("colaborador-avatar");
+        const nombre = document.getElementById("colaborador-nombre");
+        const especialidad = document.getElementById(
+          "colaborador-especialidad"
+        );
+        const institucion = document.getElementById("colaborador-institucion");
+        const experiencia = document.getElementById("colaborador-experiencia");
+
+        // Elementos de la navegación
+        const navAvatar = document.getElementById("nav-avatar");
+
+        // Crear iniciales del nombre
+        // Usar nombre_completo si está disponible, sino construir
+        const nombreCompleto =
+          colaborador.nombre_completo ||
+          (
+            colaborador.nombre +
+            " " +
+            (colaborador.apellido_paterno || "") +
+            (colaborador.apellido_materno
+              ? " " + colaborador.apellido_materno
+              : "")
+          ).trim() ||
+          "Usuario";
+        const iniciales = nombreCompleto
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .substring(0, 2);
+
+        // Actualizar elementos del header principal
+        avatar.innerHTML = iniciales;
+        nombre.textContent = nombreCompleto;
+        especialidad.textContent =
+          colaborador.especialidad || "No especificada";
+        institucion.textContent = colaborador.institucion || "No especificada";
+
+        // La experiencia puede venir como 'años_experiencia' desde la BD
+        const experienciaRaw =
+          colaborador.años_experiencia || colaborador.experiencia || "0";
+        // Extraer solo el número si viene con "años"
+        const experienciaValue = experienciaRaw
+          .toString()
+          .replace(/\s*años?\s*/gi, "")
+          .trim();
+        experiencia.textContent = experienciaValue;
+
+        // Actualizar elementos de la navegación
+        navAvatar.innerHTML = iniciales;
+      }
+
+      // Cargar especies desde la base de datos
+      async function loadEspecies() {
+        try {
+          console.log("Cargando especies...");
+          const response = await fetch("/api/especies", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await response.json();
+          console.log("Respuesta de especies:", data);
+
+          if (data.success && data.especies) {
+            displayEspecies(data.especies);
+          } else {
+            console.log("No se encontraron especies o error en la respuesta");
+            displayEspecies([]);
+          }
+        } catch (error) {
+          console.error("Error loading especies:", error);
+          document.getElementById("especies-container").innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <h4>Error al cargar especies</h4>
+                        <p>Hubo un problema al conectar con la base de datos</p>
+                    </div>
+                `;
+        }
+      }
+
+      // Mostrar especies
+      function displayEspecies(especies) {
+        const container = document.getElementById("especies-container");
+
+        if (!especies || especies.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-fish"></i>
+                        <h4>No hay especies registradas</h4>
+                        <p>Sé el primero en agregar una especie marina al catálogo</p>
+                    </div>
+                `;
+          return;
+        }
+
+        container.innerHTML = especies
+          .map(
+            (especie) => `
+                <div class="especie-card">
+                    <div class="especie-image">
+                        <img src="${
+                          especie.imagen ||
+                          especie.imagen_url ||
+                          "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjZjBmMGYwIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTk5IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiPkVzcGVjaWUgTWFyaW5hPC90ZXh0Pgo8L3N2Zz4K"
+                        }" 
+                             alt="${especie.nombre || especie.nombre_comun}" 
+                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNkZGQiLz4KPHN2ZyB4PSIxNzUiIHk9IjEyNSIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiM5OTkiPgo8cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptLTIgMTVsLTUtNSAxLjQxLTEuNDFMMTAgMTQuMTdsNy41OS03LjU5TDE5IDhsLTkgOXoiLz4KPHN2Zz4KPHN2ZyB4PSIxNzAiIHk9IjE2NSIgd2lkdGg9IjYwIiBoZWlnaHQ9IjIwIj4KPHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iMTUiIHZpZXdCb3g9IjAgMCA2MCAyMCI+Cjx0ZXh0IHg9IjMwIiB5PSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzk5OSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIj5TaW4gaW1hZ2VuPC90ZXh0Pgo8L3N2Zz4KPHN2Zz4KPC9zdmc+'"
+                             loading="lazy">
+                        <div class="conservation-badge ${
+                          especie.estado_conservacion || "preocupacion-menor"
+                        }">${getConservationText(
+              especie.estado_conservacion || "preocupacion-menor"
+            )}</div>
+                    </div>
+                    <div class="especie-content">
+                        <h3>${
+                          especie.nombre || especie.nombre_comun || "Sin nombre"
+                        }</h3>
+                        <p class="scientific-name">${
+                          especie.nombre_cientifico ||
+                          "Sin clasificación científica"
+                        }</p>
+                        <div class="especie-stats">
+                            <div class="stat">
+                                <i class="bi bi-rulers"></i>
+                                <span>${especie.longitud || "Variable"}</span>
+                            </div>
+                            <div class="stat">
+                                <i class="bi bi-geo-alt"></i>
+                                <span>${especie.ubicacion || "Global"}</span>
+                            </div>
+                            <div class="stat">
+                                <i class="bi bi-heart-pulse"></i>
+                                <span>Vida: ${
+                                  especie.esperanza_vida || "No disponible"
+                                }</span>
+                            </div>
+                            ${
+                              especie.poblacion_estimada
+                                ? `
+                            <div class="stat">
+                                <i class="bi bi-people"></i>
+                                <span>${especie.poblacion_estimada.toLocaleString()} individuos</span>
+                            </div>
+                            `
+                                : ""
+                            }
+                        </div>
+                        <p class="especie-description">${(
+                          especie.descripcion || "Descripción no disponible"
+                        ).substring(0, 150)}${
+              especie.descripcion && especie.descripcion.length > 150
+                ? "..."
+                : ""
+            }</p>
+                        <div class="especie-actions">
+                            <button class="btn-sway-success" onclick="editEspecie(${
+                              especie.id
+                            })" title="Modificar registro de especie">
+                                <i class="bi bi-pencil"></i> Modificar registro
+                            </button>
+                            <button class="btn-sway-danger" onclick="deleteEspecie(${
+                              especie.id
+                            }, '${(
+              especie.nombre ||
+              especie.nombre_comun ||
+              "Especie"
+            ).replace(/'/g, "\\'")}')" title="Eliminar especie">
+                                <i class="bi bi-trash"></i> Eliminar especie
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      // Función para obtener texto del estado de conservación
+      function getConservationText(status) {
+        const statusMap = {
+          "extincion-critica": "En Peligro Crítico",
+          peligro: "En Peligro",
+          vulnerable: "Vulnerable",
+          "casi-amenazada": "Casi Amenazada",
+          "preocupacion-menor": "Preocupación Menor",
+        };
+        return statusMap[status] || "No Evaluado";
+      }
+
+      // Cargar avistamientos del colaborador
+      async function loadAvistamientos() {
+        try {
+          if (!currentColaborador) {
+            console.log("No hay colaborador actual para cargar avistamientos");
+            return;
+          }
+
+          console.log(
+            "Cargando avistamientos para colaborador:",
+            currentColaborador.email
+          );
+
+          // Buscar avistamientos por email del colaborador (temporal hasta que tengas el endpoint específico)
+          const response = await fetch("/api/avistamientos");
+          const data = await response.json();
+
+          if (data.success && data.avistamientos) {
+            // Filtrar por email del colaborador
+            const avistamientosColaborador = data.avistamientos.filter(
+              (av) => av.email_usuario === currentColaborador.email
+            );
+
+            displayAvistamientos(avistamientosColaborador);
+            document.getElementById("reportes-count").textContent =
+              avistamientosColaborador.length;
+          } else {
+            displayAvistamientos([]);
+            document.getElementById("reportes-count").textContent = "0";
+          }
+        } catch (error) {
+          console.error("Error loading avistamientos:", error);
+          displayAvistamientos([]);
+          document.getElementById("reportes-count").textContent = "0";
+        }
+      }
+
+      // Mostrar avistamientos
+      function displayAvistamientos(avistamientos) {
+        const container = document.getElementById("avistamientos-container");
+
+        if (!avistamientos || avistamientos.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-binoculars"></i>
+                        <h4>No tienes reportes de avistamientos</h4>
+                        <p>Ve a la página de especies para reportar tus primeros avistamientos</p>
+                    </div>
+                `;
+          return;
+        }
+
+        container.innerHTML = avistamientos
+          .map(
+            (avistamiento) => `
+                <div class="avistamiento-item">
+                    <div class="avistamiento-header">
+                        <span class="avistamiento-especie">${
+                          avistamiento.especie_nombre ||
+                          "Especie no identificada"
+                        }</span>
+                        <span class="avistamiento-fecha">${new Date(
+                          avistamiento.fecha
+                        ).toLocaleDateString("es-ES")}</span>
+                    </div>
+                    <div class="avistamiento-ubicacion">
+                        <i class="bi bi-geo-alt"></i>
+                        Lat: ${avistamiento.latitud}, Lng: ${
+              avistamiento.longitud
+            }
+                    </div>
+                    ${
+                      avistamiento.notas
+                        ? `<div class="avistamiento-notas">"${avistamiento.notas}"</div>`
+                        : ""
+                    }
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      // Cargar datos para formularios
+      async function loadFormData() {
+        try {
+          console.log("Cargando datos de formularios...");
+
+          const [conservacionRes, amenazasRes, habitatsRes] = await Promise.all(
+            [
+              fetch("/api/estados-conservacion"),
+              fetch("/api/amenazas"),
+              fetch("/api/habitats"),
+            ]
+          );
+
+          const conservacion = await conservacionRes.json();
+          const amenazas = await amenazasRes.json();
+          const habitats = await habitatsRes.json();
+
+          console.log("Estados conservación:", conservacion);
+          console.log("Amenazas:", amenazas);
+          console.log("Hábitats:", habitats);
+
+          // Llenar select de estados de conservación
+          const selectConservacion = document.getElementById(
+            "estado-conservacion"
+          );
+          if (conservacion.success && conservacion.estados) {
+            selectConservacion.innerHTML =
+              '<option value="">Selecciona estado...</option>' +
+              conservacion.estados
+                .map(
+                  (estado) =>
+                    `<option value="${estado.id}">${estado.nombre}</option>`
+                )
+                .join("");
+          }
+
+          // Llenar dropdown de amenazas
+          const amenazasOptions = document.getElementById("amenazas-options");
+          if (amenazas.success && amenazas.amenazas) {
+            amenazasOptions.innerHTML = amenazas.amenazas
+              .map(
+                (amenaza) => `
+                        <div class="multi-select-option" data-value="${
+                          amenaza.id
+                        }" onclick="toggleMultiSelectOption('amenazas', ${
+                  amenaza.id
+                }, '${amenaza.nombre.replace(/'/g, "\\'")}')">
+                            <input type="checkbox" value="${
+                              amenaza.id
+                            }" onclick="event.stopPropagation()">
+                            <span>${amenaza.nombre}</span>
+                        </div>
+                    `
+              )
+              .join("");
+          }
+
+          // Llenar dropdown de hábitats
+          const habitatsOptions = document.getElementById("habitats-options");
+          if (habitats.success && habitats.habitats) {
+            habitatsOptions.innerHTML = habitats.habitats
+              .map(
+                (habitat) => `
+                        <div class="multi-select-option" data-value="${
+                          habitat.id
+                        }" onclick="toggleMultiSelectOption('habitats', ${
+                  habitat.id
+                }, '${habitat.nombre.replace(/'/g, "\\'")}')">
+                            <input type="checkbox" value="${
+                              habitat.id
+                            }" onclick="event.stopPropagation()">
+                            <span>${habitat.nombre}</span>
+                        </div>
+                    `
+              )
+              .join("");
+          }
+        } catch (error) {
+          console.error("Error loading form data:", error);
+        }
+      }
+
+      // Funciones para manejar dropdowns de selección múltiple
+      function toggleDropdown(type) {
+        const dropdown = document.getElementById(`${type}-dropdown`);
+        dropdown.classList.toggle("active");
+
+        // Cerrar otros dropdowns
+        const otherType = type === "amenazas" ? "habitats" : "amenazas";
+        document
+          .getElementById(`${otherType}-dropdown`)
+          .classList.remove("active");
+      }
+
+      function toggleMultiSelectOption(type, value, text) {
+        const option = event.currentTarget;
+        const checkbox = option.querySelector('input[type="checkbox"]');
+        const hiddenInput = document.getElementById(`${type}-selected`);
+        const selectedText = document.getElementById(`${type}-selected-text`);
+
+        // Toggle checkbox
+        checkbox.checked = !checkbox.checked;
+        option.classList.toggle("selected", checkbox.checked);
+
+        // Actualizar valores seleccionados
+        const currentValues = hiddenInput.value
+          ? hiddenInput.value.split(",")
+          : [];
+        const valueStr = value.toString();
+
+        if (checkbox.checked && !currentValues.includes(valueStr)) {
+          currentValues.push(valueStr);
+        } else if (!checkbox.checked) {
+          const index = currentValues.indexOf(valueStr);
+          if (index > -1) currentValues.splice(index, 1);
+        }
+
+        hiddenInput.value = currentValues.join(",");
+
+        // Actualizar texto mostrado
+        updateSelectedText(type);
+      }
+
+      function updateSelectedText(type) {
+        const hiddenInput = document.getElementById(`${type}-selected`);
+        const selectedText = document.getElementById(`${type}-selected-text`);
+        const selectedValues = hiddenInput.value
+          ? hiddenInput.value.split(",")
+          : [];
+
+        if (selectedValues.length === 0) {
+          selectedText.textContent = `Seleccionar ${type}...`;
+        } else if (selectedValues.length === 1) {
+          const option = document.querySelector(
+            `#${type}-options .multi-select-option[data-value="${selectedValues[0]}"] span`
+          );
+          selectedText.textContent = option
+            ? option.textContent
+            : `1 ${type} seleccionada`;
+        } else {
+          selectedText.textContent = `${selectedValues.length} ${type} seleccionadas`;
+        }
+      }
+
+      // Cerrar dropdowns al hacer clic fuera
+      document.addEventListener("click", function (event) {
+        if (!event.target.closest(".multi-select-dropdown")) {
+          document
+            .querySelectorAll(".multi-select-dropdown")
+            .forEach((dropdown) => {
+              dropdown.classList.remove("active");
+            });
+        }
+      });
+
+      // Funciones de modal
+      function openEspecieModal(especieId = null) {
+        console.log("Abriendo modal de especie...", especieId);
+        const modal = document.getElementById("especieModal");
+        const title = document.getElementById("especieModalTitle");
+        const form = document.getElementById("especieForm");
+
+        // Verificar que los elementos existan
+        if (!modal || !title || !form) {
+          console.error("No se pudieron encontrar los elementos del modal");
+          return;
+        }
+
+        form.reset();
+        document.getElementById("especie-messages").innerHTML = "";
+
+        if (especieId) {
+          title.innerHTML =
+            '<i class="bi bi-pencil"></i> Editar Especie Marina';
+          // Para edición, NO limpiar los dropdowns aún, se limpiarán y luego se cargarán los datos
+          clearMultiSelectDropdowns();
+          loadEspecieData(especieId);
+        } else {
+          title.innerHTML = '<i class="bi bi-fish"></i> Nueva Especie Marina';
+          document.getElementById("especie-id").value = "";
+          // Para nueva especie sí limpiar los dropdowns
+          clearMultiSelectDropdowns();
+        }
+
+        modal.classList.add("active");
+        console.log("Modal abierto correctamente");
+      }
+
+      function clearMultiSelectDropdowns() {
+        console.log("Limpiando dropdowns de selección múltiple...");
+
+        // Limpiar amenazas
+        const amenazasInput = document.getElementById("amenazas-selected");
+        const amenazasText = document.getElementById("amenazas-selected-text");
+
+        if (amenazasInput) amenazasInput.value = "";
+        if (amenazasText) amenazasText.textContent = "Seleccionar amenazas...";
+
+        document
+          .querySelectorAll("#amenazas-options .multi-select-option")
+          .forEach((option) => {
+            option.classList.remove("selected");
+            const checkbox = option.querySelector('input[type="checkbox"]');
+            if (checkbox) checkbox.checked = false;
+          });
+
+        // Limpiar hábitats
+        const habitatsInput = document.getElementById("habitats-selected");
+        const habitatsText = document.getElementById("habitats-selected-text");
+
+        if (habitatsInput) habitatsInput.value = "";
+        if (habitatsText) habitatsText.textContent = "Seleccionar hábitats...";
+
+        document
+          .querySelectorAll("#habitats-options .multi-select-option")
+          .forEach((option) => {
+            option.classList.remove("selected");
+            const checkbox = option.querySelector('input[type="checkbox"]');
+            if (checkbox) checkbox.checked = false;
+          });
+      }
+
+      function closeEspecieModal() {
+        document.getElementById("especieModal").classList.remove("active");
+      }
+
+      function closeDeleteModal() {
+        console.log("Cerrando modal de eliminación");
+        const deleteModal = document.getElementById("deleteModal");
+        if (deleteModal) {
+          deleteModal.classList.remove("active");
+          console.log("Modal cerrado correctamente");
+        } else {
+          console.error("No se pudo encontrar el modal para cerrar");
+        }
+
+        // Limpiar la variable especieToDelete
+        especieToDelete = null;
+        console.log("especieToDelete limpiado");
+      }
+
+      // Cerrar modales al hacer clic en el overlay
+      document
+        .getElementById("especieModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeEspecieModal();
+          }
+        });
+
+      document
+        .getElementById("deleteModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeDeleteModal();
+          }
+        });
+
+      // Cargar datos de especie para edición
+      async function loadEspecieData(especieId) {
+        try {
+          console.log("Cargando datos de especie:", especieId);
+          const response = await fetch(`/api/especies/${especieId}`);
+          const data = await response.json();
+
+          console.log("Datos de especie recibidos:", data);
+
+          if (data.success && data.especie) {
+            const especie = data.especie;
+            console.log("Datos de la especie:", especie);
+
+            document.getElementById("especie-id").value = especie.id;
+            document.getElementById("nombre-comun").value =
+              especie.nombre_comun || "";
+            document.getElementById("nombre-cientifico").value =
+              especie.nombre_cientifico || "";
+            document.getElementById("descripcion").value =
+              especie.descripcion || "";
+            document.getElementById("esperanza-vida").value =
+              especie.esperanza_vida || "";
+            document.getElementById("poblacion-estimada").value =
+              especie.poblacion_estimada || "";
+            document.getElementById("estado-conservacion").value =
+              especie.id_estado_conservacion || "";
+            document.getElementById("imagen-url").value =
+              especie.imagen_url || "";
+
+            // Agregar un pequeño delay para asegurar que los dropdowns estén completamente cargados
+            setTimeout(() => {
+              console.log("Procesando amenazas y hábitats...");
+
+              // Debug: verificar cuántas opciones hay disponibles
+              const amenazasOptionsCount = document.querySelectorAll(
+                "#amenazas-options .multi-select-option"
+              ).length;
+              const habitatsOptionsCount = document.querySelectorAll(
+                "#habitats-options .multi-select-option"
+              ).length;
+              console.log(
+                `Opciones disponibles - Amenazas: ${amenazasOptionsCount}, Hábitats: ${habitatsOptionsCount}`
+              );
+
+              // Marcar amenazas seleccionadas en los dropdowns
+              if (especie.amenazas && Array.isArray(especie.amenazas)) {
+                console.log("Amenazas encontradas:", especie.amenazas);
+                const amenazasInput =
+                  document.getElementById("amenazas-selected");
+                if (amenazasInput) {
+                  amenazasInput.value = especie.amenazas.join(",");
+                }
+
+                especie.amenazas.forEach((amenazaId) => {
+                  console.log("Buscando amenaza con ID:", amenazaId);
+                  const option = document.querySelector(
+                    `#amenazas-options .multi-select-option[data-value="${amenazaId}"]`
+                  );
+                  if (option) {
+                    console.log("Opción de amenaza encontrada:", option);
+                    const checkbox = option.querySelector(
+                      'input[type="checkbox"]'
+                    );
+                    if (checkbox) {
+                      checkbox.checked = true;
+                      option.classList.add("selected");
+                      console.log("Amenaza marcada correctamente:", amenazaId);
+                    }
+                  } else {
+                    console.warn(
+                      "No se encontró la opción de amenaza con ID:",
+                      amenazaId
+                    );
+                    // Listar todas las opciones disponibles para debug
+                    const allOptions = document.querySelectorAll(
+                      "#amenazas-options .multi-select-option"
+                    );
+                    console.log("Opciones de amenazas disponibles:");
+                    allOptions.forEach((opt) => {
+                      console.log(
+                        "- ID:",
+                        opt.getAttribute("data-value"),
+                        "Texto:",
+                        opt.querySelector("span")?.textContent
+                      );
+                    });
+                  }
+                });
+                updateSelectedText("amenazas");
+              } else {
+                console.log(
+                  "No se encontraron amenazas o no es un array:",
+                  especie.amenazas
+                );
+              }
+
+              // Marcar hábitats seleccionados en los dropdowns
+              if (especie.habitats && Array.isArray(especie.habitats)) {
+                console.log("Hábitats encontrados:", especie.habitats);
+                const habitatsInput =
+                  document.getElementById("habitats-selected");
+                if (habitatsInput) {
+                  habitatsInput.value = especie.habitats.join(",");
+                }
+
+                especie.habitats.forEach((habitatId) => {
+                  console.log("Buscando hábitat con ID:", habitatId);
+                  const option = document.querySelector(
+                    `#habitats-options .multi-select-option[data-value="${habitatId}"]`
+                  );
+                  if (option) {
+                    console.log("Opción de hábitat encontrada:", option);
+                    const checkbox = option.querySelector(
+                      'input[type="checkbox"]'
+                    );
+                    if (checkbox) {
+                      checkbox.checked = true;
+                      option.classList.add("selected");
+                      console.log("Hábitat marcado correctamente:", habitatId);
+                    }
+                  } else {
+                    console.warn(
+                      "No se encontró la opción de hábitat con ID:",
+                      habitatId
+                    );
+                    // Listar todas las opciones disponibles para debug
+                    const allOptions = document.querySelectorAll(
+                      "#habitats-options .multi-select-option"
+                    );
+                    console.log("Opciones de hábitats disponibles:");
+                    allOptions.forEach((opt) => {
+                      console.log(
+                        "- ID:",
+                        opt.getAttribute("data-value"),
+                        "Texto:",
+                        opt.querySelector("span")?.textContent
+                      );
+                    });
+                  }
+                });
+                updateSelectedText("habitats");
+              } else {
+                console.log(
+                  "No se encontraron hábitats o no es un array:",
+                  especie.habitats
+                );
+              }
+            }, 200); // Aumenté el delay a 200ms para dar más tiempo
+          } else {
+            showMessage("Error al cargar los datos de la especie", "error");
+          }
+        } catch (error) {
+          console.error("Error loading especie data:", error);
+          showMessage("Error al cargar los datos de la especie", "error");
+        }
+      }
+
+      // Guardar especie
+      async function saveEspecie() {
+        const form = document.getElementById("especieForm");
+        const formData = new FormData(form);
+        const messagesContainer = document.getElementById("especie-messages");
+
+        // Validar campos requeridos
+        const nombreComun = formData.get("nombre_comun");
+        const nombreCientifico = formData.get("nombre_cientifico");
+        const estadoConservacion = formData.get("id_estado_conservacion");
+
+        if (!nombreComun || !nombreCientifico || !estadoConservacion) {
+          messagesContainer.innerHTML = `
+                    <div class="alert-message alert-error">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Por favor completa todos los campos requeridos (*)
+                    </div>
+                `;
+          return;
+        }
+
+        // Recopilar amenazas y hábitats seleccionados de los dropdowns
+        const amenazasSelected =
+          document.getElementById("amenazas-selected").value;
+        const habitatsSelected =
+          document.getElementById("habitats-selected").value;
+
+        const amenazas = amenazasSelected
+          ? amenazasSelected.split(",").map((id) => parseInt(id))
+          : [];
+        const habitats = habitatsSelected
+          ? habitatsSelected.split(",").map((id) => parseInt(id))
+          : [];
+
+        const especieData = {
+          id: formData.get("id") || null,
+          nombre_comun: nombreComun,
+          nombre_cientifico: nombreCientifico,
+          descripcion: formData.get("descripcion") || null,
+          esperanza_vida: formData.get("esperanza_vida")
+            ? parseInt(formData.get("esperanza_vida"))
+            : null,
+          poblacion_estimada: formData.get("poblacion_estimada")
+            ? parseInt(formData.get("poblacion_estimada"))
+            : null,
+          id_estado_conservacion: parseInt(estadoConservacion),
+          imagen_url: formData.get("imagen_url") || null,
+          amenazas: amenazas,
+          habitats: habitats,
+        };
+
+        try {
+          const url = especieData.id
+            ? `/api/especies/${especieData.id}`
+            : "/api/especies";
+          const method = especieData.id ? "PUT" : "POST";
+
+          console.log("Enviando datos de especie:", especieData);
+
+          const response = await fetch(url, {
+            method: method,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(especieData),
+          });
+
+          const result = await response.json();
+          console.log("Respuesta del servidor:", result);
+
+          if (result.success) {
+            messagesContainer.innerHTML = `
+                        <div class="alert-message alert-success">
+                            <i class="bi bi-check-circle"></i>
+                            ${
+                              especieData.id
+                                ? "Especie actualizada"
+                                : "Especie creada"
+                            } exitosamente
+                        </div>
+                    `;
+
+            setTimeout(() => {
+              closeEspecieModal();
+              loadEspecies();
+            }, 1500);
+          } else {
+            messagesContainer.innerHTML = `
+                        <div class="alert-message alert-error">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            ${result.error || "Error al guardar la especie"}
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          console.error("Error saving especie:", error);
+          messagesContainer.innerHTML = `
+                    <div class="alert-message alert-error">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Error de conexión con el servidor
+                    </div>
+                `;
+        }
+      }
+
+      // Funciones de especies
+      function editEspecie(especieId) {
+        console.log("Editando especie con ID:", especieId);
+        openEspecieModal(especieId);
+      }
+
+      function deleteEspecie(especieId, nombreEspecie) {
+        console.log("=== INICIANDO ELIMINACIÓN DE ESPECIE ===");
+        console.log("ID de especie:", especieId);
+        console.log("Nombre de especie:", nombreEspecie);
+
+        // Verificar que tenemos los parámetros necesarios
+        if (!especieId) {
+          console.error("Error: ID de especie no válido");
+          showMessage("Error: ID de especie no válido", "error");
+          return;
+        }
+
+        // Establecer la especie a eliminar
+        especieToDelete = especieId;
+        console.log("especieToDelete establecido a:", especieToDelete);
+
+        // Buscar elementos del modal
+        const deleteNameElement = document.getElementById(
+          "delete-especie-name"
+        );
+        const deleteModal = document.getElementById("deleteModal");
+
+        console.log("Elemento delete-especie-name:", deleteNameElement);
+        console.log("Elemento deleteModal:", deleteModal);
+
+        if (deleteNameElement) {
+          deleteNameElement.textContent = nombreEspecie || "Especie sin nombre";
+          console.log(
+            "Nombre establecido en el modal:",
+            deleteNameElement.textContent
+          );
+        } else {
+          console.error("No se encontró el elemento delete-especie-name");
+        }
+
+        if (deleteModal) {
+          deleteModal.classList.add("active");
+          console.log("Modal de eliminación abierto - clase 'active' agregada");
+
+          // Verificar que realmente se agregó la clase
+          setTimeout(() => {
+            const hasActiveClass = deleteModal.classList.contains("active");
+            console.log("Modal tiene clase 'active':", hasActiveClass);
+          }, 100);
+        } else {
+          console.error(
+            "No se pudo encontrar el modal de eliminación con ID 'deleteModal'"
+          );
+          showMessage(
+            "Error: No se pudo abrir el modal de confirmación",
+            "error"
+          );
+        }
+      }
+
+      async function confirmDelete() {
+        console.log("=== CONFIRMANDO ELIMINACIÓN ===");
+        console.log("especieToDelete:", especieToDelete);
+
+        if (!especieToDelete) {
+          console.error("No hay especie seleccionada para eliminar");
+          showMessage("Error: No hay especie seleccionada", "error");
+          return;
+        }
+
+        // Deshabilitar el botón de confirmación para prevenir doble click
+        const confirmButton = document.querySelector(
+          '#deleteModal button[onclick="confirmDelete()"]'
+        );
+        if (confirmButton) {
+          confirmButton.disabled = true;
+          confirmButton.innerHTML =
+            '<i class="bi bi-hourglass-split"></i> Eliminando...';
+        }
+
+        try {
+          console.log(
+            "Enviando petición DELETE para especie:",
+            especieToDelete
+          );
+
+          // Usar el parámetro cascade=true para eliminar todos los registros relacionados
+          const response = await fetch(
+            `/api/especies/${especieToDelete}?cascade=true`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          console.log("Respuesta HTTP status:", response.status);
+          console.log("Respuesta HTTP statusText:", response.statusText);
+
+          const result = await response.json();
+          console.log("Respuesta de eliminación completa:", result);
+
+          if (response.ok && result.success) {
+            console.log("Eliminación exitosa");
+            closeDeleteModal();
+            await loadEspecies(); // Recargar la lista de especies
+            showMessage(
+              "Especie y todos sus registros relacionados eliminados exitosamente",
+              "success"
+            );
+          } else {
+            console.error("Error en la eliminación:", result);
+            showMessage(
+              "Error al eliminar la especie: " +
+                (result.error || result.message || "Error desconocido"),
+              "error"
+            );
+          }
+        } catch (error) {
+          console.error("Error de conexión al eliminar especie:", error);
+          showMessage("Error de conexión al eliminar la especie", "error");
+        } finally {
+          // Restaurar el botón
+          if (confirmButton) {
+            confirmButton.disabled = false;
+            confirmButton.innerHTML =
+              '<i class="bi bi-trash"></i> Eliminar Especie';
+          }
+
+          especieToDelete = null;
+          console.log("especieToDelete reseteado a null");
+        }
+      }
+
+      // Función para mostrar mensajes
+      function showMessage(message, type = "info") {
+        // Crear elemento de mensaje temporal
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `alert-message alert-${type}`;
+        messageDiv.innerHTML = `
+                <i class="bi bi-${
+                  type === "success"
+                    ? "check-circle"
+                    : type === "error"
+                    ? "exclamation-triangle"
+                    : "info-circle"
+                }"></i>
+                ${message}
+            `;
+        messageDiv.style.position = "fixed";
+        messageDiv.style.top = "2rem";
+        messageDiv.style.right = "2rem";
+        messageDiv.style.zIndex = "10000";
+        messageDiv.style.maxWidth = "400px";
+
+        document.body.appendChild(messageDiv);
+
+        setTimeout(() => {
+          if (messageDiv.parentNode) {
+            messageDiv.parentNode.removeChild(messageDiv);
+          }
+        }, 5000);
+      }
+
+      // Funciones para el modal de logout
+      function logout() {
+        const logoutModal = document.getElementById("logoutModal");
+        if (logoutModal) {
+          logoutModal.classList.add("active");
+        }
+      }
+
+      function closeLogoutModal() {
+        const logoutModal = document.getElementById("logoutModal");
+        if (logoutModal) {
+          logoutModal.classList.remove("active");
+        }
+      }
+
+      function confirmLogout() {
+        sessionStorage.clear();
+        localStorage.clear();
+        window.location.href = "/especies";
+      }
+
+      // Cerrar modal de logout al hacer clic en el overlay
+      document
+        .getElementById("logoutModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeLogoutModal();
+          }
+        });
+    </script>
+  </body>
+</html>

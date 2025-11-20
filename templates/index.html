@@ -1,0 +1,2168 @@
+<!-- =============================================
+     PÁGINA PRINCIPAL DE SWAY
+     Landing page con información principal sobre
+     conservación marina y los objetivos de la ONU
+     ============================================= -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>SWAY</title>
+    <meta content="" name="description" />
+    <meta content="" name="keywords" />
+
+    <!-- Configuración de favicon del sitio -->
+    <link
+      href="{{ url_for('static', filename='img/SWAY (1).png') }}"
+      rel="icon"
+    />
+
+    <!-- Enlaces a fuentes externas de Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Jost:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Archivos CSS de librerías externas -->
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/aos/aos.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/glightbox/css/glightbox.min.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}"
+      rel="stylesheet"
+    />
+
+    <!-- Archivo CSS principal del sitio -->
+    <link
+      href="{{ url_for('static', filename='css/main.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="index-page">
+    <!-- =============================================
+         HEADER PRINCIPAL DE NAVEGACIÓN
+         Barra de navegación fija con logo y menú
+         ============================================= -->
+    <header id="header" class="header d-flex align-items-center fixed-top">
+      <div
+        class="container-fluid container-xl position-relative d-flex align-items-center"
+      >
+        <!-- Logo y nombre del sitio -->
+        <a href="/" class="logo d-flex align-items-center me-auto">
+          <h1 class="sitename">SWAY</h1>
+        </a>
+        <!-- Menú de navegación principal -->
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="#hero" class="active">Home</a></li>
+            <li><a href="#about">Nosotros</a></li>
+            <li><a href="#portfolio">Novedades</a></li>
+            <li><a href="#team">Equipo</a></li>
+            <li><a href="#contact">Contacto</a></li>
+            <!-- Menú desplegable "Más" -->
+            <li class="dropdown">
+              <a href="#"
+                ><span>Más</span>
+                <i class="bi bi-chevron-down toggle-dropdown"></i
+              ></a>
+              <ul>
+                <li><a href="/especies">Especies</a></li>
+                <li><a href="/eventos">Eventos</a></li>
+                <li><a href="/biblioteca">Biblioteca</a></li>
+                <li><a href="/tienda">Tienda</a></li>
+              </ul>
+            </li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+        <!-- Botón principal de donación -->
+        <a class="btn-getstarted" href="/#donation">Donar</a>
+      </div>
+    </header>
+
+    <!-- =============================================
+         CONTENIDO PRINCIPAL DE LA PÁGINA
+         Secciones principales del sitio web
+         ============================================= -->
+    <main class="main">
+      <!-- =============================================
+           SECCIÓN HERO - PÁGINA DE INICIO
+           Banner principal con mensaje y call-to-action
+           ============================================= -->
+      <section id="hero" class="hero section dark-background">
+        <div class="container">
+          <div class="row gy-4">
+            <div
+              class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center"
+              data-aos="zoom-out"
+            >
+              <h1>
+                ¡Celebra el Día Mundial de los Océanos el 8 de junio y durante
+                todo el año!
+              </h1>
+              <p>Un océano, un clima, un futuro: juntos</p>
+              <div class="d-flex">
+                <a href="{{ url_for('toma_accion') }}" class="btn-get-started"
+                  >Toma acción</a
+                >
+                <a
+                  href="https://www.youtube.com/watch?v=CdPQLsq9biU"
+                  class="glightbox btn-watch-video d-flex align-items-center"
+                >
+                  <i class="bi bi-play-circle"></i><span>Más</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /Hero Section -->
+
+      <!-- =============================================
+           SECCIÓN DE ORGANIZACIONES COLABORADORAS
+           Carousel con logos de organizaciones aliadas
+           ============================================= -->
+      <section id="clients" class="clients section light-background">
+        <div class="container" data-aos="zoom-in">
+          <div class="swiper init-swiper">
+            <script type="application/json" class="swiper-config">
+              {
+                "loop": true,
+                "speed": 600,
+                "autoplay": {
+                  "delay": 5000
+                },
+                "slidesPerView": "auto",
+                "pagination": {
+                  "el": ".swiper-pagination",
+                  "type": "bullets",
+                  "clickable": true
+                },
+                "breakpoints": {
+                  "320": {
+                    "slidesPerView": 2,
+                    "spaceBetween": 40
+                  },
+                  "480": {
+                    "slidesPerView": 3,
+                    "spaceBetween": 60
+                  },
+                  "640": {
+                    "slidesPerView": 4,
+                    "spaceBetween": 80
+                  },
+                  "992": {
+                    "slidesPerView": 5,
+                    "spaceBetween": 120
+                  },
+                  "1200": {
+                    "slidesPerView": 6,
+                    "spaceBetween": 120
+                  }
+                }
+              }
+            </script>
+            <div class="swiper-wrapper align-items-center">
+              <div class="swiper-slide">
+                <img
+                  src="{{ url_for('static', filename='img/clients/amhmar.png') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+              </div>
+              <div class="swiper-slide">
+                <img
+                  src="{{ url_for('static', filename='img/clients/one.png') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+              </div>
+              <div class="swiper-slide">
+                <img
+                  src="{{ url_for('static', filename='img/clients/oceanfoundation.png') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+              </div>
+              <div class="swiper-slide">
+                <img
+                  src="{{ url_for('static', filename='img/clients/Oceana_(non-profit_group)_logo.png') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+              </div>
+              <div class="swiper-slide">
+                <img
+                  src="{{ url_for('static', filename='img/clients/mexico_azul.png') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+              </div>
+              <div class="swiper-slide">
+                <img
+                  src="{{ url_for('static', filename='img/clients/Ecomar.png') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+              </div>
+              <div class="swiper-slide">
+                <img
+                  src="{{ url_for('static', filename='img/clients/cram-Photoroom.png') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+              </div>
+              <div class="swiper-slide">
+                <img
+                  src="{{ url_for('static', filename='img/clients/NationaMarineSanctuaryFoundation.png') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /Clients Section -->
+
+      <!-- =============================================
+           SECCIÓN SOBRE NOSOTROS
+           Información sobre la misión y objetivos de SWAY
+           ============================================= -->
+      <section id="about" class="about section">
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Sobre nosotros</h2>
+        </div>
+
+        <div class="container">
+          <div class="row gy-4">
+            <div
+              class="col-lg-6 content"
+              data-aos="fade-up"
+              data-aos-delay="10"
+            >
+              <p>
+                Somos una organización sin fines de lucro global dedicada a la
+                preservación de los ecosistemas marinos y la protección de la
+                biodiversidad oceánica. En respuesta a las crecientes amenazas a
+                nuestros océanos, nos comprometemos a conservar el 30% de las
+                áreas marinas del mundo para 2030, alineados con el Objetivo de
+                Desarrollo Sostenible 14 de la ONU.
+              </p>
+              <ul>
+                <li>
+                  <i class="bi bi-check2-circle"></i>
+                  <span>Conservación de hábitats marinos. </span>
+                </li>
+                <li>
+                  <i class="bi bi-check2-circle"></i>
+                  <span>Educación y concienciación.</span>
+                </li>
+                <li>
+                  <i class="bi bi-check2-circle"></i>
+                  <span>Alianza global y enfoque científico.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="20">
+              <p>
+                El Objetivo de Desarrollo Sostenible (ODS) 14 busca "Conservar y
+                utilizar en forma sostenible los océanos, los mares y los
+                recursos marinos para el desarrollo sostenible". Este objetivo
+                busca reducir la contaminación marina, proteger los ecosistemas
+                marinos y costeros, y asegurar la sostenibilidad de la pesca y
+                otros recursos marinos.
+              </p>
+
+              <p>
+                Con una sólida red de socios internacionales, un enfoque basado
+                en la ciencia y más de 10 años de experiencia en conservación
+                marina, sabemos lo que se necesita para lograr este ambicioso
+                objetivo.
+              </p>
+              <a href="{{ url_for('toma_accion') }}" class="read-more"
+                ><span>Toma acción ahora</span><i class="bi bi-arrow-right"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /About Section -->
+
+      <!-- =============================================
+           SECCIÓN POR QUÉ ELEGIRNOS
+           Características diferenciadoras de SWAY
+           ============================================= -->
+      <section
+        id="why-us"
+        class="section why-us light-background"
+        data-builder="section"
+      >
+        <div class="container-fluid">
+          <div class="row gy-4">
+            <div
+              class="col-lg-7 d-flex flex-column justify-content-center order-2 order-lg-1"
+            >
+              <div
+                class="content px-xl-5"
+                data-aos="fade-up"
+                data-aos-delay="100"
+              >
+                <h3>
+                  <span
+                    >Impulsando la Conservación: Innovación y Comunidad para </span
+                  ><strong>Proteger Nuestros Océanos</strong>
+                </h3>
+                <p>
+                  En un mundo donde los océanos enfrentan amenazas sin
+                  precedentes, nuestra misión es clara: crear conciencia y
+                  fomentar la acción en torno al ODS 14, "Vida submarina". Nos
+                  diferenciamos a través de un enfoque integral que combina
+                  educación, colaboración y tecnología para inspirar un cambio
+                  real.
+                </p>
+              </div>
+
+              <div
+                class="faq-container px-xl-5"
+                data-aos="fade-up"
+                data-aos-delay="200"
+              >
+                <div class="faq-item faq-active">
+                  <h3><span>01</span> Educación Interactiva y Experiencial</h3>
+                  <div class="faq-content">
+                    <p>
+                      Ofrecemos programas educativos que incluyen talleres,
+                      inmersiones virtuales y actividades prácticas en entornos
+                      marinos. Esto permite a los participantes experimentar de
+                      primera mano la biodiversidad marina y comprender la
+                      importancia de su conservación.
+                    </p>
+                  </div>
+                  <i class="faq-toggle bi bi-chevron-right"></i>
+                </div>
+                <!-- End Faq item-->
+
+                <div class="faq-item">
+                  <h3>
+                    <span>02</span> Colaboraciones con Comunidades Locales
+                  </h3>
+                  <div class="faq-content">
+                    <p>
+                      Trabajamos en conjunto con comunidades costeras para
+                      desarrollar proyectos de conservación que beneficien tanto
+                      al medio ambiente como a la economía local. Esto no solo
+                      promueve la sostenibilidad, sino que también empodera a
+                      las comunidades y fomenta un sentido de pertenencia.
+                    </p>
+                  </div>
+                  <i class="faq-toggle bi bi-chevron-right"></i>
+                </div>
+                <!-- End Faq item-->
+
+                <div class="faq-item">
+                  <h3>
+                    <span>03</span> Tecnología Innovadora para la
+                    Concientización
+                  </h3>
+                  <div class="faq-content">
+                    <p>
+                      Utilizamos herramientas tecnológicas, como aplicaciones
+                      móviles y plataformas de realidad aumentada, para educar y
+                      sensibilizar sobre la vida marina. Estas herramientas
+                      pueden ofrecer información en tiempo real sobre la salud
+                      de los océanos y permitir a los usuarios participar en
+                      iniciativas de conservación desde cualquier lugar.
+                    </p>
+                  </div>
+                  <i class="faq-toggle bi bi-chevron-right"></i>
+                </div>
+                <!-- End Faq item-->
+              </div>
+            </div>
+
+            <div class="col-lg-5 order-1 order-lg-2 why-us-img">
+              <img
+                src="{{ url_for('static', filename='img/why-us.png') }}"
+                class="img-fluid"
+                alt=""
+                data-aos="zoom-in"
+                data-aos-delay="100"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /Why Us Section -->
+
+      <!-- =============================================
+           SECCIÓN DE ESTADÍSTICAS
+           Datos sobre el impacto en océanos
+           ============================================= -->
+      <section id="skills" class="skills section">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="row">
+            <div class="col-lg-6 d-flex align-items-center">
+              <img
+                src="{{ url_for('static', filename='img/skills.png') }}"
+                class="img-fluid"
+                alt=""
+              />
+            </div>
+
+            <div class="col-lg-6 pt-4 pt-lg-0 content">
+              <h3>
+                Datos Impactantes sobre Nuestros Océanos: La Realidad en Números
+              </h3>
+              <p class="fst-italic">
+                Los océanos son vitales para la vida en la Tierra, pero
+                enfrentan desafíos críticos que requieren nuestra atención
+                inmediata. Si no se toman medidas preventivas, el futuro de
+                nuestros océanos se presenta sombrío, según las predicciones más
+                preocupantes para 2030:
+              </p>
+
+              <div class="skills-content skills-animation">
+                <div class="progress">
+                  <span class="skill"
+                    ><span>Pérdida de Arrecifes de Coral</span>
+                    <i class="val">90%</i></span
+                  >
+                  <div class="progress-bar-wrap">
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      aria-valuenow="90"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                  </div>
+                </div>
+                <!-- End Skills Item -->
+
+                <div class="progress">
+                  <span class="skill"
+                    ><span>Sobrepesca Aumentada</span>
+                    <i class="val">50%</i></span
+                  >
+                  <div class="progress-bar-wrap">
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      aria-valuenow="50"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                  </div>
+                </div>
+                <!-- End Skills Item -->
+
+                <div class="progress">
+                  <span class="skill"
+                    ><span>Acidificación del Océano</span>
+                    <i class="val">50%</i></span
+                  >
+                  <div class="progress-bar-wrap">
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      aria-valuenow="50"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                  </div>
+                </div>
+                <!-- End Skills Item -->
+
+                <div class="progress">
+                  <span class="skill"
+                    ><span>Desoxigenación de los Océanos</span>
+                    <i class="val">30%</i></span
+                  >
+                  <div class="progress-bar-wrap">
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      aria-valuenow="30"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                  </div>
+                </div>
+                <!-- End Skills Item -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /Skills Section -->
+
+      <!-- =============================================
+           SECCIÓN LLAMADA A LA ACCIÓN
+           Invitación a participar en conservación
+           ============================================= -->
+      <section
+        id="call-to-action"
+        class="call-to-action section dark-background"
+      >
+        <img
+          src="https://cdn.pixabay.com/photo/2017/10/06/03/51/emperor-penguins-2821897_960_720.jpg') }}"
+          alt=""
+        />
+        <div class="container">
+          <div class="row" data-aos="zoom-in" data-aos-delay="100">
+            <div class="col-xl-9 text-center text-xl-start">
+              <h3>Llamada a la acción</h3>
+              <p>
+                ¡Actúa ahora para proteger nuestros océanos y la vida marina!
+                Cada acción cuenta para conservar la biodiversidad y garantizar
+                la salud de nuestros mares. Tu apoyo puede marcar la diferencia:
+                dona hoy, infórmate sobre prácticas sostenibles, o únete a
+                nuestras campañas de concienciación. Juntos, podemos asegurar un
+                futuro más brillante para nuestros océanos. ¡Haz tu parte y
+                ayuda a preservar la vida marina para las generaciones
+                venideras!
+              </p>
+            </div>
+            <div class="col-xl-3 cta-btn-container text-center">
+              <a
+                class="cta-btn align-middle"
+                href="{{ url_for('toma_accion') }}"
+                >Actúa ahora</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /Call To Action Section -->
+
+      <!-- =============================================
+           SECCIÓN DE NOVEDADES Y NOTICIAS
+           Grid de artículos y noticias recientes
+           ============================================= -->
+      <section id="portfolio" class="portfolio section">
+        <div class="container section-title" data-aos="fade-up">
+          <h2>novedades</h2>
+          <p>Enterate de las últimas noticias y las mejores historias</p>
+        </div>
+
+        <div class="container">
+          <div
+            class="isotope-layout"
+            data-default-filter="*"
+            data-layout="masonry"
+            data-sort="original-order"
+          >
+            <ul
+              class="portfolio-filters isotope-filters"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            >
+              <li data-filter="*" class="filter-active">Todo</li>
+              <li data-filter=".filter-app">Noticias</li>
+              <li data-filter=".filter-product">Artículos</li>
+              <li data-filter=".filter-branding">Historias</li>
+            </ul>
+            <!-- End Portfolio Filters -->
+
+            <div
+              class="row gy-4 isotope-container"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
+              <div
+                class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app"
+              >
+                <img
+                  src="{{ url_for('static', filename='img/masonry-portfolio/not-1.jpg') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+                <div class="portfolio-info">
+                  <h4>Personas versus Industrias</h4>
+                  <p>
+                    Descubre cómo un tratado global sobre plásticos puede ayudar
+                    a la contaminación plástica en todo el mundo.
+                  </p>
+                  <a
+                    href="{{ url_for('static', filename='img/masonry-portfolio/not-1.jpg') }}"
+                    title="Los residuos plásticos se encuentran ahora en las zonas más remotas del planeta. Mata la vida marina y está causando un daño importante a las comunidades que dependen de la pesca y el turismo. – António Guterres, Secretario General de la ONU."
+                    data-gallery="portfolio-gallery-app"
+                    class="glightbox preview-link"
+                    ><i class="bi bi-zoom-in"></i
+                  ></a>
+                  <a
+                    href="{{ url_for('starter_page') }}"
+                    title="Leer artículo completo sobre contaminación plástica"
+                    class="details-link"
+                    ><i class="bi bi-link-45deg"></i
+                  ></a>
+                </div>
+              </div>
+              <!-- End Portfolio Item -->
+
+              <div
+                class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product"
+              >
+                <img
+                  src="{{ url_for('static', filename='img/masonry-portfolio/art-1.jpg') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+                <div class="portfolio-info">
+                  <h4>
+                    Usted puede ayudar a conseguir un tratado mundial sólido
+                    sobre los plásticos
+                  </h4>
+                  <p>
+                    A través de la acción colectiva y el apoyo a un tratado
+                    internacional, podemos enfrentar este desafío y proteger
+                    nuestros océanos y ecosistemas.
+                  </p>
+                  <a
+                    href="{{ url_for('static', filename='img/masonry-portfolio/art-1.jpg') }}"
+                    title="La creciente crisis de contaminación por plásticos es un llamado urgente a la acción. A medida que nuestros océanos se ahogan en residuos plásticos, es imperativo que trabajemos juntos para encontrar soluciones. Un tratado internacional sólido podría ser la clave para abordar este desafío global."
+                    data-gallery="portfolio-gallery-product"
+                    class="glightbox preview-link"
+                    ><i class="bi bi-zoom-in"></i
+                  ></a>
+                  <a
+                    href="{{ url_for('starter_page') }}"
+                    title="Leer más sobre el tratado mundial contra los plásticos"
+                    class="details-link"
+                    ><i class="bi bi-link-45deg"></i
+                  ></a>
+                </div>
+              </div>
+              <!-- End Portfolio Item -->
+
+              <div
+                class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding"
+              >
+                <img
+                  src="{{ url_for('static', filename='img/masonry-portfolio/hist-1.png') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+                <div class="portfolio-info">
+                  <h4>
+                    Defendiendo la justicia ambiental: una breve carta de Kevin
+                    J. Patel
+                  </h4>
+                  <p>
+                    A sus 23 años, Patel ofrece una perspectiva fresca y
+                    apasionada sobre cómo podemos enfrentar la crisis climática
+                    y luchar por un futuro más justo para todos.
+                  </p>
+                  <a
+                    href="{{ url_for('static', filename='img/masonry-portfolio/hist-1.png') }}"
+                    title="Kevin J. Patel, un incansable activista por la justicia climática, nos brinda una carta apasionada que resuena con urgencia. A sus 23 años, Patel ha experimentado en carne propia los efectos devastadores de la contaminación del aire en Los Ángeles, una ciudad donde la calidad del aire es precaria. Su voz es un llamado a la acción, una invitación a enfrentar la crisis climática desde una perspectiva inclusiva y transformadora."
+                    data-gallery="portfolio-gallery-branding"
+                    class="glightbox preview-link"
+                    ><i class="bi bi-zoom-in"></i
+                  ></a>
+                  <a
+                    href="{{ url_for('toma_accion') }}"
+                    title="Conoce más sobre activismo ambiental"
+                    class="details-link"
+                    ><i class="bi bi-link-45deg"></i
+                  ></a>
+                </div>
+              </div>
+              <!-- End Portfolio Item -->
+
+              <div
+                class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app"
+              >
+                <img
+                  src="{{ url_for('static', filename='img/masonry-portfolio/art-2.jpg') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+                <div class="portfolio-info">
+                  <h4>
+                    Oportunidad histórica para resolver el problema del plástico
+                  </h4>
+                  <p>
+                    En un esfuerzo global sin precedentes, más de 60 países se
+                    han comprometido a desarrollar un tratado ambicioso para
+                    poner fin a la contaminación por plásticos para el año 2040.
+                  </p>
+                  <a
+                    href="{{ url_for('static', filename='img/masonry-portfolio/art-2.jpg') }}"
+                    title="La crisis de contaminación por plásticos exige una respuesta global urgente. En un gesto prometedor, más de 60 países, desde los Emiratos Árabes Unidos hasta las Islas Salomón, se han comprometido a desarrollar un tratado ambicioso para acabar con la contaminación por plásticos para el año 2040. Este objetivo es tan ambicioso para la crisis del plástico como lo ha sido el objetivo de 2°C del Acuerdo de París para abordar la crisis climática."
+                    data-gallery="portfolio-gallery-app"
+                    class="glightbox preview-link"
+                    ><i class="bi bi-zoom-in"></i
+                  ></a>
+                  <a
+                    href="{{ url_for('starter_page') }}"
+                    title="Leer más sobre la oportunidad histórica contra el plástico"
+                    class="details-link"
+                    ><i class="bi bi-link-45deg"></i
+                  ></a>
+                </div>
+              </div>
+              <!-- End Portfolio Item -->
+
+              <div
+                class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product"
+              >
+                <img
+                  src="https://cdn.pixabay.com/photo/2019/08/05/14/02/environmental-4386105_1280.jpg') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+                <div class="portfolio-info">
+                  <h4>Océanos en Crisis: El Asedio del Plástico</h4>
+                  <p>
+                    En un mundo donde los mares se han convertido en vertederos,
+                    la vida marina lucha por sobrevivir.
+                  </p>
+                  <a
+                    href="https://cdn.pixabay.com/photo/2019/08/05/14/02/environmental-4386105_1280.jpg"
+                    title="Revela la alarmante situación de nuestros océanos, invadidos por desechos plásticos que amenazan la biodiversidad y la salud de los ecosistemas marinos. Esta crisis global requiere una acción urgente para preservar el futuro de la vida bajo el agua."
+                    data-gallery="portfolio-gallery-product"
+                    class="glightbox preview-link"
+                    ><i class="bi bi-zoom-in"></i
+                  ></a>
+                  <a
+                    href="{{ url_for('especies') }}"
+                    title="Conoce las especies marinas en peligro"
+                    class="details-link"
+                    ><i class="bi bi-link-45deg"></i
+                  ></a>
+                </div>
+              </div>
+              <!-- End Portfolio Item -->
+
+              <div
+                class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding"
+              >
+                <img
+                  src="https://www.thepeopleofasia.com/wp-content/uploads/2019/03/sasinakaudelka.jpg') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+                <div class="portfolio-info">
+                  <h4>
+                    12 Personas que están apoyando el medio ambiente para
+                    liberarlo de la contaminación
+                  </h4>
+                  <p>
+                    SWAY tiene hoy para ti una lista de personas que buscan
+                    hacer una diferencia ayudando a conservar el planeta en que
+                    vivimos.
+                  </p>
+                  <a
+                    href="https://www.thepeopleofasia.com/wp-content/uploads/2019/03/sasinakaudelka.jpg"
+                    title="Sasina Kaudelka. Ella es cofundadora de la sede tailandesa de Trash Hero (Héroe de la Basura), un movimiento que busca reducir la cantidad de desperdicios y soluciones inteligentes a la contaminación. Sasina se reúne cada semana con las personas locales para limpiar la playa de Ao Nang y el río que se encuentra cerca de la playa. En 2016, ganó el premio a la Excelencia Verde de Tailandia por su contribución al turismo ecológico en dicha zona."
+                    data-gallery="portfolio-gallery-branding"
+                    class="glightbox preview-link"
+                    ><i class="bi bi-zoom-in"></i
+                  ></a>
+                  <a
+                    href="{{ url_for('toma_accion') }}"
+                    title="Inspírate con estas historias de activismo"
+                    class="details-link"
+                    ><i class="bi bi-link-45deg"></i
+                  ></a>
+                </div>
+              </div>
+              <!-- End Portfolio Item -->
+
+              <div
+                class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app"
+              >
+                <img
+                  src="https://cdn.pixabay.com/photo/2020/08/31/09/33/beach-5531919_1280.jpg') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+                <div class="portfolio-info">
+                  <h4>
+                    El Oceans20 presenta propuestas para la conservación marina
+                    que se entregarán a los líderes del G20
+                  </h4>
+                  <p>
+                    El grupo de compromiso del G20 Social finaliza las
+                    recomendaciones a los sherpas y prepara las versiones
+                    preliminares de las propuestas que se entregarán al Canal de
+                    Finanzas en el mes de julio.
+                  </p>
+                  <a
+                    href="https://cdn.pixabay.com/photo/2020/08/31/09/33/beach-5531919_1280.jpg"
+                    title="El Oceans20 (O20) presentó sus recomendaciones a los Sherpas del G20 y una versión preliminar de lo que se entregará al Canal de Finanzas en la reunión de Deputies la próxima semana, en Río de Janeiro. Durante la Midterm Meeting (reunión intermedia), mediada por Alexander Turra, coordinador de la Cátedra Unesco para la Sostenibilidad de los Océanos"
+                    data-gallery="portfolio-gallery-app"
+                    class="glightbox preview-link"
+                    ><i class="bi bi-zoom-in"></i
+                  ></a>
+                  <a
+                    href="{{ url_for('eventos') }}"
+                    title="Ver eventos de conservación marina"
+                    class="details-link"
+                    ><i class="bi bi-link-45deg"></i
+                  ></a>
+                </div>
+              </div>
+              <!-- End Portfolio Item -->
+
+              <div
+                class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product"
+              >
+                <img
+                  src="https://www.poblanerias.com/wp-content/archivos/2017/02/vaquita-marina-1021x580.jpg') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+                <div class="portfolio-info">
+                  <h4>
+                    Avistamientos de vaquitas marinas mantienen la esperanza por
+                    la especie
+                  </h4>
+                  <p>
+                    Observar una vaquita marina en el Alto Golfo de California
+                    es tan complicado como buscar una aguja en un pajar. Muchos
+                    factores y algo de suerte deben alinearse para conseguirlo.
+                  </p>
+                  <a
+                    href="https://www.poblanerias.com/wp-content/archivos/2017/02/vaquita-marina-1021x580.jpg"
+                    title="La vaquita marina (Phocoena sinus), endémica del Alto Golfo de California, es el cetáceo en mayor peligro de extinción del mundo. Si bien en México cuenta con el máximo nivel de protección legal dentro de la NOM-059, sumado a estar incluida en la Lista Roja de Especies Amenazadas de la Unión Internacional para la Conservación de la Naturaleza (IUCN, por sus siglas en inglés) y contar con el respaldo internacional de la Convención sobre el Comercio Internacional de Especies Amenazadas de Fauna y Flora Silvestres (CITES, por sus siglas en inglés), el hábitat de la marsopa mexicana no ha logrado liberarse de las artes de pesca ilegales que han causado un declive dramático de su población."
+                    data-gallery="portfolio-gallery-product"
+                    class="glightbox preview-link"
+                    ><i class="bi bi-zoom-in"></i
+                  ></a>
+                  <a
+                    href="{{ url_for('especies') }}"
+                    title="Conoce más sobre especies en peligro como la vaquita marina"
+                    class="details-link"
+                    ><i class="bi bi-link-45deg"></i
+                  ></a>
+                </div>
+              </div>
+              <!-- End Portfolio Item -->
+
+              <div
+                class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding"
+              >
+                <img
+                  src="https://cdn.pixabay.com/photo/2016/07/31/19/26/fisherman-1559753_1280.jpg') }}"
+                  class="img-fluid"
+                  alt=""
+                />
+                <div class="portfolio-info">
+                  <h4>
+                    La economía marina crece de dos a tres veces más rápido que
+                    el resto de la economía
+                  </h4>
+                  <p>
+                    Por un lado, las previsiones de la economía marina son muy
+                    prometedoras y, por otro, los océanos no son un recurso
+                    inagotable. Es necesario tomar medidas en materia de
+                    ecología y descarbonización.
+                  </p>
+                  <a
+                    href="https://cdn.pixabay.com/photo/2016/07/31/19/26/fisherman-1559753_1280.jpg"
+                    title="Es esencial llevar a cabo un análisis exhaustivo para minimizar los efectos sobre la biodiversidad marina que ejercen varios sectores económicos, como las industrias pesqueras. El 80% del comercio internacional se realiza por barco."
+                    data-gallery="portfolio-gallery-branding"
+                    class="glightbox preview-link"
+                    ><i class="bi bi-zoom-in"></i
+                  ></a>
+                  <a
+                    href="{{ url_for('tienda') }}"
+                    title="Apoya la economía sostenible en nuestra tienda"
+                    class="details-link"
+                    ><i class="bi bi-link-45deg"></i
+                  ></a>
+                </div>
+              </div>
+              <!-- End Portfolio Item -->
+            </div>
+            <!-- End Portfolio Container -->
+          </div>
+        </div>
+      </section>
+      <!-- /Portfolio Section -->
+
+      <!-- =============================================
+           SECCIÓN DEL EQUIPO
+           Información del personal de SWAY
+           ============================================= -->
+      <section id="team" class="team section">
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Personal</h2>
+          <p>Conoce al equipo detrás de este gran proyecto</p>
+        </div>
+
+        <div class="container">
+          <div class="row gy-4">
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            >
+              <div class="team-member d-flex align-items-start">
+                <div class="pic">
+                  <img
+                    src="{{ url_for('static', filename='img/team/file.png') }}"
+                    class="img-fluid"
+                    alt=""
+                  />
+                </div>
+                <div class="member-info">
+                  <h4>Emiliano Ledesma</h4>
+                  <span>Gestor de Proyecto</span>
+                  <div class="social">
+                    <a href="https://x.com/Emiliano_Led"
+                      ><i class="bi bi-twitter-x"></i
+                    ></a>
+                    <a
+                      href="https://www.facebook.com/emiliano.ledesmaledesma/?locale=es_LA"
+                      ><i class="bi bi-facebook"></i
+                    ></a>
+                    <a
+                      href="https://www.instagram.com/emiliano_ledesma_ledesma/"
+                      ><i class="bi bi-instagram"></i
+                    ></a>
+                    <a href="https://www.linkedin.com/in/emiliano-ledesma/"
+                      ><i class="bi bi-linkedin"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Team Member -->
+
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
+              <div class="team-member d-flex align-items-start">
+                <div class="pic">
+                  <img
+                    src="{{ url_for('static', filename='img/team/Ricardo.png') }}"
+                    class="img-fluid"
+                    alt=""
+                  />
+                </div>
+                <div class="member-info">
+                  <h4>Ricardo Méndez</h4>
+                  <span>Gestor Técnico</span>
+                  <div class="social">
+                    <a href="https://x.com/ricardomr1901?s=21"
+                      ><i class="bi bi-twitter-x"></i
+                    ></a>
+                    <a
+                      href="https://www.facebook.com/profile.php?id=100013620098378&locale=es_LA"
+                      ><i class="bi bi-facebook"></i
+                    ></a>
+                    <a
+                      href="https://www.instagram.com/rmricardo19?fbclid=IwY2xjawESNHVleHRuA2FlbQIxMAABHSMPysniVzQpqvk73Y3z4ES8AU7Up9UjanjmpT-SD-t0O_rfDOw8Fb7iPw_aem_ZPGx9Uaqt-bbKEiu0cHzjQ"
+                      ><i class="bi bi-instagram"></i
+                    ></a>
+                    <a
+                      href="https://www.linkedin.com/school/upq/posts/?feedView=all"
+                      ><i class="bi bi-linkedin"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Team Member -->
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-aos-delay="500"
+            >
+              <div class="team-member d-flex align-items-start">
+                <div class="pic">
+                  <img
+                    src="{{ url_for('static', filename='img/team/Diego.png') }}"
+                    class="img-fluid"
+                    alt=""
+                  />
+                </div>
+                <div class="member-info">
+                  <h4>Diego Jiménez</h4>
+                  <span>Consultor de Vida Marina</span>
+                  <div class="social">
+                    <a href="https://x.com/UPQoficial"
+                      ><i class="bi bi-twitter-x"></i
+                    ></a>
+                    <a href="https://www.facebook.com/diegxlxrd?locale=es_LA"
+                      ><i class="bi bi-facebook"></i
+                    ></a>
+                    <a
+                      href="https://www.instagram.com/die888jv?fbclid=IwY2xjawESNN5leHRuA2FlbQIxMAABHTQQGAQgw3mx4APphdLjTdUh9VZTVjrtd46X7iaz1nY3WxlSA0LS7sbdNA_aem_l0xis3821bV-bUYEApWwcQ"
+                      ><i class="bi bi-instagram"></i
+                    ></a>
+                    <a
+                      href="https://www.linkedin.com/school/upq/posts/?feedView=all"
+                      ><i class="bi bi-linkedin"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Team Member -->
+
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-aos-delay="700"
+            >
+              <div class="team-member d-flex align-items-start">
+                <div class="pic">
+                  <img
+                    src="{{ url_for('static', filename='img/team/Artemio.png') }}"
+                    class="img-fluid"
+                    alt=""
+                  />
+                </div>
+                <div class="member-info">
+                  <h4>Artemio Hurtado</h4>
+                  <span>Programador</span>
+                  <div class="social">
+                    <a href="https://x.com/UPQoficial"
+                      ><i class="bi bi-twitter-x"></i
+                    ></a>
+                    <a
+                      href="https://www.facebook.com/share/WK3xit8u9zeyfdMT/?mibextid=qi2Omg"
+                      ><i class="bi bi-facebook"></i
+                    ></a>
+                    <a href="https://www.instagram.com/im_arthi01/"
+                      ><i class="bi bi-instagram"></i
+                    ></a>
+                    <a
+                      href="https://www.linkedin.com/school/upq/posts/?feedView=all"
+                      ><i class="bi bi-linkedin"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Team Member -->
+            <div
+              class="col-lg-4 col-md-6"
+              data-aos="fade-up"
+              data-aos-delay="700"
+            >
+              <div class="team-member d-flex align-items-start">
+                <div class="pic">
+                  <img
+                    src="{{ url_for('static', filename='img/team/Joaquin.png') }}"
+                    class="img-fluid"
+                    alt=""
+                  />
+                </div>
+                <div class="member-info">
+                  <h4>Joaquín Moreno</h4>
+                  <span>Programador</span>
+                  <div class="social">
+                    <a
+                      href="https://x.com/jakersit0?t=ZsrIR1gJX3cdSBvzS237ZQ&s=09"
+                      ><i class="bi bi-twitter-x"></i
+                    ></a>
+                    <a
+                      href="https://www.facebook.com/profile.php?id=100070021665729&locale=es_LA"
+                      ><i class="bi bi-facebook"></i
+                    ></a>
+                    <a href="https://www.instagram.com/joaquin_josue0702/"
+                      ><i class="bi bi-instagram"></i
+                    ></a>
+                    <a
+                      href="https://www.linkedin.com/in/joaqu%C3%ADn-josu%C3%A9-moreno-nieves-214237298/"
+                      ><i class="bi bi-linkedin"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Team Member -->
+
+            <div
+              class="col-lg-4 col-md-6 mx-auto"
+              data-aos="fade-up"
+              data-aos-delay="800"
+            >
+              <div class="team-member d-flex align-items-start">
+                <div class="pic">
+                  <img
+                    src="{{ url_for('static', filename='img/tripie.png') }}"
+                    class="img-fluid"
+                    alt=""
+                  />
+                </div>
+                <div class="member-info">
+                  <h4>Abraham Velázquez</h4>
+                  <span>Programador</span>
+                  <div class="social">
+                    <a href="https://x.com/UPQoficial"
+                      ><i class="bi bi-twitter-x"></i
+                    ></a>
+                    <a href="https://www.facebook.com/UPQoficial?locale=es_LA"
+                      ><i class="bi bi-facebook"></i
+                    ></a>
+                    <a href="https://www.instagram.com/soyupq/"
+                      ><i class="bi bi-instagram"></i
+                    ></a>
+                    <a
+                      href="https://www.linkedin.com/school/upq/posts/?feedView=all"
+                      ><i class="bi bi-linkedin"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Team Member -->
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================
+           SECCIÓN DE DONACIONES
+           Formulario y opciones para donar
+           ============================================= -->
+      <section id="donation" class="donation section light-background">
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Haz una donación</h2>
+          <p>
+            Tu apoyo es crucial para nuestra misión de proteger los océanos y
+            preservar la biodiversidad marina. Con tu donación, nos ayudarás a
+            conservar el 30% de las áreas marinas para 2030, educar a las
+            comunidades y promover prácticas sostenibles. Únete a nosotros y haz
+            la diferencia hoy. ¡Cada aporte cuenta para un océano más saludable!
+          </p>
+        </div>
+
+        <div class="donation-container">
+          <form id="donation-form" class="donation-form">
+            <div class="amount-selection">
+              <label for="amount-radio-group">Selecciona la cantidad:</label>
+              <div
+                class="radio-group"
+                id="amount-radio-group"
+                role="radiogroup"
+                aria-labelledby="amount-label"
+              >
+                <label>
+                  <input
+                    type="radio"
+                    name="amount"
+                    value="10"
+                    onclick="setAmount(10)"
+                    aria-describedby="amount-10-desc"
+                  />
+                  <span>$10</span>
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="amount"
+                    value="30"
+                    onclick="setAmount(30)"
+                    aria-describedby="amount-30-desc"
+                  />
+                  <span>$30</span>
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="amount"
+                    value="other"
+                    onclick="setAmount('')"
+                    aria-describedby="custom-amount-desc"
+                  />
+                  <span>Otra</span>
+                </label>
+              </div>
+            </div>
+            <div class="amount-input">
+              <span aria-hidden="true">$</span>
+              <input
+                type="number"
+                id="custom-amount"
+                name="custom-amount"
+                placeholder="10000"
+                min="1"
+                max="100000"
+                step="1"
+                oninput="clearRadio()"
+                aria-label="Cantidad personalizada de donación en dólares"
+                aria-describedby="custom-amount-help"
+              />
+            </div>
+            <div id="custom-amount-help" class="sr-only">
+              Ingresa una cantidad personalizada entre $1 y $100,000
+            </div>
+            <button
+              type="button"
+              class="donate-button"
+              onclick="processDonationDirect(event)"
+              aria-describedby="donate-help"
+              data-no-redirect="true"
+            >
+              <i class="bi bi-heart-fill" aria-hidden="true"></i>
+              Dona ahora
+            </button>
+            <div id="donate-help" class="sr-only">
+              Proceder con la donación seleccionada
+            </div>
+          </form>
+        </div>
+
+        <div id="confirmation-popup" class="popup">
+          <div class="popup-content">
+            <span class="close-button" onclick="closePopup()">&times;</span>
+            <p>¿Confirmas tu donación de <span id="donation-amount"></span>?</p>
+            <button
+              type="button"
+              onclick="confirmDonation()"
+              style="cursor: pointer"
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+
+        <script>
+          // Improved donation form functionality
+          function setAmount(value) {
+            const customAmountInput = document.getElementById("custom-amount");
+            customAmountInput.value = value || "";
+
+            // Update visual feedback
+            if (value) {
+              customAmountInput.classList.add("has-preset-value");
+            } else {
+              customAmountInput.classList.remove("has-preset-value");
+              customAmountInput.focus(); // Focus on input when "Otra" is selected
+            }
+          }
+
+          function clearRadio() {
+            const radios = document.getElementsByName("amount");
+            radios.forEach((radio) => {
+              radio.checked = false;
+            });
+
+            const customAmountInput = document.getElementById("custom-amount");
+            customAmountInput.classList.remove("has-preset-value");
+          }
+
+          function showConfirmation(event) {
+            console.log("=== SHOW CONFIRMATION CALLED ===");
+
+            try {
+              if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+
+              const customAmount =
+                document.getElementById("custom-amount").value;
+              const selectedRadio = document.querySelector(
+                'input[name="amount"]:checked'
+              );
+
+              console.log("Custom amount value:", customAmount);
+              console.log("Selected radio:", selectedRadio);
+              console.log("Selected radio value:", selectedRadio?.value);
+
+              let donationAmount = "";
+              let numericAmount = 0;
+
+              if (selectedRadio && selectedRadio.value !== "other") {
+                numericAmount = parseFloat(selectedRadio.value);
+                donationAmount = `$${numericAmount.toLocaleString()}`;
+                console.log("Using radio amount:", donationAmount);
+              } else if (
+                customAmount &&
+                !isNaN(customAmount) &&
+                parseFloat(customAmount) > 0
+              ) {
+                numericAmount = parseFloat(customAmount);
+                donationAmount = `$${numericAmount.toLocaleString()}`;
+                console.log("Using custom amount:", donationAmount);
+              } else {
+                console.log("No valid amount found");
+                alert(
+                  "Por favor selecciona o ingresa una cantidad válida para donar."
+                );
+                return;
+              }
+
+              console.log("Numeric amount for validation:", numericAmount);
+
+              if (numericAmount < 1 || numericAmount > 100000) {
+                alert("La cantidad debe estar entre $1 y $100,000.");
+                return;
+              }
+
+              console.log("Final donation amount to display:", donationAmount);
+              document.getElementById("donation-amount").textContent =
+                donationAmount;
+              document.getElementById("confirmation-popup").style.display =
+                "flex";
+            } catch (error) {
+              console.error("Error in showConfirmation:", error);
+            }
+          }
+
+          function closePopup() {
+            document.getElementById("confirmation-popup").style.display =
+              "none";
+            // Return focus to donate button
+            document.querySelector(".donate-button").focus();
+          }
+
+          function confirmDonation() {
+            console.log("=== CONFIRMING DONATION - STARTING ===");
+
+            // Stop any event propagation that might interfere
+            event.stopPropagation();
+            event.preventDefault();
+
+            const amountText =
+              document.getElementById("donation-amount").textContent;
+            const numericAmount = amountText.replace("$", "").replace(",", "");
+
+            console.log("Amount text from DOM:", amountText);
+            console.log("Numeric amount:", numericAmount);
+            console.log(
+              "URL will be:",
+              `{{ url_for('payment') }}?amount=${numericAmount}`
+            );
+
+            // Store amount and redirect to payment page in the SAME window
+            localStorage.setItem("donationAmount", numericAmount);
+
+            // Close the popup first
+            document.getElementById("confirmation-popup").style.display =
+              "none";
+
+            // Remove any event listeners that might interfere
+            window.onbeforeunload = null;
+
+            console.log("About to redirect...");
+
+            // Force redirect in same window using the most direct method
+            setTimeout(() => {
+              window.location.href = `{{ url_for('payment') }}?amount=${numericAmount}`;
+            }, 100);
+
+            console.log("=== CONFIRMING DONATION - END ===");
+          }
+
+          // Keyboard accessibility for popup
+          document.addEventListener("keydown", function (event) {
+            const popup = document.getElementById("confirmation-popup");
+            if (popup.style.display === "flex" && event.key === "Escape") {
+              closePopup();
+            }
+          });
+
+          // Debug function - you can call this in browser console to test the flow
+          window.testDonationFlow = function (amount) {
+            console.log("=== TESTING DONATION FLOW ===");
+            console.log("Testing with amount:", amount);
+
+            // Set the amount in the input field
+            document.getElementById("custom-amount").value = amount;
+
+            // Clear any selected radio buttons
+            const radios = document.getElementsByName("amount");
+            radios.forEach((radio) => {
+              radio.checked = false;
+            });
+
+            // Trigger the form submission
+            showConfirmation(new Event("submit"));
+          };
+
+          // Direct test function - call with testDirectRedirect(5000)
+          window.testDirectRedirect = function (amount) {
+            console.log("=== DIRECT REDIRECT TEST ===");
+            console.log("Redirecting with amount:", amount);
+            localStorage.setItem("donationAmount", amount);
+            window.location.href = `{{ url_for('payment') }}?amount=${amount}`;
+          };
+
+          // Test function that bypasses popup completely
+          window.testDirectFlow = function (amount) {
+            console.log("=== TESTING DIRECT FLOW (NO POPUP) ===");
+
+            // Set the amount in the input
+            document.getElementById("custom-amount").value = amount;
+
+            // Call confirmDonation directly without popup
+            const numericAmount = amount.toString();
+            localStorage.setItem("donationAmount", numericAmount);
+
+            console.log(
+              "Direct flow - redirecting to:",
+              `{{ url_for('payment') }}?amount=${numericAmount}`
+            );
+
+            // Try the most basic redirect
+            window.location = `{{ url_for('payment') }}?amount=${numericAmount}`;
+          };
+
+          // Direct donation processing (bypass popup to avoid window opening issues)
+          function processDonationDirect(event) {
+            console.log("=== PROCESSING DONATION DIRECTLY ===");
+
+            // Prevent any default behavior
+            if (event) {
+              event.preventDefault();
+              event.stopPropagation();
+              event.stopImmediatePropagation();
+            }
+
+            const customAmount = document.getElementById("custom-amount").value;
+            const selectedRadio = document.querySelector(
+              'input[name="amount"]:checked'
+            );
+
+            console.log("Custom amount value:", customAmount);
+            console.log("Selected radio:", selectedRadio);
+            console.log("Selected radio value:", selectedRadio?.value);
+
+            let numericAmount = 0;
+
+            if (selectedRadio && selectedRadio.value !== "other") {
+              numericAmount = parseFloat(selectedRadio.value);
+              console.log("Using radio amount:", numericAmount);
+            } else if (
+              customAmount &&
+              !isNaN(customAmount) &&
+              parseFloat(customAmount) > 0
+            ) {
+              numericAmount = parseFloat(customAmount);
+              console.log("Using custom amount:", numericAmount);
+            } else {
+              console.log("No valid amount found");
+              alert(
+                "Por favor selecciona o ingresa una cantidad válida para donar."
+              );
+              return;
+            }
+
+            console.log("Numeric amount for validation:", numericAmount);
+
+            if (numericAmount < 1 || numericAmount > 100000) {
+              alert("La cantidad debe estar entre $1 y $100,000.");
+              return;
+            }
+
+            console.log("Proceeding with amount:", numericAmount);
+
+            // Store amount and redirect DIRECTLY (no popup)
+            localStorage.setItem("donationAmount", numericAmount.toString());
+
+            console.log(
+              "About to redirect to:",
+              `{{ url_for('payment') }}?amount=${numericAmount}`
+            );
+
+            // Multiple redirect methods to ensure it works in the same window
+            const targetUrl = `{{ url_for('payment') }}?amount=${numericAmount}`;
+
+            // Method 1: Force same window navigation
+            try {
+              window.location.assign(targetUrl);
+            } catch (e) {
+              console.log("assign failed, trying replace:", e);
+              try {
+                window.location.replace(targetUrl);
+              } catch (e2) {
+                console.log("replace failed, trying href:", e2);
+                window.location.href = targetUrl;
+              }
+            }
+          }
+
+          // Format number input as user types
+          document
+            .getElementById("custom-amount")
+            .addEventListener("input", function (e) {
+              let value = e.target.value.replace(/[^\d]/g, ""); // Remove non-digits
+              if (value) {
+                // Add thousands separators for display (but keep actual value as number)
+                const numericValue = parseInt(value);
+                if (numericValue > 100000) {
+                  e.target.value = "100000";
+                } else {
+                  e.target.value = value;
+                }
+              }
+            });
+        </script>
+      </section>
+      <!-- /donating Section -->
+
+      <!-- =============================================
+           SECCIÓN DE TESTIMONIOS
+           Opiniones de usuarios y colaboradores
+           ============================================= -->
+      <section id="testimonials" class="testimonials section">
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Nuestros usuarios opinan</h2>
+          <p>
+            Sigue de cerca opiniones y casos de éxito de personas destacadas
+          </p>
+        </div>
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="swiper init-swiper">
+            <script type="application/json" class="swiper-config">
+              {
+                "loop": true,
+                "speed": 600,
+                "autoplay": {
+                  "delay": 5000
+                },
+                "slidesPerView": "auto",
+                "pagination": {
+                  "el": ".swiper-pagination",
+                  "type": "bullets",
+                  "clickable": true
+                }
+              }
+            </script>
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <div class="testimonial-item">
+                  <img
+                    src="{{ url_for('static', filename='img/testimonials/testimonials-1.jpg') }}"
+                    class="testimonial-img"
+                    alt=""
+                  />
+                  <h3>Ricardo Gómez</h3>
+                  <h4>
+                    Director de Fundación Internacional de Conservación Oceánica
+                  </h4>
+                  <div class="stars">
+                    <i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i>
+                  </div>
+                  <p>
+                    <i class="bi bi-quote quote-icon-left"></i>
+                    <span
+                      >La colaboración con esta organización ha sido clave en el
+                      éxito de nuestras iniciativas globales. Su enfoque
+                      estratégico y su compromiso con la conservación mariana
+                      son ejemplares.</span
+                    >
+                    <i class="bi bi-quote quote-icon-right"></i>
+                  </p>
+                </div>
+              </div>
+              <!-- End testimonial item -->
+
+              <div class="swiper-slide">
+                <div class="testimonial-item">
+                  <img
+                    src="{{ url_for('static', filename='img/testimonials/testimonials-2.jpg') }}"
+                    class="testimonial-img"
+                    alt=""
+                  />
+                  <h3>Jia Li</h3>
+                  <h4>Profesora</h4>
+                  <div class="stars">
+                    <i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i>
+                  </div>
+                  <p>
+                    <i class="bi bi-quote quote-icon-left"></i>
+                    <span
+                      >Su enfoque basado en la ciencia y la colaboración con
+                      expertos realmente marca la diferencia. Me alegra ver que
+                      mis donaciones están contribuyendo a la conservación de la
+                      vida marina.</span
+                    >
+                    <i class="bi bi-quote quote-icon-right"></i>
+                  </p>
+                </div>
+              </div>
+              <!-- End testimonial item -->
+
+              <div class="swiper-slide">
+                <div class="testimonial-item">
+                  <img
+                    src="{{ url_for('static', filename='img/testimonials/testimonials-3.jpg') }}"
+                    class="testimonial-img"
+                    alt=""
+                  />
+                  <h3>Jena Karlis</h3>
+                  <h4>Periodista</h4>
+                  <div class="stars">
+                    <i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i>
+                  </div>
+                  <p>
+                    <i class="bi bi-quote quote-icon-left"></i>
+                    <span
+                      >Aprecio la transparencia en cómo se utilizan las
+                      donaciones. Es genial saber que mi contribución está
+                      siendo bien empleada para proteger nuestros océanos.</span
+                    >
+                    <i class="bi bi-quote quote-icon-right"></i>
+                  </p>
+                </div>
+              </div>
+              <!-- End testimonial item -->
+
+              <div class="swiper-slide">
+                <div class="testimonial-item">
+                  <img
+                    src="{{ url_for('static', filename='img/testimonials/testimonials-4.jpg') }}"
+                    class="testimonial-img"
+                    alt=""
+                  />
+                  <h3>Matt Brandon</h3>
+                  <h4>Fotógrafo</h4>
+                  <div class="stars">
+                    <i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i>
+                  </div>
+                  <p>
+                    <i class="bi bi-quote quote-icon-left"></i>
+                    <span
+                      >He tenido el privilegio de capturar imágenes de los
+                      proyectos de conservación apoyados por esta organización.
+                      El progreso es visible y sus esfuerzos están marcando una
+                      diferencia real en nuestros océanos.</span
+                    >
+                    <i class="bi bi-quote quote-icon-right"></i>
+                  </p>
+                </div>
+              </div>
+              <!-- End testimonial item -->
+
+              <div class="swiper-slide">
+                <div class="testimonial-item">
+                  <img
+                    src="{{ url_for('static', filename='img/testimonials/testimonials-5.jpg') }}"
+                    class="testimonial-img"
+                    alt=""
+                  />
+                  <h3>John Larson</h3>
+                  <h4>Estudiante</h4>
+                  <div class="stars">
+                    <i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i
+                    ><i class="bi bi-star-fill"></i>
+                  </div>
+                  <p>
+                    <i class="bi bi-quote quote-icon-left"></i>
+                    <span
+                      >Desde que empecé a seguir su trabajo, he cambiado muchos
+                      de mis hábitos para ser más sostenible. Me alegra ver cómo
+                      están haciendo una diferencia en la protección de los
+                      océanos.</span
+                    >
+                    <i class="bi bi-quote quote-icon-right"></i>
+                  </p>
+                </div>
+              </div>
+              <!-- End testimonial item -->
+            </div>
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>
+      </section>
+      <!-- /Testimonials Section -->
+
+      <!-- =============================================
+           SECCIÓN DE PREGUNTAS FRECUENTES
+           FAQ sobre conservación marina y donaciones
+           ============================================= -->
+      <section id="faq-2" class="faq-2 section light-background">
+        <div class="container section-title" data-aos="fade-up">
+          <h2>FAQ</h2>
+          <p>
+            Encuentra respuestas a las dudas más comunes sobre nuestra misión,
+            cómo puedes ayudar, los desafíos que enfrentan nuestros océanos y el
+            uso de las donaciones. Si tienes más preguntas, estamos aquí para
+            ayudarte.
+          </p>
+        </div>
+
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-10">
+              <div class="faq-container">
+                <div
+                  class="faq-item faq-active"
+                  data-aos="fade-up"
+                  data-aos-delay="200"
+                >
+                  <i class="faq-icon bi bi-question-circle"></i>
+                  <h3>
+                    ¿Cómo se eligen los proyectos de conservación marina que
+                    apoyan?
+                  </h3>
+                  <div class="faq-content">
+                    <p>
+                      Seleccionamos proyectos basados en su impacto potencial,
+                      viabilidad científica y alineación con nuestras metas de
+                      conservación. Colaboramos con expertos y organizaciones
+                      locales para identificar áreas críticas y desarrollar
+                      estrategias efectivas para preservar los ecosistemas
+                      marinos.
+                    </p>
+                  </div>
+                  <i class="faq-toggle bi bi-chevron-right"></i>
+                </div>
+                <!-- End Faq item-->
+
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="300">
+                  <i class="faq-icon bi bi-question-circle"></i>
+                  <h3>
+                    ¿Qué puede hacer una persona para contribuir a la
+                    preservación de los océanos desde su hogar?
+                  </h3>
+                  <div class="faq-content">
+                    <p>
+                      Puedes adoptar prácticas sostenibles como reducir el uso
+                      de plásticos, apoyar empresas responsables con el medio
+                      ambiente y educar a otros sobre la importancia de los
+                      océanos. Además, puedes participar en campañas de limpieza
+                      de playas y promover el consumo responsable de productos
+                      del mar.
+                    </p>
+                  </div>
+                  <i class="faq-toggle bi bi-chevron-right"></i>
+                </div>
+                <!-- End Faq item-->
+
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="400">
+                  <i class="faq-icon bi bi-question-circle"></i>
+                  <h3>¿Qué desafíos enfrentan nuestros océanos actualmente?</h3>
+                  <div class="faq-content">
+                    <p>
+                      Nuestros océanos enfrentan múltiples amenazas, como la
+                      contaminación plástica, la sobreexplotación de recursos
+                      marinos, el cambio climático y la destrucción de hábitats.
+                      Estos problemas afectan la salud de los ecosistemas
+                      marinos y la biodiversidad, haciendo urgente la acción
+                      para su conservación.
+                    </p>
+                  </div>
+                  <i class="faq-toggle bi bi-chevron-right"></i>
+                </div>
+                <!-- End Faq item-->
+
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="500">
+                  <i class="faq-icon bi bi-question-circle"></i>
+                  <h3>
+                    ¿Cómo se utilizan los fondos recaudados en las campañas de
+                    donación?
+                  </h3>
+                  <div class="faq-content">
+                    <p>
+                      Los fondos recaudados se utilizan para implementar
+                      proyectos de conservación, investigar el estado de la vida
+                      marina, restaurar hábitats dañados y llevar a cabo
+                      campañas de sensibilización y educación. Aseguramos que
+                      cada recurso se utilice de manera efectiva para lograr un
+                      impacto positivo en nuestros océanos.
+                    </p>
+                  </div>
+                  <i class="faq-toggle bi bi-chevron-right"></i>
+                </div>
+                <!-- End Faq item-->
+
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="600">
+                  <i class="faq-icon bi bi-question-circle"></i>
+                  <h3>
+                    ¿Cómo puedo involucrarme más allá de hacer una donación?
+                  </h3>
+                  <div class="faq-content">
+                    <p>
+                      Además de donar, puedes participar como voluntario en
+                      eventos de conservación, difundir información sobre la
+                      protección de los océanos en tus redes sociales, unirte a
+                      campañas de limpieza de playas o apoyar políticas y
+                      prácticas sostenibles en tu comunidad. Cada acción cuenta
+                      para promover la preservación de nuestros mares.
+                    </p>
+                  </div>
+                  <i class="faq-toggle bi bi-chevron-right"></i>
+                </div>
+                <!-- End Faq item-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /Faq 2 Section -->
+
+      <!-- =============================================
+           SECCIÓN DE CONTACTO
+           Formulario y información de contacto
+           ============================================= -->
+      <section id="contact" class="contact section">
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Contacto</h2>
+          <p>Ponte en contacto con nosotros para saber cómo puedes ayudar</p>
+        </div>
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="row gy-4">
+            <div class="col-lg-5">
+              <div class="info-wrap">
+                <div
+                  class="info-item d-flex"
+                  data-aos="fade-up"
+                  data-aos-delay="200"
+                >
+                  <i class="bi bi-geo-alt flex-shrink-0"></i>
+                  <div>
+                    <h3>Dirección</h3>
+                    <p>
+                      Carretera Estatal 420 S/N, El Rosario 76240, Santiago de
+                      Querétaro, Qro
+                    </p>
+                  </div>
+                </div>
+                <!-- End Info Item -->
+
+                <div
+                  class="info-item d-flex"
+                  data-aos="fade-up"
+                  data-aos-delay="300"
+                >
+                  <i class="bi bi-telephone flex-shrink-0"></i>
+                  <div>
+                    <h3>Llámanos</h3>
+                    <p>+52 442 101 9000</p>
+                  </div>
+                </div>
+                <!-- End Info Item -->
+
+                <div
+                  class="info-item d-flex"
+                  data-aos="fade-up"
+                  data-aos-delay="400"
+                >
+                  <i class="bi bi-envelope flex-shrink-0"></i>
+                  <div>
+                    <h3>Escríbenos</h3>
+                    <p>123046244@upq.edu.mx</p>
+                  </div>
+                </div>
+                <!-- End Info Item -->
+
+                <div class="iframe-container">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3736.0228911471577!2d-100.27738288932885!3d20.546244280905782!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d3452b278e7259%3A0xeb40a967d716216c!2sUniversidad%20Polit%C3%A9cnica%20de%20Quer%C3%A9taro!5e0!3m2!1sen!2sus!4v1722044385446!5m2!1sen!2sus"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                  >
+                  </iframe>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-7">
+              <form
+                id="contact-form"
+                class="php-email-form"
+                data-aos="fade-up"
+                data-aos-delay="200"
+                onsubmit="enviarContacto(event)"
+              >
+                <div class="row gy-4">
+                  <div class="col-md-4">
+                    <label for="nombre-field" class="pb-2">Nombre *</label>
+                    <input
+                      type="text"
+                      name="nombre"
+                      id="nombre-field"
+                      class="form-control"
+                      required=""
+                      minlength="2"
+                      maxlength="50"
+                      data-validation="soloTexto"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label for="apellido-paterno-field" class="pb-2"
+                      >Apellido Paterno *</label
+                    >
+                    <input
+                      type="text"
+                      name="apellidoPaterno"
+                      id="apellido-paterno-field"
+                      class="form-control"
+                      required=""
+                      minlength="2"
+                      maxlength="50"
+                      data-validation="soloTexto"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label for="apellido-materno-field" class="pb-2"
+                      >Apellido Materno</label
+                    >
+                    <input
+                      type="text"
+                      name="apellidoMaterno"
+                      id="apellido-materno-field"
+                      class="form-control"
+                      minlength="2"
+                      maxlength="50"
+                      data-validation="soloTexto"
+                    />
+                  </div>
+                  <div class="col-md-12">
+                    <label for="email-field" class="pb-2"
+                      >Correo Electrónico *</label
+                    >
+                    <input
+                      type="email"
+                      class="form-control"
+                      name="email"
+                      id="email-field"
+                      required=""
+                      maxlength="150"
+                      data-validation="email"
+                    />
+                  </div>
+                  <div class="col-md-12">
+                    <label for="subject-field" class="pb-2">Asunto *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="subject"
+                      id="subject-field"
+                      required=""
+                      minlength="5"
+                      maxlength="200"
+                    />
+                  </div>
+                  <div class="col-md-12">
+                    <label for="message-field" class="pb-2">Mensaje *</label>
+                    <textarea
+                      class="form-control"
+                      name="message"
+                      rows="6"
+                      id="message-field"
+                      required=""
+                      minlength="10"
+                      maxlength="1000"
+                    ></textarea>
+                  </div>
+                  <div class="col-md-12 text-center">
+                    <button type="submit" class="btn-submit" id="submit-btn">
+                      <i class="bi bi-send"></i> Enviar mensaje
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div id="message-popup" class="popup">
+              <div class="popup-content">
+                <span class="close-button" onclick="closeMessagePopup()"
+                  >&times;</span
+                >
+                <p id="message-popup-text">
+                  ¡Tu mensaje ha sido enviado con éxito!
+                </p>
+              </div>
+            </div>
+            <!-- End Contact Form -->
+          </div>
+        </div>
+      </section>
+      <!-- /Contact Section -->
+    </main>
+
+    <!-- =============================================
+         FOOTER PRINCIPAL DEL SITIO
+         Enlaces, información de contacto y newsletter
+         ============================================= -->
+    <footer id="footer" class="footer">
+      <div class="footer-newsletter">
+        <div class="container">
+          <div class="row justify-content-center text-center">
+            <div class="col-lg-6">
+              <h4>Únete a nuestro newsletter</h4>
+              <p>
+                Subscríbete para obtener las últimas noticias y eventos más
+                importantes!
+              </p>
+              <div class="newsletter-form">
+                <input type="email" name="email" id="newsletter-email" />
+                <input
+                  type="submit"
+                  value="Subscribirse"
+                  onclick="showNewsletterConfirmation()"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal de confirmación de newsletter -->
+      <div id="newsletter-popup" class="popup">
+        <div class="popup-content">
+          <span class="close-button" onclick="closeNewsletterPopup()"
+            >&times;</span
+          >
+          <p>¡Gracias por suscribirte a nuestro newsletter!</p>
+        </div>
+      </div>
+      <!-- /End newsletter Section -->
+
+      <div class="container footer-top">
+        <div class="row gy-4">
+          <div class="col-lg-4 col-md-6 footer-about">
+            <a href="index.html" class="d-flex align-items-center">
+              <span class="sitename">SWAY</span>
+            </a>
+            <div class="footer-contact pt-3">
+              <p>Carretera Estatal 420 S/N, El Rosario</p>
+              <p>76240, Santiago de Querétaro, Qro</p>
+              <p class="mt-3">
+                <strong>Telefóno:</strong> <span>+52 442 101 9000</span>
+              </p>
+              <p><strong>Email:</strong> <span>123046244@upq.edu.mx</span></p>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Links útiles</h4>
+            <ul>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Home</a></li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#about">Sobre Nosotros</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#donation">Donar</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#">Términos de Servicio</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Entérate de más</h4>
+            <ul>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="{{ url_for('toma_accion') }}">Toma acción</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="{{ url_for('starter_page') }}">Blog</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="{{ url_for('starter_page') }}">Casos de Éxito</a>
+              </li>
+              <li>
+                <i class="bi bi-chevron-right"></i>
+                <a href="#">Patrocinadores</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-4 col-md-12">
+            <h4>Síguenos</h4>
+            <p>Mantente en contacto a través de nuestras redes sociales</p>
+            <div class="social-links d-flex">
+              <a href="https://x.com/UPQoficial"
+                ><i class="bi bi-twitter-x"></i
+              ></a>
+              <a href="https://www.facebook.com/UPQoficial?locale=es_LA"
+                ><i class="bi bi-facebook"></i
+              ></a>
+              <a href="https://www.instagram.com/soyupq/"
+                ><i class="bi bi-instagram"></i
+              ></a>
+              <a href="https://www.linkedin.com/school/upq/posts/?feedView=all"
+                ><i class="bi bi-linkedin"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container copyright text-center mt-4">
+        <p>
+          © <span>Copyright</span> <strong class="px-1 sitename">SWAY</strong>
+          <span>Todos los derechos reservados</span>
+        </p>
+      </div>
+    </footer>
+    <!-- /End footer Section -->
+
+    <!-- Botón de scroll hacia arriba -->
+    <a
+      href="#"
+      id="scroll-top"
+      class="scroll-top d-flex align-items-center justify-content-center"
+      ><i class="bi bi-arrow-up-short"></i
+    ></a>
+
+    <!-- Indicador de carga de página -->
+    <div id="preloader"></div>
+
+    <!-- Archivos JavaScript de librerías externas -->
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- <script src="{{ url_for('static', filename='vendor/php-email-form/validate.js') }}"></script> -->
+    <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/waypoints/noframework.waypoints.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+
+    <!-- Archivos JavaScript principales del sitio -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+  </body>
+</html>

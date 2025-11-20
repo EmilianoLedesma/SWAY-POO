@@ -1,0 +1,308 @@
+<!-- =============================================
+     PÁGINA DE ARTÍCULOS Y BLOG
+     Página de contenido educativo sobre
+     contaminación plástica y conservación
+     ============================================= -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>LA LUCHA CONTRA LA CONTAMINACIÓN PLÁSTICA
+  </title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/SWAY (1).png') }}" rel="icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Jost:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+
+</head>
+
+<body class="starter-page-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+      <a href="{{ url_for('index') }}" class="logo d-flex align-items-center me-auto">
+        <h1 class="sitename">SWAY</h1>
+      </a>      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{ url_for('index') }}#hero">Home</a></li>
+          <li><a href="{{ url_for('index') }}#about">Nosotros</a></li>
+          <li><a href="{{ url_for('index') }}#portfolio">Novedades</a></li>
+          <li><a href="{{ url_for('index') }}#team">Equipo</a></li>
+          <li><a href="{{ url_for('index') }}#contact">Contacto</a></li>
+          <li class="dropdown"><a href="#"><span>Más</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="{{ url_for('especies') }}">Especies</a></li>
+              <li><a href="{{ url_for('eventos') }}">Eventos</a></li>
+              <li><a href="{{ url_for('biblioteca') }}">Biblioteca</a></li>
+              <li><a href="{{ url_for('tienda') }}">Tienda</a></li>
+            </ul>
+          </li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted" href="{{ url_for('index') }}#donation">Donar</a>
+
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Starter Section Section -->
+    <section id="starter-section" class="starter-section section">
+
+      <section id="plastic-pollution" class="plastic-pollution section">
+        <div class="container">
+          <div class="section-title" data-aos="fade-up">
+            <h2>La Lucha Contra la Contaminación Plástica</h2>
+            <p>Un tratado global para abordar la crisis de la contaminación por plásticos.</p>
+          </div>
+
+          <div class="article" data-aos="fade-up">
+            <h3>¿Qué es la Contaminación Plástica?</h3>
+            <p>
+              La contaminación plástica se refiere a la acumulación de productos de plástico en el medio ambiente, que
+              causa efectos adversos en la vida silvestre, la fauna y la salud humana. Cada año, millones de toneladas
+              de plástico terminan en nuestros océanos, afectando a la vida marina y a los ecosistemas.
+            </p>
+            <h3>Impacto en la Vida Marina</h3>
+            <p>
+              Los plásticos en el océano son una amenaza significativa para la vida marina. Animales como tortugas, aves
+              y mamíferos marinos confunden el plástico con alimento, lo que puede llevar a la muerte por asfixia o
+              malnutrición. Además, los microplásticos se introducen en la cadena alimentaria, afectando a los seres
+              humanos que consumen mariscos contaminados.
+            </p>
+            <h3>Plásticos en Nuestros Océanos</h3>
+            <p>
+              Se estima que más de 8 millones de toneladas de plástico ingresan a los océanos cada año. Este problema se
+              agrava por la falta de infraestructura adecuada para la gestión de residuos en muchas partes del mundo.
+              Las botellas, bolsas y otros productos de plástico de un solo uso son los principales culpables de esta
+              crisis.
+            </p>
+            <h3>Acción Colectiva Contra la Contaminación</h3>
+            <p>
+              La acción colectiva de las personas es fundamental en la lucha contra la contaminación plástica.
+              Movimientos globales han surgido, donde ciudadanos, activistas y organizaciones no gubernamentales
+              trabajan juntos para presionar a las empresas y gobiernos a adoptar prácticas más sostenibles. Campañas de
+              limpieza de playas, protestas y la promoción de alternativas al plástico son solo algunas de las formas en
+              que la comunidad se une para hacer frente a este problema.
+            </p>
+            <h3>Soluciones Sostenibles</h3>
+            <p>
+              Para combatir la contaminación plástica, es crucial implementar soluciones sostenibles. Esto incluye la
+              reducción del uso de plásticos de un solo uso, la promoción de alternativas biodegradables y el
+              fortalecimiento de las políticas de reciclaje. Además, un tratado global sobre plásticos podría ayudar a
+              establecer normas y regulaciones para reducir la producción y el uso de plásticos.
+            </p>
+          </div>
+
+          <div class="row gy-4">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+              <div class="card">
+                <img src="https://blog.aegon.es/wp-content/uploads/2022/07/contaminacion-marina.jpg" class="img-fluid"
+                  alt="Contaminación Plástica">
+                <div class="card-body">
+                  <h4>Impacto en la Vida Marina</h4>
+                  <p>La contaminación plástica afecta gravemente a la fauna marina.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+              <div class="card">
+                <img
+                  src="https://ep01.epimg.net/internacional/imagenes/2019/06/07/america/1559940618_676007_1559941003_sumario_normal.jpg"
+                  class="img-fluid" alt="Plásticos en el Océano">
+                <div class="card-body">
+                  <h4>Plásticos en Nuestros Océanos</h4>
+                  <p>Millones de toneladas de plástico terminan en nuestros océanos cada año.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+              <div class="card">
+                <img src="https://ambarplus.com/wp-content/uploads/2023/06/7922-1-scaled.jpg" class="img-fluid"
+                  alt="Soluciones Sostenibles">
+                <div class="card-body">
+                  <h4>Soluciones Sostenibles</h4>
+                  <p>Es necesario implementar soluciones sostenibles para reducir el uso de plásticos.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="plastic-pollution">
+            <div class="section-title">
+              <h2>Imágenes de Alto Impacto</h2>
+              <p>Explora cómo nuestras acciones afectan el medio ambiente.</p>
+            </div>
+
+            <div class="impact-images" data-aos="fade-up" data-aos-delay="400">
+              <div class="row gy-4">
+                <div class="col-md-6">
+                  <div class="impact-card" onclick="toggleDescription(this)">
+                    <img
+                      src="https://static.nationalgeographicla.com/files/styles/image_3200/public/01-global-climate-strike.jpg?w=1900&h=1267"
+                      class="img-fluid" alt="Protesta contra la contaminación">
+                    <div class="description" style="display: none;">
+                      <h4>Jóvenes de todo el mundo protestan por el cambio climático</h4>
+                      <p>En más de 200 naciones, los jóvenes les piden a los adultos que tomen medidas y dejen de
+                        arruinar el futuro del planeta.</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="impact-card" onclick="toggleDescription(this)">
+                    <img src="https://www.paiscircular.cl/wp-content/uploads/2019/03/limpieza-de-playas-5-1024x657.jpg"
+                      class="img-fluid" alt="Limpieza de playas">
+                    <div class="description" style="display: none;">
+                      <h4>Día Internacional de la Limpieza de playas: una solución aguas abajo</h4>
+                      <p><p>Las consecuencias de las actividades humanas en los ecosistemas costeros y marinos, dieron como resultado declarar el 
+                        17 de septiembre como el Día Internacional de Limpieza de Playas con el fin de concientizar a la ciudadanía sobre el cuidado del medio ambiente.</p></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+      </section>
+
+    </section><!-- /Starter Section Section -->
+
+  </main>
+
+  <footer id="footer" class="footer">
+
+    <div class="footer-newsletter">
+      <div class="container">
+        <div class="row justify-content-center text-center">
+          <div class="col-lg-6">
+            <h4>Únete a nuestro newsletter</h4>
+            <p>Subscríbete para obtener las últimas noticias y eventos más importantes!</p>
+            <div class="newsletter-form">
+              <input type="email" name="email" id="newsletter-email">
+              <input type="submit" value="Subscribirse" onclick="subscribeNewsletter()">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="newsletterPopup" class="popup">
+      <div class="popup-content">
+        <span class="close" onclick="closePopup('newsletterPopup')">&times;</span>
+        <p>Gracias por suscribirte al newsletter!</p>
+      </div>
+    </div>
+
+
+
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="{{ url_for('index') }}" class="d-flex align-items-center">
+            <span class="sitename">SWAY</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p> Carretera Estatal 420 S/N, El Rosario</p>
+            <p>76240 Santiago de Querétaro, Qro</p>
+            <p class="mt-3"><strong>Telefóno:</strong> <span>+52 442 101 9000</span></p>
+            <p><strong>Email:</strong> <span>123046244@upq.edu.mx</span></p>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Links útiles</h4>
+          <ul>
+            <li><i class="bi bi-chevron-right"></i> <a href="{{ url_for('index') }}">Home</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="{{ url_for('index') }}#about">Sobre Nosotros</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="{{ url_for('index') }}#donation">Donar</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Términos de Servicio</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Entérate de más</h4>
+          <ul>
+            <li><i class="bi bi-chevron-right"></i> <a href="{{ url_for('toma_accion') }}">Toma acción</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="{{ url_for('starter_page') }}">Blog</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="{{ url_for('starter_page') }}">Casos de Éxito</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="#">Patrocinadores</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+          <h4>Síguenos</h4>
+          <p>Mantente en contacto a través de nuestras redes sociales</p>
+          <div class="social-links d-flex">
+            <a href="https://x.com/UPQoficial"><i class="bi bi-twitter-x"></i></a>
+            <a href="https://www.facebook.com/UPQoficial?locale=es_LA"><i class="bi bi-facebook"></i></a>
+            <a href="https://www.instagram.com/soyupq/"><i class="bi bi-instagram"></i></a>
+            <a href="https://www.linkedin.com/school/upq/posts/?feedView=all"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/php-email-form/validate.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/waypoints/noframework.waypoints.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+
+  <!-- Main JS File -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+  <script>
+    function toggleDescription(card) {
+      var description = card.querySelector('.description');
+      if (description.style.display === "none" || description.style.display === "") {
+        description.style.display = "block";
+      } else {
+        description.style.display = "none";
+      }
+    }
+  </script>
+
+
+</body>
+
+</html>

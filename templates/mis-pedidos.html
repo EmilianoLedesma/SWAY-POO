@@ -1,0 +1,206 @@
+<!-- =============================================
+     PÁGINA DE MIS PEDIDOS
+     Panel de usuario para consultar el historial
+     de compras y estado de pedidos
+     ============================================= -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Mis Pedidos - SWAY</title>
+
+    <!-- Configuración de favicon del sitio -->
+    <link href="{{ url_for('static', filename='img/SWAY (1).png') }}" rel="icon" />
+
+    <!-- Enlaces a fuentes externas de Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800&family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800"
+      rel="stylesheet"
+    />
+
+    <!-- Archivos CSS de librerías externas -->
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}"
+      rel="stylesheet"
+    />
+    <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet" />
+
+    <!-- Main CSS File -->
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/tienda.css') }}" rel="stylesheet" />
+  </head>
+
+  <body class="tienda-page">
+    <!-- Header -->
+    <header id="header" class="header d-flex align-items-center fixed-top">
+      <div
+        class="container-fluid container-xl position-relative d-flex align-items-center"
+      >
+        <a href="/" class="logo d-flex align-items-center me-auto">
+          <h1 class="sitename">SWAY</h1>
+        </a>
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/#about">Nosotros</a></li>
+            <li><a href="/#portfolio">Novedades</a></li>
+            <li><a href="/#team">Equipo</a></li>
+            <li><a href="/#contact">Contacto</a></li>
+            <li class="dropdown">
+              <a href="#"
+                ><span>Más</span>
+                <i class="bi bi-chevron-down toggle-dropdown"></i
+              ></a>
+              <ul>
+                <li><a href="/especies">Especies</a></li>
+                <li><a href="/eventos">Eventos</a></li>
+                <li><a href="/biblioteca">Biblioteca</a></li>
+                <li><a href="/tienda">Tienda</a></li>
+              </ul>
+            </li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+        <!-- Botón de usuario y donar -->
+        <div class="header-actions d-flex align-items-center">
+          <div class="user-menu" id="user-menu">
+            <button class="btn-user" id="btn-user">
+              <i class="bi bi-person"></i>
+              <span id="user-name">Iniciar Sesión</span>
+            </button>
+            <div class="user-dropdown" id="user-dropdown">
+              <a href="#" id="btn-login">Iniciar Sesión</a>
+              <a href="#" id="btn-register">Registrarse</a>
+              <a href="#" id="btn-my-orders" style="display: none"
+                >Mis Pedidos</a
+              >
+              <a href="#" id="btn-logout" style="display: none"
+                >Cerrar Sesión</a
+              >
+            </div>
+          </div>
+          <a class="btn-getstarted" href="/#donation">Donar</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Hero Section -->
+      <section id="hero" class="hero section dark-background">
+        <div class="container">
+          <div class="row gy-4">
+            <div
+              class="col-lg-8 order-2 order-lg-1 d-flex flex-column justify-content-center"
+              data-aos="zoom-out"
+            >
+              <h1>Mis Pedidos</h1>
+              <p>Revisa el estado de tus pedidos y el historial de compras.</p>
+              <a href="/tienda" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Volver a la Tienda
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mis Pedidos Section -->
+      <section id="mis-pedidos" class="section">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="user-info-card mb-4" id="user-info-card">
+                <h4>Información del Usuario</h4>
+                <div id="user-details" class="user-details">
+                  <!-- Información del usuario se cargará aquí -->
+                </div>
+              </div>
+
+              <div class="orders-section" id="orders-section">
+                <h4>Historial de Pedidos</h4>
+                <div class="orders-loading" id="orders-loading">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando pedidos...</span>
+                  </div>
+                </div>
+                <div
+                  id="orders-container"
+                  class="orders-container"
+                  style="display: none"
+                >
+                  <!-- Los pedidos se cargarán aquí -->
+                </div>
+                <div
+                  id="no-orders"
+                  class="no-orders text-center"
+                  style="display: none"
+                >
+                  <i
+                    class="bi bi-cart-x"
+                    style="font-size: 3rem; color: #ccc"
+                  ></i>
+                  <h5>No tienes pedidos aún</h5>
+                  <p>¡Visita nuestra tienda para realizar tu primera compra!</p>
+                  <a href="/tienda" class="btn btn-primary">Ir a la Tienda</a>
+                </div>
+              </div>
+
+              <!-- Mensaje de error/no autorizado -->
+              <div class="text-center" id="error-message" style="display: none">
+                <div class="alert alert-warning" role="alert">
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                  <strong>Acceso Denegado</strong><br />
+                  Debes iniciar sesión para ver tus pedidos.
+                </div>
+                <a href="/tienda" class="btn btn-primary">
+                  <i class="bi bi-arrow-left"></i> Ir a la Tienda
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="footer">
+      <div class="container copyright text-center mt-4">
+        <p>
+          © <span>Copyright</span> <strong class="px-1 sitename">SWAY</strong>
+          <span>Todos los derechos reservados</span>
+        </p>
+      </div>
+    </footer>
+
+    <!-- Scroll Top -->
+    <a
+      href="#"
+      id="scroll-top"
+      class="scroll-top d-flex align-items-center justify-content-center"
+      ><i class="bi bi-arrow-up-short"></i
+    ></a>
+
+    <!-- Preloader -->
+    <div id="preloader"></div>
+
+    <!-- Vendor JS Files -->
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/waypoints/noframework.waypoints.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+
+    <!-- Main JS File -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mis-pedidos.js') }}"></script>
+  </body>
+</html>
