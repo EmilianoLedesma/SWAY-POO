@@ -1571,7 +1571,6 @@
                   type="hidden"
                   id="id-especie"
                   name="id_especie"
-                  required
                 />
               </div>
             </div>
@@ -1585,8 +1584,7 @@
                   type="datetime-local"
                   id="fecha-avistamiento"
                   name="fecha_avistamiento"
-                  required
-                  max=""
+                max=""
                   data-validation="fechaPasada"
                 />
               </div>
@@ -1602,8 +1600,7 @@
                   step="any"
                   id="latitud"
                   name="latitud"
-                  required
-                  min="-90"
+                min="-90"
                   max="90"
                   placeholder="Ej: 20.6296"
                   data-validation="latitud"
@@ -1618,8 +1615,7 @@
                   step="any"
                   id="longitud"
                   name="longitud"
-                  required
-                  min="-180"
+                min="-180"
                   max="180"
                   placeholder="Ej: -87.0739"
                   data-validation="longitud"
@@ -1653,8 +1649,7 @@
                     type="text"
                     id="nombre-usuario"
                     name="nombre_usuario"
-                    required
-                    minlength="2"
+                minlength="2"
                     maxlength="50"
                     placeholder="Juan"
                     data-validation="soloTexto"
@@ -1668,8 +1663,7 @@
                     type="text"
                     id="apellido-paterno-usuario"
                     name="apellido_paterno_usuario"
-                    required
-                    minlength="2"
+                minlength="2"
                     maxlength="50"
                     placeholder="Pérez"
                     data-validation="soloTexto"
@@ -1697,8 +1691,7 @@
                     type="email"
                     id="email-usuario"
                     name="email_usuario"
-                    required
-                    maxlength="150"
+                maxlength="150"
                     placeholder="juan.perez@gmail.com"
                     data-validation="email"
                   />
@@ -1769,8 +1762,7 @@
                   type="email"
                   id="login-email"
                   name="email"
-                  required
-                  placeholder="tu@email.com"
+                placeholder="tu@email.com"
                 />
               </div>
 
@@ -1782,8 +1774,7 @@
                   type="password"
                   id="login-password"
                   name="password"
-                  required
-                  placeholder="••••••••"
+                placeholder="••••••••"
                 />
               </div>
 
@@ -1814,8 +1805,7 @@
                       type="text"
                       id="reg-nombre"
                       name="nombre"
-                      required
-                      minlength="2"
+                minlength="2"
                       maxlength="50"
                       placeholder="Juan"
                       data-validation="soloTexto"
@@ -1829,8 +1819,7 @@
                       type="text"
                       id="reg-apellido-paterno"
                       name="apellidoPaterno"
-                      required
-                      minlength="2"
+                minlength="2"
                       maxlength="50"
                       placeholder="Pérez"
                       data-validation="soloTexto"
@@ -1858,8 +1847,7 @@
                       type="email"
                       id="reg-email"
                       name="email"
-                      required
-                      placeholder="juan.perez@universidad.edu"
+                placeholder="juan.perez@universidad.edu"
                     />
                   </div>
                 </div>
@@ -1873,8 +1861,7 @@
                       type="password"
                       id="reg-password"
                       name="password"
-                      required
-                      minlength="8"
+                minlength="8"
                       placeholder="Mínimo 8 caracteres"
                     />
                   </div>
@@ -1886,8 +1873,7 @@
                       type="password"
                       id="reg-confirm-password"
                       name="confirm_password"
-                      required
-                      placeholder="Repetir contraseña"
+                placeholder="Repetir contraseña"
                     />
                   </div>
                 </div>
@@ -1903,7 +1889,8 @@
                     <label for="reg-especialidad">
                       <i class="bi bi-bookmark"></i> Especialidad *
                     </label>
-                    <select id="reg-especialidad" name="especialidad" required>
+                    <select id="reg-especialidad" name="especialidad"
+                >
                       <option value="">Selecciona tu especialidad</option>
                       <option value="biologia-marina">Biología Marina</option>
                       <option value="oceanografia">Oceanografía</option>
@@ -1923,8 +1910,7 @@
                     <select
                       id="reg-grado-academico"
                       name="grado_academico"
-                      required
-                    >
+                >
                       <option value="">Selecciona tu grado</option>
                       <option value="licenciatura">Licenciatura</option>
                       <option value="maestria">Maestría</option>
@@ -1943,8 +1929,7 @@
                       type="text"
                       id="reg-institucion"
                       name="institucion"
-                      required
-                      maxlength="200"
+                maxlength="200"
                       placeholder="Universidad o Centro de Investigación"
                     />
                   </div>
@@ -1956,8 +1941,7 @@
                       type="number"
                       id="reg-anos-experiencia"
                       name="años_experiencia"
-                      required
-                      min="0"
+                min="0"
                       max="100"
                       placeholder="Ingresa tus años de experiencia (0-100)"
                     />
@@ -2002,8 +1986,7 @@
                     id="reg-motivacion"
                     name="motivacion"
                     rows="4"
-                    required
-                    minlength="50"
+                minlength="50"
                     maxlength="500"
                     placeholder="Describe tu motivación para colaborar en el proyecto y tu experiencia relevante en especies marinas..."
                   ></textarea>
@@ -2013,7 +1996,8 @@
 
               <div class="terms-section">
                 <label class="checkbox-container">
-                  <input type="checkbox" id="reg-terms" name="terms" required />
+                  <input type="checkbox" id="reg-terms" name="terms"
+                />
                   <span class="checkmark"></span>
                   <span class="terms-text">
                     Acepto los

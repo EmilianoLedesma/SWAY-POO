@@ -300,8 +300,7 @@
                   type="email"
                   name="email"
                   id="newsletter-email"
-                  required
-                  data-validation="email"
+                data-validation="email"
                 />
                 <input
                   type="submit"
@@ -443,24 +442,22 @@
           <h4>Iniciar Sesión</h4>
           <form id="loginForm">
             <div class="mb-3">
-              <label for="loginEmail" class="form-label">Email</label>
+              <label for="loginEmail" class="form-label">Email *</label>
               <input
                 type="email"
                 class="form-control"
                 id="loginEmail"
                 name="email"
-                required
                 data-validation="email"
               />
             </div>
             <div class="mb-3">
-              <label for="loginPassword" class="form-label">Contraseña</label>
+              <label for="loginPassword" class="form-label">Contraseña *</label>
               <input
                 type="password"
                 class="form-control"
                 id="loginPassword"
                 name="password"
-                required
                 minlength="6"
                 data-validation="password"
               />
@@ -485,14 +482,13 @@
             <div class="row">
               <div class="col-md-4">
                 <div class="mb-3">
-                  <label for="registerName" class="form-label">Nombre</label>
+                  <label for="registerName" class="form-label">Nombre *</label>
                   <input
                     type="text"
                     class="form-control"
                     id="registerName"
                     name="nombre"
-                    required
-                    minlength="2"
+                minlength="2"
                     maxlength="50"
                     data-validation="soloTexto"
                     placeholder="Ej: Juan"
@@ -509,8 +505,7 @@
                     class="form-control"
                     id="registerApellidoPaterno"
                     name="apellidoPaterno"
-                    required
-                    minlength="2"
+                minlength="2"
                     maxlength="50"
                     data-validation="soloTexto"
                     placeholder="Ej: García"
@@ -536,18 +531,17 @@
               </div>
             </div>
             <div class="mb-3">
-              <label for="registerEmail" class="form-label">Email</label>
+              <label for="registerEmail" class="form-label">Email *</label>
               <input
                 type="email"
                 class="form-control"
                 id="registerEmail"
                 name="email"
-                required
                 data-validation="email"
               />
             </div>
             <div class="mb-3">
-              <label for="registerTelefono" class="form-label">Teléfono</label>
+              <label for="registerTelefono" class="form-label">Teléfono *</label>
               <input
                 type="tel"
                 class="form-control"
@@ -578,7 +572,6 @@
                 class="form-control"
                 id="registerPassword"
                 name="password"
-                required
                 minlength="6"
                 data-validation="password"
               />
@@ -592,7 +585,7 @@
               <label class="form-check-label" for="registerNewsletter">
                 Suscribirme al newsletter para recibir noticias sobre
                 conservación marina
-              </label>
+               *</label>
             </div>
             <button type="submit" class="btn btn-primary w-100">
               Registrarse
@@ -661,8 +654,7 @@
                     class="form-control"
                     id="shipping-state"
                     name="estado"
-                    required
-                    placeholder="Ej: Querétaro"
+                placeholder="Ej: Querétaro"
                     maxlength="100"
                   />
                 </div>
@@ -673,8 +665,7 @@
                     class="form-control"
                     id="shipping-city"
                     name="municipio"
-                    required
-                    placeholder="Ej: Querétaro"
+                placeholder="Ej: Querétaro"
                     maxlength="100"
                   />
                 </div>
@@ -688,8 +679,7 @@
                     class="form-control"
                     id="shipping-colony"
                     name="colonia"
-                    required
-                    placeholder="Ej: Centro"
+                placeholder="Ej: Centro"
                     maxlength="100"
                   />
                 </div>
@@ -700,8 +690,7 @@
                     class="form-control"
                     id="shipping-street"
                     name="calle"
-                    required
-                    placeholder="Ej: 5 de Mayo"
+                placeholder="Ej: 5 de Mayo"
                     maxlength="100"
                   />
                 </div>
@@ -715,8 +704,7 @@
                     class="form-control"
                     name="codigo_postal"
                     id="shipping-zip"
-                    required
-                    minlength="5"
+                minlength="5"
                     maxlength="5"
                     placeholder="76000"
                   />
@@ -728,12 +716,11 @@
                     class="form-control"
                     name="numero_exterior"
                     id="shipping-exterior"
-                    required
-                    placeholder="123"
+                placeholder="123"
                   />
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label">Número Interior</label>
+                  <label class="form-label">Número Interior *</label>
                   <input
                     type="text"
                     class="form-control"
@@ -746,7 +733,7 @@
 
               <div class="row mt-3">
                 <div class="col-md-12">
-                  <label class="form-label">Notas de Entrega</label>
+                  <label class="form-label">Notas de Entrega *</label>
                   <textarea
                     class="form-control"
                     name="notas"
@@ -808,8 +795,7 @@
                     type="text"
                     id="card-number"
                     name="card_number"
-                    required
-                    placeholder="1234 5678 9012 3456"
+                placeholder="1234 5678 9012 3456"
                     maxlength="19"
                     data-validation="tarjeta"
                   />
@@ -825,8 +811,7 @@
                     type="text"
                     id="card-name"
                     name="card_name"
-                    required
-                    placeholder="Juan Pérez"
+                placeholder="Juan Pérez"
                     data-validation="soloTexto"
                   />
                 </div>
@@ -838,8 +823,7 @@
                     type="text"
                     id="card-expiry"
                     name="card_expiry"
-                    required
-                    placeholder="MM/YY"
+                placeholder="MM/YY"
                     maxlength="5"
                     data-validation="fechaVencimiento"
                   />
@@ -852,8 +836,7 @@
                     type="text"
                     id="card-cvv"
                     name="card_cvv"
-                    required
-                    placeholder="123"
+                placeholder="123"
                     maxlength="4"
                     data-validation="cvv"
                   />
@@ -1115,8 +1098,8 @@
           paypalDetails.style.display = "none";
           paymentButtonText.textContent = "Procesar Pago";
 
-          // Make card fields required
-          cardFields.forEach((field) => {
+          // Make card fields
+                cardFields.forEach((field) => {
             if (field) {
               field.setAttribute("required", "required");
             }
@@ -1126,7 +1109,8 @@
           paypalDetails.style.display = "block";
           paymentButtonText.textContent = "Continuar con PayPal";
 
-          // Remove required attribute from card fields
+          // Remove
+                attribute from card fields
           cardFields.forEach((field) => {
             if (field) {
               field.removeAttribute("required");

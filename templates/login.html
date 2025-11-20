@@ -156,28 +156,27 @@
 
         <form id="loginForm">
           <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
+            <label for="email" class="form-label">Email *</label>
             <input
               type="email"
               class="form-control"
               id="email"
               name="email"
-              required
               maxlength="150"
               data-validation="email"
+              placeholder="Ingrese su email"
             />
           </div>
 
           <div class="mb-3">
-            <label for="password" class="form-label">Contraseña</label>
+            <label for="password" class="form-label">Contraseña *</label>
             <input
               type="password"
               class="form-control"
               id="password"
               name="password"
-              required
-              minlength="6"
               maxlength="50"
+              placeholder="Ingrese su contraseña"
             />
           </div>
 
@@ -206,38 +205,38 @@
     <script>
       // Funciones de utilidad para mostrar mensajes estilizados
       function showMessage(type, message, icon = null) {
-        const container = document.getElementById('message-container');
+        const container = document.getElementById("message-container");
         if (!container) return;
-        
+
         // Limpiar mensajes anteriores
-        container.innerHTML = '';
-        
+        container.innerHTML = "";
+
         // Crear elemento de mensaje
-        const messageDiv = document.createElement('div');
+        const messageDiv = document.createElement("div");
         messageDiv.className = `${type}-message`;
-        
+
         // Icono por defecto según tipo
         if (!icon) {
-          switch(type) {
-            case 'error':
-              icon = 'bi-exclamation-triangle-fill';
+          switch (type) {
+            case "error":
+              icon = "bi-exclamation-triangle-fill";
               break;
-            case 'success':
-              icon = 'bi-check-circle-fill';
+            case "success":
+              icon = "bi-check-circle-fill";
               break;
             default:
-              icon = 'bi-info-circle-fill';
+              icon = "bi-info-circle-fill";
           }
         }
-        
+
         messageDiv.innerHTML = `<i class="bi ${icon}"></i> ${message}`;
         container.appendChild(messageDiv);
       }
-      
+
       function clearMessages() {
-        const container = document.getElementById('message-container');
+        const container = document.getElementById("message-container");
         if (container) {
-          container.innerHTML = '';
+          container.innerHTML = "";
         }
       }
 
@@ -271,18 +270,21 @@
               localStorage.setItem("user-sway", JSON.stringify(result.user));
 
               // Mostrar mensaje de éxito
-              showMessage('success', '¡Login exitoso! Redirigiendo...');
+              showMessage("success", "¡Login exitoso! Redirigiendo...");
 
               // Redirigir a la tienda después de un momento
               setTimeout(() => {
                 window.location.href = "/tienda";
               }, 1500);
             } else {
-              showMessage('error', result.message || 'Error al iniciar sesión');
+              showMessage("error", result.message || "Error al iniciar sesión");
             }
           } catch (error) {
             console.error("Error:", error);
-            showMessage('error', 'Error de conexión. Por favor intenta de nuevo.');
+            showMessage(
+              "error",
+              "Error de conexión. Por favor intenta de nuevo."
+            );
           }
         });
     </script>

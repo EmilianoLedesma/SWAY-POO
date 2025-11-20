@@ -675,8 +675,7 @@
                         <input
                           type="text"
                           name="titulo"
-                          required
-                          minlength="5"
+                minlength="5"
                           maxlength="200"
                           data-validation="soloTexto"
                         />
@@ -685,7 +684,8 @@
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label>Tipo de Evento *</label>
-                        <select name="tipo" id="tipo-evento" required>
+                        <select name="tipo" id="tipo-evento"
+                >
                           <!-- Se llenará dinámicamente desde la base de datos -->
                         </select>
                       </div>
@@ -699,14 +699,13 @@
                         <input
                           type="date"
                           name="fecha_evento"
-                          required
-                          data-validation="fechaFutura"
+                data-validation="fechaFutura"
                         />
                       </div>
                     </div>
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label>Capacidad Máxima</label>
+                        <label>Capacidad Máxima *</label>
                         <input
                           type="number"
                           name="capacidad_maxima"
@@ -723,14 +722,15 @@
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label>Modalidad *</label>
-                        <select name="modalidad" id="modalidad-evento" required>
+                        <select name="modalidad" id="modalidad-evento"
+                >
                           <!-- Se llenará dinámicamente desde la base de datos -->
                         </select>
                       </div>
                     </div>
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label>Plataforma</label>
+                        <label>Plataforma *</label>
                         <input
                           type="text"
                           name="ubicacion"
@@ -747,20 +747,20 @@
                       name="descripcion"
                       rows="4"
                       placeholder="Describe tu evento, objetivos y lo que los participantes pueden esperar..."
-                      required
-                    ></textarea>
+                ></textarea>
                   </div>
 
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label>Hora de Inicio *</label>
-                        <input type="time" name="hora_inicio" required />
+                        <input type="time" name="hora_inicio"
+                />
                       </div>
                     </div>
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label>Hora de Fin</label>
+                        <label>Hora de Fin *</label>
                         <input type="time" name="hora_fin" />
                       </div>
                     </div>
@@ -769,7 +769,7 @@
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label>Costo de Entrada</label>
+                        <label>Costo de Entrada *</label>
                         <input
                           type="number"
                           name="costo"
@@ -786,15 +786,15 @@
                           type="email"
                           name="contacto"
                           placeholder="email@ejemplo.com"
-                          required
-                        />
+                />
                       </div>
                     </div>
                   </div>
 
                   <div class="form-group">
                     <label>
-                      <input type="checkbox" name="terminos" required />
+                      <input type="checkbox" name="terminos"
+                />
                       Acepto los términos y condiciones y que mi evento sea
                       revisado antes de su publicación.
                     </label>

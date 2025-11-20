@@ -158,44 +158,43 @@
         <form id="registerForm">
           <div class="row">
             <div class="col-md-12 mb-3">
-              <label for="nombre" class="form-label">Nombre</label>
+              <label for="nombre" class="form-label">Nombre *</label>
               <input
                 type="text"
                 class="form-control"
                 id="nombre"
                 name="nombre"
-                required
-                minlength="2"
                 maxlength="50"
                 data-validation="soloTexto"
                 placeholder="Ej: Juan"
               />
             </div>
           </div>
-          
+
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label for="apellidoPaterno" class="form-label">Apellido Paterno</label>
+              <label for="apellidoPaterno" class="form-label"
+                >Apellido Paterno *</label
+              >
               <input
                 type="text"
                 class="form-control"
                 id="apellidoPaterno"
                 name="apellidoPaterno"
-                required
-                minlength="2"
                 maxlength="50"
                 data-validation="soloTexto"
                 placeholder="Ej: García"
               />
             </div>
             <div class="col-md-6 mb-3">
-              <label for="apellidoMaterno" class="form-label">Apellido Materno</label>
+              <label for="apellidoMaterno" class="form-label"
+                >Apellido Materno</label
+              >
               <input
                 type="text"
                 class="form-control"
                 id="apellidoMaterno"
                 name="apellidoMaterno"
-                minlength="2"
                 maxlength="50"
                 data-validation="soloTexto"
                 placeholder="Ej: López (opcional)"
@@ -204,47 +203,45 @@
           </div>
 
           <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
+            <label for="email" class="form-label">Email *</label>
             <input
               type="email"
               class="form-control"
               id="email"
               name="email"
-              required
               maxlength="150"
               data-validation="email"
+              placeholder="correo@ejemplo.com"
             />
           </div>
 
           <div class="mb-3">
-            <label for="password" class="form-label">Contraseña</label>
+            <label for="password" class="form-label">Contraseña *</label>
             <input
               type="password"
               class="form-control"
               id="password"
               name="password"
-              required
-              minlength="6"
               maxlength="50"
               data-validation="password"
+              placeholder="Mínimo 6 caracteres"
             />
             <small class="form-text text-muted">Mínimo 6 caracteres</small>
           </div>
 
           <div class="mb-3">
             <label for="password_confirm" class="form-label"
-              >Confirmar Contraseña</label
+              >Confirmar Contraseña *</label
             >
             <input
               type="password"
               class="form-control"
               id="password_confirm"
               name="password_confirm"
-              required
-              minlength="6"
               maxlength="50"
               data-validation="passwordConfirm"
               data-confirm-target="password"
+              placeholder="Repita su contraseña"
             />
           </div>
 
@@ -261,12 +258,7 @@
           </div>
 
           <div class="mb-3 form-check">
-            <input
-              type="checkbox"
-              class="form-check-input"
-              id="terms"
-              required
-            />
+            <input type="checkbox" class="form-check-input" id="terms" />
             <label class="form-check-label" for="terms">
               Acepto los <a href="#" target="_blank">términos y condiciones</a>
             </label>
@@ -292,38 +284,38 @@
     <script>
       // Funciones de utilidad para mostrar mensajes estilizados
       function showMessage(type, message, icon = null) {
-        const container = document.getElementById('message-container');
+        const container = document.getElementById("message-container");
         if (!container) return;
-        
+
         // Limpiar mensajes anteriores
-        container.innerHTML = '';
-        
+        container.innerHTML = "";
+
         // Crear elemento de mensaje
-        const messageDiv = document.createElement('div');
+        const messageDiv = document.createElement("div");
         messageDiv.className = `${type}-message`;
-        
+
         // Icono por defecto según tipo
         if (!icon) {
-          switch(type) {
-            case 'error':
-              icon = 'bi-exclamation-triangle-fill';
+          switch (type) {
+            case "error":
+              icon = "bi-exclamation-triangle-fill";
               break;
-            case 'success':
-              icon = 'bi-check-circle-fill';
+            case "success":
+              icon = "bi-check-circle-fill";
               break;
             default:
-              icon = 'bi-info-circle-fill';
+              icon = "bi-info-circle-fill";
           }
         }
-        
+
         messageDiv.innerHTML = `<i class="bi ${icon}"></i> ${message}`;
         container.appendChild(messageDiv);
       }
-      
+
       function clearMessages() {
-        const container = document.getElementById('message-container');
+        const container = document.getElementById("message-container");
         if (container) {
-          container.innerHTML = '';
+          container.innerHTML = "";
         }
       }
 
@@ -337,7 +329,7 @@
           const passwordConfirm = formData.get("password_confirm");
 
           if (password !== passwordConfirm) {
-            showMessage('error', 'Las contraseñas no coinciden');
+            showMessage("error", "Las contraseñas no coinciden");
             return;
           }
 
@@ -365,16 +357,22 @@
             const result = await response.json();
 
             if (result.success) {
-              showMessage('success', '¡Registro exitoso! Ahora puedes iniciar sesión.');
+              showMessage(
+                "success",
+                "¡Registro exitoso! Ahora puedes iniciar sesión."
+              );
               setTimeout(() => {
                 window.location.href = "/login";
               }, 2000);
             } else {
-              showMessage('error', result.message || 'Error en el registro');
+              showMessage("error", result.message || "Error en el registro");
             }
           } catch (error) {
             console.error("Error:", error);
-            showMessage('error', 'Error de conexión. Por favor intenta de nuevo.');
+            showMessage(
+              "error",
+              "Error de conexión. Por favor intenta de nuevo."
+            );
           }
         });
     </script>

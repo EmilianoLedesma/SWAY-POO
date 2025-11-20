@@ -5,6 +5,20 @@ import json
 import pyodbc
 from datetime import datetime
 import sqlite3
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from werkzeug.security import generate_password_hash, check_password_hash
+
+# Importar modelos y validadores
+from models import (
+    get_session, Usuario, Colaborador, EspecieMarina, EstadoConservacion,
+    Producto, CategoriaProducto, Pedido, DetallePedido, CarritoCompra,
+    AvistamientoEspecie, TipoHabitat, TipoAmenaza
+)
+from validators import (
+    validate_user_registration, validate_user_login, validate_colaborador_registration,
+    validate_especie_marina, validate_producto, validate_pedido, ValidationError
+)
 
 app = Flask(__name__, static_folder='assets', static_url_path='/static')
 
@@ -13,6 +27,9 @@ app.secret_key = 'sway_secret_key_ultra_secreta'
 
 # Configurar CORS para permitir peticiones AJAX
 CORS(app)
+
+# Crear sesión de SQLAlchemy con scope
+db_session = scoped_session(lambda: get_session())
 
 # Función helper para construir nombres completos evitando duplicación
 def construir_nombre_completo(nombre, apellido_paterno, apellido_materno, prefijo=""):
@@ -3722,5 +3739,20 @@ def get_modalidades():
         print(f"Error en get_modalidades: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+# ========================================
+# INTEGRACIÓN DE RUTAS ORM
+# ========================================
+try:
+    from routes_orm import register_all_orm_routes
+    register_all_orm_routes(app)
+    print("✅ Sistema ORM SQLAlchemy integrado correctamente")
+except ImportError as e:
+    print(f"⚠️ No se pudo cargar routes_orm: {e}")
+    print("ℹ️ Continuando con rutas pyodbc existentes")
+
 if __name__ == '__main__':
+    print("🌊 Iniciando servidor SWAY...")
+    print("📊 Base de datos: SQL Server")
+    print("🔧 ORM: SQLAlchemy + pyodbc (híbrido)")
+    print("🚀 Servidor corriendo en http://localhost:5000")
     app.run(debug=True, host='0.0.0.0', port=5000)

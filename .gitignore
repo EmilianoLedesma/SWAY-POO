@@ -53,6 +53,24 @@ uploads/*
 
 # Archives
 *.zip
+sway_terminado.zip
 
 # Temporary files
 nul
+
+# Environment variables (IMPORTANTE - nunca subir credenciales)
+.env
+.env.local
+.env.production
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Archivos de prueba temporal
+test_*.py
+verificar_*.py
+
+# Node modules (si usas npm)
+node_modules/
