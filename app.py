@@ -17,7 +17,8 @@ from models import (
 )
 from validators import (
     validate_user_registration, validate_user_login, validate_colaborador_registration,
-    validate_especie_marina, validate_producto, validate_pedido, ValidationError
+    validate_especie_marina, validate_producto, validate_pedido, validate_direccion_envio,
+    validate_metodo_pago, ValidationError
 )
 
 app = Flask(__name__, static_folder='assets', static_url_path='/static')
@@ -1553,7 +1554,7 @@ def get_calles(colonia_id):
 
 @app.route('/api/pedidos/crear', methods=['POST'])
 def crear_pedido():
-    """Crear nuevo pedido"""
+    """Crear nuevo pedido con validación del servidor"""
     try:
         data = request.get_json()
         
@@ -1562,6 +1563,21 @@ def crear_pedido():
         for field in required_fields:
             if not data.get(field):
                 return jsonify({'error': f'El campo {field} es requerido'}), 400
+        
+        # VALIDAR DIRECCIÓN DE ENVÍO usando validators.py
+        try:
+            direccion_data = data['direccion']
+            validated_direccion = validate_direccion_envio(direccion_data)
+        except ValidationError as ve:
+            return jsonify({'error': str(ve)}), 400
+        
+        # VALIDAR MÉTODO DE PAGO usando validators.py
+        pago_data = data['pago']
+        metodo_pago = pago_data.get('tipo_pago', 'credit_card')
+        try:
+            validated_pago = validate_metodo_pago(pago_data, metodo_pago)
+        except ValidationError as ve:
+            return jsonify({'error': str(ve)}), 400
         
         conn = get_db_connection()
         if not conn:

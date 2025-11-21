@@ -720,7 +720,7 @@
                   />
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label">Número Interior *</label>
+                  <label class="form-label">Número Interior</label>
                   <input
                     type="text"
                     class="form-control"
@@ -733,7 +733,7 @@
 
               <div class="row mt-3">
                 <div class="col-md-12">
-                  <label class="form-label">Notas de Entrega *</label>
+                  <label class="form-label">Notas de Entrega</label>
                   <textarea
                     class="form-control"
                     name="notas"
@@ -850,15 +850,15 @@
               id="paypal-details"
               style="display: none"
             >
-              <div class="paypal-info text-center">
+              <div class="paypal-info text-center p-4">
                 <i
                   class="bi bi-paypal paypal-icon"
-                  style="font-size: 2rem; color: #0070ba"
+                  style="font-size: 4rem; color: #0070ba"
                 ></i>
-                <h5>Pagar con PayPal</h5>
-                <p>
-                  Serás redirigido a PayPal para completar el pago de forma
-                  segura.
+                <h5 class="mt-3">Pagar con PayPal</h5>
+                <p class="text-muted">
+                  Al hacer clic en "Procesar Pago", tu pedido será registrado 
+                  y procesado de forma segura con PayPal.
                 </p>
               </div>
             </div>
@@ -1074,6 +1074,113 @@
         window.currentPaymentAmount = amount;
       }
 
+      // Función para mostrar alertas estilizadas
+      function showStyledAlert(message, type = 'error') {
+        // Eliminar alerta anterior si existe
+        const existingAlert = document.getElementById('custom-alert');
+        if (existingAlert) {
+          existingAlert.remove();
+        }
+
+        // Crear contenedor de alerta
+        const alertDiv = document.createElement('div');
+        alertDiv.id = 'custom-alert';
+        alertDiv.style.cssText = `
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 9999;
+          min-width: 300px;
+          max-width: 500px;
+          padding: 15px 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          animation: slideDown 0.3s ease-out;
+          font-family: 'Poppins', sans-serif;
+        `;
+
+        // Estilos según el tipo
+        const styles = {
+          error: {
+            bg: '#fff5f5',
+            border: '#fc8181',
+            text: '#c53030',
+            icon: 'bi-exclamation-circle-fill'
+          },
+          warning: {
+            bg: '#fffaf0',
+            border: '#f6ad55',
+            text: '#c05621',
+            icon: 'bi-exclamation-triangle-fill'
+          },
+          success: {
+            bg: '#f0fff4',
+            border: '#68d391',
+            text: '#2f855a',
+            icon: 'bi-check-circle-fill'
+          }
+        };
+
+        const style = styles[type] || styles.error;
+        alertDiv.style.backgroundColor = style.bg;
+        alertDiv.style.border = `2px solid ${style.border}`;
+        alertDiv.style.color = style.text;
+
+        // Contenido de la alerta
+        alertDiv.innerHTML = `
+          <i class="bi ${style.icon}" style="font-size: 24px;"></i>
+          <div style="flex: 1;">
+            <strong style="display: block; margin-bottom: 4px;">
+              ${type === 'error' ? 'Error de Validación' : type === 'warning' ? 'Advertencia' : 'Éxito'}
+            </strong>
+            <span style="font-size: 14px;">${message}</span>
+          </div>
+          <button onclick="this.parentElement.remove()" style="
+            background: none;
+            border: none;
+            color: ${style.text};
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+          ">
+            <i class="bi bi-x"></i>
+          </button>
+        `;
+
+        // Agregar animación CSS
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+          @keyframes slideDown {
+            from {
+              opacity: 0;
+              transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(-50%) translateY(0);
+            }
+          }
+        `;
+        document.head.appendChild(styleSheet);
+
+        // Agregar al body
+        document.body.appendChild(alertDiv);
+
+        // Auto-remover después de 5 segundos
+        setTimeout(() => {
+          if (alertDiv && alertDiv.parentElement) {
+            alertDiv.style.animation = 'slideDown 0.3s ease-out reverse';
+            setTimeout(() => alertDiv.remove(), 300);
+          }
+        }, 5000);
+      }
+
       // Payment method toggle
       function togglePaymentMethod() {
         const selectedMethod = document.querySelector(
@@ -1085,38 +1192,14 @@
           ".payment-button-text"
         );
 
-        // Get all credit card fields
-        const cardFields = [
-          document.getElementById("card-number"),
-          document.getElementById("card-name"),
-          document.getElementById("card-expiry"),
-          document.getElementById("card-cvv"),
-        ];
-
         if (selectedMethod === "credit_card") {
           cardDetails.style.display = "block";
           paypalDetails.style.display = "none";
           paymentButtonText.textContent = "Procesar Pago";
-
-          // Make card fields
-                cardFields.forEach((field) => {
-            if (field) {
-              field.setAttribute("required", "required");
-            }
-          });
         } else {
           cardDetails.style.display = "none";
           paypalDetails.style.display = "block";
           paymentButtonText.textContent = "Continuar con PayPal";
-
-          // Remove
-                attribute from card fields
-          cardFields.forEach((field) => {
-            if (field) {
-              field.removeAttribute("required");
-              field.setCustomValidity(""); // Clear any validation errors
-            }
-          });
         }
       }
 
@@ -1129,45 +1212,133 @@
         ).value;
         const paymentAmount = window.currentPaymentAmount || 0;
 
-        // For PayPal, only validate shipping information
+        // Validar según el método de pago
         if (selectedMethod === "paypal") {
-          // Validate shipping fields only
-          const form = document.getElementById("payment-form");
-          const shippingFields = [
-            "shipping-state",
-            "shipping-city",
-            "shipping-colony",
-            "shipping-street",
-            "shipping-zip",
-            "shipping-exterior",
-          ];
+          // Para PayPal, solo validar información de envío
+          const shippingFields = {
+            'shipping-state': 'Estado',
+            'shipping-city': 'Municipio',
+            'shipping-colony': 'Colonia',
+            'shipping-street': 'Calle',
+            'shipping-zip': 'Código Postal',
+            'shipping-exterior': 'Número Exterior'
+          };
 
           let isValid = true;
-          shippingFields.forEach((fieldId) => {
+          let firstInvalidField = null;
+
+          for (const [fieldId, fieldName] of Object.entries(shippingFields)) {
             const field = document.getElementById(fieldId);
-            if (
-              field &&
-              field.hasAttribute("required") &&
-              !field.value.trim()
-            ) {
-              field.setCustomValidity("Este campo es requerido");
-              field.reportValidity();
+            if (field && !field.value.trim()) {
+              if (!firstInvalidField) {
+                firstInvalidField = field;
+              }
+              field.style.borderColor = '#dc3545';
               isValid = false;
             } else if (field) {
-              field.setCustomValidity("");
+              field.style.borderColor = '';
             }
-          });
-
-          if (isValid) {
-            processPayment("paypal", paymentAmount);
           }
-        } else {
-          // For credit card, validate the entire form
-          const form = document.getElementById("payment-form");
-          if (!form.checkValidity()) {
-            form.reportValidity();
+
+          // Validar código postal (5 dígitos)
+          const zipField = document.getElementById('shipping-zip');
+          if (zipField && zipField.value.trim()) {
+            if (!/^\d{5}$/.test(zipField.value.trim())) {
+              zipField.style.borderColor = '#dc3545';
+              showStyledAlert('El código postal debe contener exactamente 5 dígitos numéricos', 'error');
+              isValid = false;
+              if (!firstInvalidField) {
+                firstInvalidField = zipField;
+              }
+            }
+          }
+
+          if (!isValid) {
+            showStyledAlert('Por favor complete todos los campos de envío requeridos', 'error');
+            if (firstInvalidField) {
+              firstInvalidField.focus();
+            }
             return;
           }
+
+          processPayment("paypal", paymentAmount);
+        } else {
+          // Para tarjeta de crédito, validar todo
+          const allFields = {
+            'shipping-state': 'Estado',
+            'shipping-city': 'Municipio',
+            'shipping-colony': 'Colonia',
+            'shipping-street': 'Calle',
+            'shipping-zip': 'Código Postal',
+            'shipping-exterior': 'Número Exterior',
+            'card-number': 'Número de Tarjeta',
+            'card-name': 'Nombre en la Tarjeta',
+            'card-expiry': 'Vencimiento',
+            'card-cvv': 'CVV'
+          };
+
+          let isValid = true;
+          let firstInvalidField = null;
+
+          for (const [fieldId, fieldName] of Object.entries(allFields)) {
+            const field = document.getElementById(fieldId);
+            if (field && !field.value.trim()) {
+              if (!firstInvalidField) {
+                firstInvalidField = field;
+              }
+              field.style.borderColor = '#dc3545';
+              isValid = false;
+            } else if (field) {
+              field.style.borderColor = '';
+            }
+          }
+
+          if (!isValid) {
+            showStyledAlert('Por favor complete todos los campos requeridos', 'error');
+            if (firstInvalidField) {
+              firstInvalidField.focus();
+            }
+            return;
+          }
+
+          // Validaciones específicas de tarjeta
+          const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
+          const cardExpiry = document.getElementById('card-expiry').value;
+          const cvv = document.getElementById('card-cvv').value;
+          const zipCode = document.getElementById('shipping-zip').value;
+
+          // Validar número de tarjeta (16 dígitos)
+          if (!/^\d{16}$/.test(cardNumber)) {
+            showStyledAlert('El número de tarjeta debe contener exactamente 16 dígitos', 'error');
+            document.getElementById('card-number').focus();
+            document.getElementById('card-number').style.borderColor = '#dc3545';
+            return;
+          }
+
+          // Validar formato de vencimiento (MM/YY)
+          if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry)) {
+            showStyledAlert('El vencimiento debe tener formato MM/YY (ejemplo: 12/25)', 'error');
+            document.getElementById('card-expiry').focus();
+            document.getElementById('card-expiry').style.borderColor = '#dc3545';
+            return;
+          }
+
+          // Validar CVV (3 o 4 dígitos)
+          if (!/^\d{3,4}$/.test(cvv)) {
+            showStyledAlert('El CVV debe contener 3 o 4 dígitos numéricos', 'error');
+            document.getElementById('card-cvv').focus();
+            document.getElementById('card-cvv').style.borderColor = '#dc3545';
+            return;
+          }
+
+          // Validar código postal (5 dígitos)
+          if (!/^\d{5}$/.test(zipCode)) {
+            showStyledAlert('El código postal debe contener exactamente 5 dígitos numéricos', 'error');
+            document.getElementById('shipping-zip').focus();
+            document.getElementById('shipping-zip').style.borderColor = '#dc3545';
+            return;
+          }
+
           processPayment("credit_card", paymentAmount);
         }
       }
@@ -1255,14 +1426,15 @@
               // Show success modal
               showPaymentSuccess();
             } else {
-              alert(
-                "Error al procesar el pedido: " + (data.error || data.message)
+              showStyledAlert(
+                "Error al procesar el pedido: " + (data.error || data.message),
+                'error'
               );
             }
           })
           .catch((error) => {
             console.error("Error:", error);
-            alert("Error de conexión. Por favor, inténtalo de nuevo.");
+            showStyledAlert("Error de conexión. Por favor, inténtalo de nuevo.", 'error');
           })
           .finally(() => {
             submitButton.innerHTML = originalText;

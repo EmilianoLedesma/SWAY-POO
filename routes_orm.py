@@ -564,6 +564,236 @@ def register_especies_routes(app):
             db.close()
 
 # ========================================
+# RUTAS DE PEDIDOS Y TIENDA
+# ========================================
+
+def register_pedidos_routes(app):
+    """Registrar rutas de pedidos y compras con ORM"""
+    
+    # NOTA: El endpoint /api/pedidos/crear ya existe en app.py usando pyodbc
+    # No duplicamos el endpoint aquí para evitar conflictos
+    
+    @app.route('/api/pedidos/mis-pedidos', methods=['GET'])
+    def get_mis_pedidos_orm():
+        """Obtener pedidos del usuario autenticado"""
+        db = get_session()
+        try:
+            # Verificar que el usuario esté autenticado
+            if 'tienda_user_id' not in session:
+                return jsonify({'success': False, 'error': 'No autorizado'}), 401
+            
+            user_id = session['tienda_user_id']
+            
+            # Obtener pedidos del usuario ordenados por fecha
+            pedidos = db.query(Pedido).filter_by(id_usuario=user_id).order_by(Pedido.fecha_pedido.desc()).all()
+            
+            pedidos_list = []
+            for pedido in pedidos:
+                # Obtener detalles del pedido
+                detalles = db.query(DetallePedido).filter_by(id_pedido=pedido.id).all()
+                
+                items = []
+                for detalle in detalles:
+                    producto = detalle.producto
+                    items.append({
+                        'id': detalle.id,
+                        'producto_id': producto.id,
+                        'nombre': producto.nombre,
+                        'cantidad': detalle.cantidad,
+                        'precio_unitario': float(detalle.precio_unitario),
+                        'subtotal': float(detalle.subtotal),
+                        'imagen_url': producto.imagen_url
+                    })
+                
+                pedidos_list.append({
+                    'id': pedido.id,
+                    'numero_pedido': pedido.numero_pedido,
+                    'fecha_pedido': pedido.fecha_pedido.isoformat() if pedido.fecha_pedido else None,
+                    'subtotal': float(pedido.subtotal),
+                    'impuestos': float(pedido.impuestos),
+                    'costo_envio': float(pedido.costo_envio),
+                    'total': float(pedido.total),
+                    'estado': pedido.estado,
+                    'metodo_pago': pedido.metodo_pago,
+                    'items': items,
+                    'total_items': len(items)
+                })
+            
+            return jsonify({
+                'success': True,
+                'pedidos': pedidos_list,
+                'total': len(pedidos_list)
+            })
+            
+        except SQLAlchemyError as e:
+            print(f"Error de base de datos: {e}")
+            return jsonify({'success': False, 'error': 'Error al obtener pedidos'}), 500
+        finally:
+            db.close()
+    
+    @app.route('/api/pedidos/detalle/<int:pedido_id>', methods=['GET'])
+    def get_pedido_detalle_alt_orm(pedido_id):
+        """Obtener detalles de un pedido específico (ruta alternativa)"""
+        db = get_session()
+        try:
+            pedido = db.query(Pedido).filter_by(id=pedido_id).first()
+            
+            if not pedido:
+                return jsonify({'success': False, 'error': 'Pedido no encontrado'}), 404
+            
+            # Verificar que el usuario autenticado sea el dueño del pedido
+            if 'tienda_user_id' not in session or session['tienda_user_id'] != pedido.id_usuario:
+                return jsonify({'success': False, 'error': 'No autorizado'}), 403
+            
+            # Obtener detalles
+            detalles = db.query(DetallePedido).filter_by(id_pedido=pedido.id).all()
+            
+            items = []
+            for detalle in detalles:
+                producto = detalle.producto
+                items.append({
+                    'id': detalle.id,
+                    'producto_id': producto.id,
+                    'nombre': producto.nombre,
+                    'cantidad': detalle.cantidad,
+                    'precio_unitario': float(detalle.precio_unitario),
+                    'subtotal': float(detalle.subtotal),
+                    'imagen_url': producto.imagen_url
+                })
+            
+            return jsonify({
+                'success': True,
+                'pedido': {
+                    'id': pedido.id,
+                    'numero_pedido': pedido.numero_pedido,
+                    'fecha_pedido': pedido.fecha_pedido.isoformat() if pedido.fecha_pedido else None,
+                    'subtotal': float(pedido.subtotal),
+                    'impuestos': float(pedido.impuestos),
+                    'costo_envio': float(pedido.costo_envio),
+                    'total': float(pedido.total),
+                    'estado': pedido.estado,
+                    'metodo_pago': pedido.metodo_pago,
+                    'notas_especiales': pedido.notas_especiales,
+                    'items': items
+                }
+            })
+            
+        except SQLAlchemyError as e:
+            print(f"Error de base de datos: {e}")
+            return jsonify({'success': False, 'error': 'Error al obtener pedido'}), 500
+        finally:
+            db.close()
+    
+    @app.route('/api/pedidos/usuario/<int:user_id>', methods=['GET'])
+    def get_pedidos_usuario_orm(user_id):
+        """Obtener pedidos de un usuario específico"""
+        db = get_session()
+        try:
+            # Verificar que el usuario autenticado solo pueda ver sus propios pedidos
+            if 'tienda_user_id' not in session or session['tienda_user_id'] != user_id:
+                return jsonify({'success': False, 'error': 'No autorizado'}), 403
+            
+            # Obtener pedidos del usuario ordenados por fecha
+            pedidos = db.query(Pedido).filter_by(id_usuario=user_id).order_by(Pedido.fecha_pedido.desc()).all()
+            
+            pedidos_list = []
+            for pedido in pedidos:
+                # Obtener detalles del pedido
+                detalles = db.query(DetallePedido).filter_by(id_pedido=pedido.id).all()
+                
+                items = []
+                for detalle in detalles:
+                    producto = detalle.producto
+                    items.append({
+                        'id': detalle.id,
+                        'producto_id': producto.id,
+                        'nombre': producto.nombre,
+                        'cantidad': detalle.cantidad,
+                        'precio_unitario': float(detalle.precio_unitario),
+                        'subtotal': float(detalle.subtotal),
+                        'imagen_url': producto.imagen_url
+                    })
+                
+                pedidos_list.append({
+                    'id': pedido.id,
+                    'numero_pedido': pedido.numero_pedido,
+                    'fecha_pedido': pedido.fecha_pedido.isoformat() if pedido.fecha_pedido else None,
+                    'subtotal': float(pedido.subtotal),
+                    'impuestos': float(pedido.impuestos),
+                    'costo_envio': float(pedido.costo_envio),
+                    'total': float(pedido.total),
+                    'estado': pedido.estado,
+                    'metodo_pago': pedido.metodo_pago,
+                    'items': items,
+                    'total_items': len(items)
+                })
+            
+            return jsonify({
+                'success': True,
+                'pedidos': pedidos_list,
+                'total': len(pedidos_list)
+            })
+            
+        except SQLAlchemyError as e:
+            print(f"Error de base de datos: {e}")
+            return jsonify({'success': False, 'error': 'Error al obtener pedidos'}), 500
+        finally:
+            db.close()
+    
+    @app.route('/api/pedidos/<int:pedido_id>', methods=['GET'])
+    def get_pedido_detalle_orm(pedido_id):
+        """Obtener detalles de un pedido específico"""
+        db = get_session()
+        try:
+            pedido = db.query(Pedido).filter_by(id=pedido_id).first()
+            
+            if not pedido:
+                return jsonify({'success': False, 'error': 'Pedido no encontrado'}), 404
+            
+            # Verificar que el usuario autenticado sea el dueño del pedido
+            if 'tienda_user_id' not in session or session['tienda_user_id'] != pedido.id_usuario:
+                return jsonify({'success': False, 'error': 'No autorizado'}), 403
+            
+            # Obtener detalles
+            detalles = db.query(DetallePedido).filter_by(id_pedido=pedido.id).all()
+            
+            items = []
+            for detalle in detalles:
+                producto = detalle.producto
+                items.append({
+                    'id': detalle.id,
+                    'producto_id': producto.id,
+                    'nombre': producto.nombre,
+                    'cantidad': detalle.cantidad,
+                    'precio_unitario': float(detalle.precio_unitario),
+                    'subtotal': float(detalle.subtotal),
+                    'imagen_url': producto.imagen_url
+                })
+            
+            return jsonify({
+                'success': True,
+                'pedido': {
+                    'id': pedido.id,
+                    'numero_pedido': pedido.numero_pedido,
+                    'fecha_pedido': pedido.fecha_pedido.isoformat() if pedido.fecha_pedido else None,
+                    'subtotal': float(pedido.subtotal),
+                    'impuestos': float(pedido.impuestos),
+                    'costo_envio': float(pedido.costo_envio),
+                    'total': float(pedido.total),
+                    'estado': pedido.estado,
+                    'metodo_pago': pedido.metodo_pago,
+                    'notas_especiales': pedido.notas_especiales,
+                    'items': items
+                }
+            })
+            
+        except SQLAlchemyError as e:
+            print(f"Error de base de datos: {e}")
+            return jsonify({'success': False, 'error': 'Error al obtener pedido'}), 500
+        finally:
+            db.close()
+
+# ========================================
 # FUNCIÓN PRINCIPAL PARA REGISTRAR TODAS LAS RUTAS
 # ========================================
 
@@ -572,4 +802,5 @@ def register_all_orm_routes(app):
     register_user_routes(app)
     register_colaborador_routes(app)
     register_especies_routes(app)
+    register_pedidos_routes(app)
     print("✅ Rutas ORM registradas exitosamente")

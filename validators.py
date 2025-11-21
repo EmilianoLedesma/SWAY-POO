@@ -243,3 +243,53 @@ def validate_pedido(data):
     validated['items'] = validated_items
     
     return validated
+
+def validate_direccion_envio(data):
+    """Validar datos de dirección de envío"""
+    validated = {}
+    
+    validated['estado'] = validate_text(data.get('estado'), 'Estado', min_length=2, max_length=100)
+    validated['municipio'] = validate_text(data.get('municipio'), 'Municipio', min_length=2, max_length=100)
+    validated['colonia'] = validate_text(data.get('colonia'), 'Colonia', min_length=2, max_length=100)
+    validated['calle'] = validate_text(data.get('calle'), 'Calle', min_length=2, max_length=100)
+    validated['numero_exterior'] = validate_text(data.get('numero_exterior'), 'Número Exterior', min_length=1, max_length=10)
+    validated['numero_interior'] = validate_text(data.get('numero_interior'), 'Número Interior', min_length=1, max_length=10, allow_empty=True)
+    
+    # Validar código postal (5 dígitos)
+    codigo_postal = validate_required(data.get('codigo_postal'), 'Código Postal')
+    if not re.match(r'^\d{5}$', codigo_postal):
+        raise ValidationError('El código postal debe ser de 5 dígitos')
+    validated['codigo_postal'] = codigo_postal
+    
+    validated['notas'] = validate_text(data.get('notas'), 'Notas', min_length=0, max_length=500, allow_empty=True)
+    
+    return validated
+
+def validate_metodo_pago(data, metodo):
+    """Validar datos del método de pago"""
+    validated = {}
+    
+    if metodo == 'credit_card':
+        # Validar número de tarjeta (16 dígitos sin espacios)
+        card_number = validate_required(data.get('card_number'), 'Número de Tarjeta')
+        card_number_clean = re.sub(r'\s', '', card_number)
+        if not re.match(r'^\d{16}$', card_number_clean):
+            raise ValidationError('El número de tarjeta debe tener 16 dígitos')
+        validated['card_number'] = card_number_clean
+        
+        # Validar nombre en tarjeta
+        validated['card_name'] = validate_text(data.get('card_name'), 'Nombre en Tarjeta', min_length=3, max_length=100)
+        
+        # Validar fecha de vencimiento (MM/YY)
+        card_expiry = validate_required(data.get('card_expiry'), 'Fecha de Vencimiento')
+        if not re.match(r'^(0[1-9]|1[0-2])\/\d{2}$', card_expiry):
+            raise ValidationError('La fecha de vencimiento debe tener formato MM/YY')
+        validated['card_expiry'] = card_expiry
+        
+        # Validar CVV (3 o 4 dígitos)
+        cvv = validate_required(data.get('card_cvv'), 'CVV')
+        if not re.match(r'^\d{3,4}$', cvv):
+            raise ValidationError('El CVV debe tener 3 o 4 dígitos')
+        validated['card_cvv'] = cvv
+    
+    return validated
