@@ -18,7 +18,9 @@
       "Bash(timeout:*)",
       "Bash(pip install:*)",
       "Bash(start http://localhost:5000/tienda)",
-      "Bash(explorer \"http://localhost:5000/tienda\")"
+      "Bash(explorer \"http://localhost:5000/tienda\")",
+      "Bash(NUL)",
+      "Bash(powershell -Command:*)"
     ],
     "deny": []
   }

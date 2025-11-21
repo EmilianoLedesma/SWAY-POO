@@ -352,8 +352,7 @@ def register_especies_routes(app):
             page = int(request.args.get('page', 1))
             limit = int(request.args.get('limit', 12))
             
-            # Query base
-            query = db.query(EspecieMarina).filter_by(activo=True)
+            query = db.query(EspecieMarina)
             
             # Aplicar filtros
             if search:
@@ -371,7 +370,6 @@ def register_especies_routes(app):
             total = query.count()
             especies = query.offset((page - 1) * limit).limit(limit).all()
             
-            # Serializar resultados
             especies_list = []
             for especie in especies:
                 especies_list.append({
@@ -379,11 +377,10 @@ def register_especies_routes(app):
                     'nombre_comun': especie.nombre_comun,
                     'nombre_cientifico': especie.nombre_cientifico,
                     'descripcion': especie.descripcion,
-                    'habitat_principal': especie.habitat_principal,
-                    'estado_conservacion': especie.estado_conservacion.codigo if especie.estado_conservacion else 'DD',
-                    'imagen_url': especie.imagen_url,
-                    'profundidad_max': float(especie.profundidad_max) if especie.profundidad_max else None,
-                    'longitud_max': float(especie.longitud_max) if especie.longitud_max else None
+                    'esperanza_vida': especie.esperanza_vida,
+                    'poblacion_estimada': especie.poblacion_estimada,
+                    'estado_conservacion': especie.estado_conservacion.nombre if especie.estado_conservacion else 'Desconocido',
+                    'imagen_url': especie.imagen_url
                 })
             
             return jsonify({
@@ -405,7 +402,7 @@ def register_especies_routes(app):
         """Obtener detalles de una especie específica"""
         db = get_session()
         try:
-            especie = db.query(EspecieMarina).filter_by(id=id, activo=True).first()
+            especie = db.query(EspecieMarina).filter_by(id=id).first()
             
             if not especie:
                 return jsonify({'success': False, 'error': 'Especie no encontrada'}), 404
@@ -417,17 +414,9 @@ def register_especies_routes(app):
                     'nombre_comun': especie.nombre_comun,
                     'nombre_cientifico': especie.nombre_cientifico,
                     'descripcion': especie.descripcion,
-                    'filo': especie.filo,
-                    'clase': especie.clase,
-                    'orden': especie.orden,
-                    'familia': especie.familia,
-                    'habitat_principal': especie.habitat_principal,
-                    'profundidad_min': float(especie.profundidad_min) if especie.profundidad_min else None,
-                    'profundidad_max': float(especie.profundidad_max) if especie.profundidad_max else None,
                     'esperanza_vida': especie.esperanza_vida,
-                    'longitud_max': float(especie.longitud_max) if especie.longitud_max else None,
-                    'peso_max': float(especie.peso_max) if especie.peso_max else None,
-                    'estado_conservacion': especie.estado_conservacion.codigo if especie.estado_conservacion else 'DD',
+                    'poblacion_estimada': especie.poblacion_estimada,
+                    'estado_conservacion': especie.estado_conservacion.nombre if especie.estado_conservacion else 'Desconocido',
                     'imagen_url': especie.imagen_url
                 }
             })
@@ -470,17 +459,11 @@ def register_especies_routes(app):
             nueva_especie = EspecieMarina(
                 nombre_comun=validated_data['nombre_comun'],
                 nombre_cientifico=validated_data['nombre_cientifico'],
-                descripcion=validated_data['descripcion'],
-                filo=validated_data.get('filo'),
-                clase=validated_data.get('clase'),
-                orden=validated_data.get('orden'),
-                familia=validated_data.get('familia'),
-                profundidad_min=validated_data.get('profundidad_min'),
-                profundidad_max=validated_data.get('profundidad_max'),
+                descripcion=validated_data.get('descripcion'),
                 esperanza_vida=validated_data.get('esperanza_vida'),
+                poblacion_estimada=validated_data.get('poblacion_estimada'),
                 id_estado_conservacion=validated_data['id_estado_conservacion'],
-                id_colaborador_registrante=session['colab_colaborador_id'],
-                activo=True
+                imagen_url=validated_data.get('imagen_url')
             )
             
             db.add(nueva_especie)
@@ -524,18 +507,14 @@ def register_especies_routes(app):
             except ValidationError as e:
                 return jsonify({'success': False, 'error': str(e)}), 400
             
-            # Actualizar campos
+            # Actualizar campos 
             especie.nombre_comun = validated_data['nombre_comun']
             especie.nombre_cientifico = validated_data['nombre_cientifico']
-            especie.descripcion = validated_data['descripcion']
-            especie.filo = validated_data.get('filo')
-            especie.clase = validated_data.get('clase')
-            especie.orden = validated_data.get('orden')
-            especie.familia = validated_data.get('familia')
-            especie.profundidad_min = validated_data.get('profundidad_min')
-            especie.profundidad_max = validated_data.get('profundidad_max')
+            especie.descripcion = validated_data.get('descripcion')
             especie.esperanza_vida = validated_data.get('esperanza_vida')
+            especie.poblacion_estimada = validated_data.get('poblacion_estimada')
             especie.id_estado_conservacion = validated_data['id_estado_conservacion']
+            especie.imagen_url = validated_data.get('imagen_url')
             
             db.commit()
             
@@ -567,9 +546,9 @@ def register_especies_routes(app):
             
             if not especie:
                 return jsonify({'success': False, 'error': 'Especie no encontrada'}), 404
-            
-            # Soft delete
-            especie.activo = False
+
+            # Hard delete (la tabla no tiene columna 'activo')
+            db.delete(especie)
             db.commit()
             
             return jsonify({

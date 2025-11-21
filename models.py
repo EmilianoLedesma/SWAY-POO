@@ -113,8 +113,7 @@ class Colaborador(Base):
     
     # Relaciones
     usuario = relationship('Usuario', back_populates='colaborador')
-    especies_registradas = relationship('EspecieMarina', back_populates='colaborador_registrante')
-    avistamientos = relationship('AvistamientoEspecie', back_populates='colaborador')
+
 
 # ========================================
 # MODELOS DE ESPECIES MARINAS
@@ -122,103 +121,68 @@ class Colaborador(Base):
 
 class EstadoConservacion(Base):
     __tablename__ = 'EstadosConservacion'
-    
+
     id = Column(Integer, primary_key=True, autoincrement=True)
-    codigo = Column(String(5), unique=True, nullable=False)
     nombre = Column(String(50), nullable=False)
     descripcion = Column(Text)
-    color_codigo = Column(String(7))
-    nivel_prioridad = Column(Integer)
     
     # Relaciones
     especies = relationship('EspecieMarina', back_populates='estado_conservacion')
 
 class TipoHabitat(Base):
     __tablename__ = 'TiposHabitat'
-    
+
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(100), nullable=False)
     descripcion = Column(Text)
-    
-    # Relaciones
-    especies = relationship('EspecieHabitat', back_populates='habitat')
+
 
 class TipoAmenaza(Base):
     __tablename__ = 'TiposAmenaza'
-    
+
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(100), nullable=False)
     descripcion = Column(Text)
-    
-    # Relaciones
-    especies = relationship('EspecieAmenaza', back_populates='amenaza')
 
 class EspecieMarina(Base):
-    __tablename__ = 'EspeciesMarinas'
-    
+    __tablename__ = 'Especies'  
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre_comun = Column(String(100), nullable=False)
     nombre_cientifico = Column(String(100), unique=True, nullable=False)
-    reino = Column(String(50), default='Animalia')
-    filo = Column(String(50))
-    clase = Column(String(50))
-    orden = Column(String(50))
-    familia = Column(String(50))
-    genero = Column(String(50))
-    especie = Column(String(50))
     descripcion = Column(Text)
-    habitat_principal = Column(String(200))
-    profundidad_min = Column(Integer)
-    profundidad_max = Column(Integer)
-    temperatura_min = Column(Numeric(4, 1))
-    temperatura_max = Column(Numeric(4, 1))
-    distribucion_geografica = Column(Text)
     esperanza_vida = Column(Integer)
-    longitud_max = Column(Numeric(6, 2))
-    peso_max = Column(Numeric(8, 2))
-    id_estado_conservacion = Column(Integer, ForeignKey('EstadosConservacion.id'), nullable=False)
-    id_colaborador_registrante = Column(Integer, ForeignKey('Colaboradores.id'), nullable=False)
-    imagen_url = Column(String(500))
-    fecha_registro = Column(DateTime, default=datetime.utcnow)
-    activo = Column(Boolean, default=True)
-    
+    poblacion_estimada = Column(Integer)  
+    id_estado_conservacion = Column(Integer, ForeignKey('EstadosConservacion.id'))
+    imagen_url = Column(String(255))  
+
     # Relaciones
     estado_conservacion = relationship('EstadoConservacion', back_populates='especies')
-    colaborador_registrante = relationship('Colaborador', back_populates='especies_registradas')
-    habitats = relationship('EspecieHabitat', back_populates='especie')
-    amenazas = relationship('EspecieAmenaza', back_populates='especie')
-    avistamientos = relationship('AvistamientoEspecie', back_populates='especie')
 
 class EspecieHabitat(Base):
     __tablename__ = 'EspeciesHabitats'
-    
+
     id = Column(Integer, primary_key=True, autoincrement=True)
-    id_especie = Column(Integer, ForeignKey('EspeciesMarinas.id'), nullable=False)
+    id_especie = Column(Integer, ForeignKey('Especies.id'), nullable=False)
     id_habitat = Column(Integer, ForeignKey('TiposHabitat.id'), nullable=False)
     preferencia = Column(String(20))
-    
-    # Relaciones
-    especie = relationship('EspecieMarina', back_populates='habitats')
-    habitat = relationship('TipoHabitat', back_populates='especies')
+
 
 class EspecieAmenaza(Base):
     __tablename__ = 'EspeciesAmenazas'
-    
+
     id = Column(Integer, primary_key=True, autoincrement=True)
-    id_especie = Column(Integer, ForeignKey('EspeciesMarinas.id'), nullable=False)
+    id_especie = Column(Integer, ForeignKey('Especies.id'), nullable=False)
     id_amenaza = Column(Integer, ForeignKey('TiposAmenaza.id'), nullable=False)
     nivel_impacto = Column(String(20))
     notas = Column(Text)
-    
-    # Relaciones
-    especie = relationship('EspecieMarina', back_populates='amenazas')
-    amenaza = relationship('TipoAmenaza', back_populates='especies')
+
+
 
 class AvistamientoEspecie(Base):
     __tablename__ = 'AvistamientosEspecies'
-    
+
     id = Column(Integer, primary_key=True, autoincrement=True)
-    id_especie = Column(Integer, ForeignKey('EspeciesMarinas.id'), nullable=False)
+    id_especie = Column(Integer, ForeignKey('Especies.id'), nullable=False)
     id_colaborador = Column(Integer, ForeignKey('Colaboradores.id'), nullable=False)
     latitud = Column(Numeric(10, 8))
     longitud = Column(Numeric(11, 8))
@@ -236,10 +200,8 @@ class AvistamientoEspecie(Base):
     fecha_registro = Column(DateTime, default=datetime.utcnow)
     validado = Column(Boolean, default=False)
     id_validador = Column(Integer, ForeignKey('Colaboradores.id'))
-    
-    # Relaciones
-    especie = relationship('EspecieMarina', back_populates='avistamientos')
-    colaborador = relationship('Colaborador', foreign_keys=[id_colaborador], back_populates='avistamientos')
+
+
 
 # ========================================
 # MODELOS DE E-COMMERCE
