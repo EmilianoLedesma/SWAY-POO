@@ -1,0 +1,23 @@
+# Requiere: pip install qrcode[pil] pillow
+from pathlib import Path
+import qrcode
+
+# Enlace declarado manualmente (editar aquí)
+link = "https://salable-pertinently-chong.ngrok-free.dev"
+
+# Configuración del QR
+qr = qrcode.QRCode(
+    version=None,  # ajusta automáticamente el tamaño
+    error_correction=qrcode.constants.ERROR_CORRECT_M,
+    box_size=10,
+    border=4,
+)
+qr.add_data(link)
+qr.make(fit=True)
+
+# Generar imagen y guardar en el mismo directorio
+img = qr.make_image(fill_color="black", back_color="white")
+output = Path.cwd() / "qr.png"
+img.save(output)
+
+print(f"QR guardado en: {output}")

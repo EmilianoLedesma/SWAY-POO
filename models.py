@@ -86,7 +86,6 @@ class Usuario(Base):
     password_hash = Column(String(254))
     telefono = Column(String(15))
     fecha_nacimiento = Column(Date)
-    id_direccion = Column(Integer, ForeignKey('Direcciones.id'))
     suscrito_newsletter = Column(Boolean, default=False)
     activo = Column(Boolean, default=True)
     fecha_registro = Column(DateTime, default=datetime.utcnow)
@@ -110,7 +109,8 @@ class Colaborador(Base):
     estado_solicitud = Column(String(20), default='pendiente')
     activo = Column(Boolean, default=True)
     fecha_solicitud = Column(DateTime, default=datetime.utcnow)
-    
+    face_encoding = Column(Text, nullable=True)
+
     # Relaciones
     usuario = relationship('Usuario', back_populates='colaborador')
 

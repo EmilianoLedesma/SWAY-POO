@@ -333,6 +333,100 @@ def register_colaborador_routes(app):
         else:
             return jsonify({'authenticated': False})
 
+    @app.route('/api/colaboradores/enroll-face', methods=['POST'])
+    def colaborador_enroll_face():
+        """Registrar encoding facial del colaborador autenticado."""
+        if 'colab_colaborador_id' not in session:
+            return jsonify({'success': False, 'error': 'No autorizado'}), 401
+
+        from face_service import decode_base64_image, extract_face_encoding
+        import json as _json
+
+        data = request.get_json()
+        image_b64 = data.get('image')
+        if not image_b64:
+            return jsonify({'success': False, 'error': 'Imagen requerida'}), 400
+
+        image_rgb = decode_base64_image(image_b64)
+        if image_rgb is None:
+            return jsonify({'success': False, 'error': 'Imagen inválida'}), 400
+
+        encoding = extract_face_encoding(image_rgb)
+        if encoding is None:
+            return jsonify({'success': False, 'error': 'No se detectó un rostro en la imagen'}), 400
+
+        db = get_session()
+        try:
+            colaborador = db.query(Colaborador).filter_by(id=session['colab_colaborador_id']).first()
+            colaborador.face_encoding = _json.dumps(encoding)
+            db.commit()
+            return jsonify({'success': True, 'message': 'Rostro registrado exitosamente'})
+        except SQLAlchemyError as e:
+            db.rollback()
+            return jsonify({'success': False, 'error': 'Error al guardar encoding'}), 500
+        finally:
+            db.close()
+
+    @app.route('/api/colaboradores/login-face', methods=['POST'])
+    def colaborador_login_face():
+        """Autenticar colaborador por reconocimiento facial."""
+        try:
+            from face_service import decode_base64_image, extract_face_encoding, compare_face
+        except ImportError as e:
+            print(f"[face] ImportError: {e}")
+            return jsonify({'success': False, 'error': f'Librería de reconocimiento no disponible: {e}'}), 503
+
+        data = request.get_json()
+        image_b64 = data.get('image')
+        if not image_b64:
+            return jsonify({'success': False, 'error': 'Imagen requerida'}), 400
+
+        image_rgb = decode_base64_image(image_b64)
+        if image_rgb is None:
+            return jsonify({'success': False, 'error': 'Imagen inválida'}), 400
+
+        candidate_encoding = extract_face_encoding(image_rgb)
+        if candidate_encoding is None:
+            return jsonify({'success': False, 'error': 'No se detectó un rostro'}), 400
+
+        db = get_session()
+        try:
+            colaboradores = db.query(Colaborador).filter(
+                Colaborador.estado_solicitud == 'aprobada',
+                Colaborador.activo == True,
+                Colaborador.face_encoding.isnot(None)
+            ).all()
+
+            for colaborador in colaboradores:
+                if compare_face(colaborador.face_encoding, candidate_encoding):
+                    usuario = colaborador.usuario
+                    nombre_completo = construir_nombre_completo(
+                        usuario.nombre, usuario.apellido_paterno, usuario.apellido_materno, "Dr. "
+                    )
+                    session['colab_user_id'] = usuario.id
+                    session['colab_user_name'] = nombre_completo
+                    session['colab_user_email'] = usuario.email
+                    session['colab_colaborador_id'] = colaborador.id
+                    session['colab_user_type'] = 'colaborador'
+
+                    return jsonify({
+                        'success': True,
+                        'message': 'Sesión iniciada por reconocimiento facial',
+                        'colaborador': {
+                            'id': colaborador.id,
+                            'nombre': nombre_completo,
+                            'email': usuario.email
+                        }
+                    })
+
+            return jsonify({'success': False, 'error': 'Rostro no reconocido'}), 401
+
+        except Exception as e:
+            print(f"[face login] Error: {type(e).__name__}: {e}")
+            return jsonify({'success': False, 'error': f'{type(e).__name__}: {str(e)}'}), 500
+        finally:
+            db.close()
+
 # ========================================
 # RUTAS DE ESPECIES MARINAS (CRUD COMPLETO)
 # ========================================
