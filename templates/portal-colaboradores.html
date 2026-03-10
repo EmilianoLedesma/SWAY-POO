@@ -1293,6 +1293,171 @@
         }
       }
 
+      /* ============================================
+         Reconocimiento Facial - Estilos SWAY
+         ============================================ */
+
+      /* Botón de reconocimiento facial con estilo distinto para diferenciarlo */
+      .btn-face-login {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          #2c4468 100%
+        );
+        color: white;
+        border: 2px solid rgba(71, 178, 228, 0.4);
+        padding: 0.875rem 1.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        justify-content: center;
+        box-shadow: 0 4px 16px rgba(55, 81, 126, 0.3);
+        font-family: var(--default-font);
+        text-decoration: none;
+      }
+
+      .btn-face-login:hover {
+        background: linear-gradient(
+          135deg,
+          #2c4468 0%,
+          var(--primary-color) 100%
+        );
+        border-color: var(--accent-color);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(55, 81, 126, 0.4);
+        color: white;
+      }
+
+      .btn-face-login i {
+        font-size: 1.15rem;
+      }
+
+      /* Botón de registrar rostro (solo visible con sesión activa) */
+      .btn-enroll-face {
+        background: linear-gradient(
+          135deg,
+          #20c997 0%,
+          var(--success-color) 100%
+        );
+        color: white;
+        border: none;
+        padding: 0.875rem 1.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        display: none; /* oculto por defecto; JS lo muestra si hay sesión */
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 16px rgba(40, 167, 69, 0.3);
+        font-family: var(--default-font);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .btn-enroll-face:hover {
+        background: linear-gradient(
+          135deg,
+          var(--success-color) 0%,
+          #20c997 100%
+        );
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(40, 167, 69, 0.4);
+      }
+
+      /* Sección de cámara dentro del modal facial */
+      .face-camera-section {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 1.5rem;
+        background: rgba(55, 81, 126, 0.04);
+        border-radius: 16px;
+        border: 1px solid rgba(71, 178, 228, 0.2);
+        margin-top: 1.5rem;
+      }
+
+      .face-camera-section.visible {
+        display: flex;
+      }
+
+      .face-video-wrapper {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 3px solid rgba(71, 178, 228, 0.4);
+        box-shadow: 0 4px 20px rgba(55, 81, 126, 0.2);
+        background: #000;
+        width: 100%;
+        max-width: 360px;
+      }
+
+      .face-video-wrapper video {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 9px;
+      }
+
+      /* Canvas oculto: solo se usa para capturar el frame */
+      #face-canvas {
+        display: none;
+      }
+
+      .face-camera-label {
+        font-size: 0.9rem;
+        color: var(--default-color);
+        opacity: 0.75;
+        text-align: center;
+      }
+
+      .face-camera-label i {
+        color: var(--accent-color);
+        margin-right: 0.35rem;
+      }
+
+      /* Separador de opciones de login */
+      .login-divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 1.25rem 0;
+        color: var(--default-color);
+        opacity: 0.5;
+        font-size: 0.9rem;
+      }
+
+      .login-divider::before,
+      .login-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: rgba(55, 81, 126, 0.2);
+      }
+
+      /* Alerta dentro del modal facial */
+      #face-alert {
+        display: none;
+        margin-top: 1rem;
+        border-radius: 10px;
+        padding: 0.875rem 1.25rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        align-items: center;
+        gap: 0.6rem;
+      }
+
+      #face-alert.visible {
+        display: flex;
+      }
+
       @media (max-width: 480px) {
         .nav-container {
           flex-direction: column;
@@ -1326,6 +1491,17 @@
               <p id="nav-rol">Colaborador Científico</p>
             </div>
           </div>
+          <!-- Botón registrar rostro: visible solo cuando hay sesión activa -->
+          <button
+            class="btn-enroll-face"
+            id="btn-enroll-face-nav"
+            onclick="openFaceModal('enroll')"
+            title="Registrar mi rostro para futuros inicios de sesión"
+            aria-label="Registrar reconocimiento facial"
+          >
+            <i class="bi bi-person-bounding-box"></i>
+            Registrar mi rostro
+          </button>
           <button class="logout-btn" onclick="logout()">
             <i class="bi bi-box-arrow-right"></i>
             Cerrar Sesión
@@ -1342,6 +1518,7 @@
           Gestiona especies marinas y revisa tus reportes de avistamientos de
           manera eficiente
         </p>
+
 
         <div class="colaborador-info">
           <div class="colaborador-avatar" id="colaborador-avatar">
@@ -1697,6 +1874,86 @@
               class="modal-btn modal-btn-danger"
             >
               <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Reconocimiento Facial -->
+    <div class="modal-overlay" id="faceModal" role="dialog" aria-modal="true" aria-labelledby="faceModalTitle">
+      <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 480px;">
+        <button class="modal-close" onclick="closeFaceModal()" aria-label="Cerrar modal de reconocimiento facial">
+          &times;
+        </button>
+        <div class="modal-body">
+          <div class="collaborator-form-header">
+            <h2 id="faceModalTitle" style="color: var(--primary-color);">
+              <i class="bi bi-camera-video"></i>
+              <span id="face-modal-title-text">Reconocimiento Facial</span>
+            </h2>
+            <p id="face-modal-subtitle">Apunta la cámara a tu rostro y presiona capturar</p>
+          </div>
+
+          <!-- Alerta de estado (error / éxito) -->
+          <div
+            id="face-alert"
+            class="alert-message"
+            role="alert"
+            aria-live="polite"
+          ></div>
+
+          <!-- Sección de cámara -->
+          <div class="face-camera-section" id="face-camera-section">
+            <div class="face-video-wrapper">
+              <video
+                id="face-video"
+                autoplay
+                playsinline
+                muted
+                aria-label="Vista previa de la cámara para reconocimiento facial"
+              ></video>
+            </div>
+            <!-- Canvas oculto usado para capturar el fotograma -->
+            <canvas id="face-canvas" width="640" height="480"></canvas>
+            <p class="face-camera-label">
+              <i class="bi bi-info-circle"></i>
+              Asegúrate de tener buena iluminación y centra tu rostro en el encuadre
+            </p>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="modal-buttons" style="flex-direction: column; gap: 0.75rem;">
+            <!-- Botón para activar la cámara (estado inicial) -->
+            <button
+              type="button"
+              id="btn-activate-camera"
+              class="btn-sway-primary"
+              onclick="activarCamaraFacial()"
+              aria-label="Activar cámara"
+            >
+              <i class="bi bi-camera-video-fill"></i> Activar cámara
+            </button>
+
+            <!-- Botón para capturar y verificar (visible tras activar cámara) -->
+            <button
+              type="button"
+              id="btn-capturar-face"
+              class="btn-sway-primary"
+              onclick="capturarYVerificarFace()"
+              style="display: none;"
+              aria-label="Capturar imagen y verificar identidad"
+            >
+              <i class="bi bi-camera"></i> Capturar y verificar
+            </button>
+
+            <button
+              type="button"
+              onclick="closeFaceModal()"
+              class="modal-btn modal-btn-cancel"
+              aria-label="Cancelar y cerrar modal"
+            >
+              <i class="bi bi-x-circle"></i> Cancelar
             </button>
           </div>
         </div>
@@ -2805,6 +3062,274 @@
             closeLogoutModal();
           }
         });
+
+      // ============================================================
+      //  RECONOCIMIENTO FACIAL
+      //  Modo "login"  → POST /api/colaboradores/login-face
+      //  Modo "enroll" → POST /api/colaboradores/enroll-face
+      // ============================================================
+
+      // Estado del módulo facial
+      let faceModalMode = "login"; // "login" | "enroll"
+      let faceCameraStream = null; // MediaStream activo
+
+      /**
+       * Abre el modal de reconocimiento facial y configura título y subtítulo
+       * según el modo solicitado.
+       * @param {"login"|"enroll"} mode
+       */
+      function openFaceModal(mode) {
+        faceModalMode = mode;
+
+        const titleText = document.getElementById("face-modal-title-text");
+        const subtitle  = document.getElementById("face-modal-subtitle");
+        const modal     = document.getElementById("faceModal");
+
+        if (mode === "enroll") {
+          titleText.textContent = "Registrar mi rostro";
+          subtitle.textContent  = "Registraremos tu rostro para inicios de sesión futuros";
+        } else {
+          titleText.textContent = "Reconocimiento Facial";
+          subtitle.textContent  = "Apunta la cámara a tu rostro y presiona capturar";
+        }
+
+        // Resetear estado visual al abrir
+        ocultarAlertaFace();
+        document.getElementById("face-camera-section").classList.remove("visible");
+        document.getElementById("btn-activate-camera").style.display = "inline-flex";
+        document.getElementById("btn-capturar-face").style.display   = "none";
+
+        modal.classList.add("active");
+      }
+
+      /**
+       * Cierra el modal facial y libera el stream de la cámara si estaba activo.
+       */
+      function closeFaceModal() {
+        detenerCamaraFacial();
+        document.getElementById("faceModal").classList.remove("active");
+        ocultarAlertaFace();
+        // Resetear botones
+        document.getElementById("btn-activate-camera").style.display = "inline-flex";
+        document.getElementById("btn-capturar-face").style.display   = "none";
+        document.getElementById("face-camera-section").classList.remove("visible");
+      }
+
+      // Cerrar modal facial al hacer clic en el overlay
+      document.getElementById("faceModal").addEventListener("click", function (e) {
+        if (e.target === this) {
+          closeFaceModal();
+        }
+      });
+
+      /**
+       * Solicita acceso a la cámara y muestra el stream en el elemento <video>.
+       */
+      async function activarCamaraFacial() {
+        const btnActivar  = document.getElementById("btn-activate-camera");
+        const btnCapturar = document.getElementById("btn-capturar-face");
+        const camSection  = document.getElementById("face-camera-section");
+        const video       = document.getElementById("face-video");
+
+        ocultarAlertaFace();
+
+        // Verificar que el navegador soporte getUserMedia
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          mostrarAlertaFace(
+            "Tu navegador no soporta el acceso a la cámara. Prueba con Chrome o Firefox actualizado.",
+            "error"
+          );
+          return;
+        }
+
+        try {
+          // Solicitar acceso a la cámara frontal preferentemente
+          faceCameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }
+          });
+          video.srcObject = faceCameraStream;
+
+          // Mostrar sección de cámara y cambiar botones
+          camSection.classList.add("visible");
+          btnActivar.style.display  = "none";
+          btnCapturar.style.display = "inline-flex";
+
+          console.log("Cámara activada para reconocimiento facial.");
+        } catch (err) {
+          console.error("Error al acceder a la cámara:", err);
+          let mensaje = "No se pudo acceder a la cámara.";
+
+          if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+            mensaje = "Permiso de cámara denegado. Por favor, otorga acceso a la cámara en tu navegador e intenta de nuevo.";
+          } else if (err.name === "NotFoundError") {
+            mensaje = "No se encontró una cámara disponible en este dispositivo.";
+          } else if (err.name === "NotReadableError") {
+            mensaje = "La cámara está siendo usada por otra aplicación. Ciérrala e intenta de nuevo.";
+          }
+
+          mostrarAlertaFace(mensaje, "error");
+        }
+      }
+
+      /**
+       * Detiene el stream de la cámara y limpia el srcObject del video.
+       */
+      function detenerCamaraFacial() {
+        if (faceCameraStream) {
+          faceCameraStream.getTracks().forEach(track => track.stop());
+          faceCameraStream = null;
+        }
+        const video = document.getElementById("face-video");
+        if (video) video.srcObject = null;
+      }
+
+      /**
+       * Captura un fotograma del video, lo convierte a base64 JPEG
+       * y lo envía al endpoint correspondiente según el modo activo.
+       */
+      async function capturarYVerificarFace() {
+        const video   = document.getElementById("face-video");
+        const canvas  = document.getElementById("face-canvas");
+        const btnCapturar = document.getElementById("btn-capturar-face");
+
+        if (!faceCameraStream) {
+          mostrarAlertaFace("La cámara no está activa. Actívala primero.", "error");
+          return;
+        }
+
+        ocultarAlertaFace();
+
+        // Deshabilitar botón para evitar doble envío
+        btnCapturar.disabled = true;
+        btnCapturar.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+
+        try {
+          // Dibujar el frame actual en el canvas
+          const ctx = canvas.getContext("2d");
+          canvas.width  = video.videoWidth  || 640;
+          canvas.height = video.videoHeight || 480;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          // Obtener imagen en base64 (formato JPEG para mayor compatibilidad)
+          const imageBase64 = canvas.toDataURL("image/jpeg", 0.85);
+
+          // Determinar endpoint según modo
+          const endpoint = faceModalMode === "enroll"
+            ? "/api/colaboradores/enroll-face"
+            : "/api/colaboradores/login-face";
+
+          console.log(`Enviando imagen a ${endpoint}...`);
+
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: imageBase64 })
+          });
+
+          const result = await response.json();
+          console.log("Respuesta del servidor facial:", result);
+
+          if (response.ok && result.success) {
+            if (faceModalMode === "enroll") {
+              // Registro exitoso
+              detenerCamaraFacial();
+              mostrarAlertaFace(
+                result.message || "Rostro registrado correctamente. Ya puedes iniciar sesión con reconocimiento facial.",
+                "success"
+              );
+              // Cerrar modal automáticamente tras 2.5 s
+              setTimeout(() => closeFaceModal(), 2500);
+            } else {
+              // Login exitoso: redirigir al dashboard o recargar
+              mostrarAlertaFace(
+                result.message || "Identidad verificada. Redirigiendo...",
+                "success"
+              );
+              detenerCamaraFacial();
+              setTimeout(() => {
+                if (result.redirect) {
+                  window.location.href = result.redirect;
+                } else {
+                  window.location.reload();
+                }
+              }, 1200);
+            }
+          } else {
+            // Error retornado por el servidor
+            const errorMsg = result.error || result.message || "No se pudo verificar la identidad. Intenta de nuevo.";
+            mostrarAlertaFace(errorMsg, "error");
+            console.warn("Error de verificación facial:", errorMsg);
+          }
+        } catch (err) {
+          console.error("Error en la solicitud de reconocimiento facial:", err);
+          mostrarAlertaFace(
+            "Error de conexión con el servidor. Revisa tu red e intenta de nuevo.",
+            "error"
+          );
+        } finally {
+          // Restaurar botón solo si el modal aún está visible y la operación no fue exitosa
+          const modal = document.getElementById("faceModal");
+          if (modal && modal.classList.contains("active")) {
+            btnCapturar.disabled = false;
+            btnCapturar.innerHTML = '<i class="bi bi-camera"></i> Capturar y verificar';
+          }
+        }
+      }
+
+      /**
+       * Muestra un mensaje de alerta dentro del modal facial.
+       * @param {string} mensaje
+       * @param {"success"|"error"|"warning"} tipo
+       */
+      function mostrarAlertaFace(mensaje, tipo) {
+        const alerta = document.getElementById("face-alert");
+        const iconMap = {
+          success: "check-circle",
+          error:   "exclamation-triangle",
+          warning: "exclamation-circle"
+        };
+        alerta.className = `alert-message alert-${tipo} visible`;
+        alerta.innerHTML = `<i class="bi bi-${iconMap[tipo] || "info-circle"}"></i> ${mensaje}`;
+      }
+
+      /** Oculta la alerta del modal facial. */
+      function ocultarAlertaFace() {
+        const alerta = document.getElementById("face-alert");
+        alerta.className = "alert-message";
+        alerta.innerHTML = "";
+      }
+
+      /**
+       * Verifica si hay una sesión de colaborador activa consultando
+       * /api/colaboradores/status y, de ser así, muestra el botón "Registrar mi rostro".
+       */
+      async function verificarSesionParaBtnEnroll() {
+        try {
+          const response = await fetch("/api/colaboradores/status", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.authenticated || data.logueado || data.success) {
+              const btnEnroll = document.getElementById("btn-enroll-face-nav");
+              if (btnEnroll) {
+                btnEnroll.style.display = "inline-flex";
+              }
+              console.log("Sesión activa: botón 'Registrar mi rostro' habilitado.");
+            }
+          }
+        } catch (err) {
+          // Si el endpoint no existe o falla, simplemente no mostramos el botón
+          console.warn("No se pudo verificar el estado de sesión para el botón de enroll facial:", err);
+        }
+      }
+
+      // Ejecutar verificación de sesión al cargar la página
+      document.addEventListener("DOMContentLoaded", function () {
+        verificarSesionParaBtnEnroll();
+      });
     </script>
   </body>
 </html>

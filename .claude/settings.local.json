@@ -20,7 +20,10 @@
       "Bash(start http://localhost:5000/tienda)",
       "Bash(explorer \"http://localhost:5000/tienda\")",
       "Bash(NUL)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "WebSearch",
+      "Bash(py:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": []
   }
