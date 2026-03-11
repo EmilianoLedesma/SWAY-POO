@@ -1766,6 +1766,63 @@
               </div>
             </div>
 
+            <!-- Firma Biométrica -->
+            <div class="form-row" style="margin-top: 1.5rem;">
+              <div class="form-group" style="width: 100%;">
+                <label>
+                  <i class="bi bi-person-bounding-box"></i> Firma Biométrica *
+                </label>
+                <div id="firma-status" style="
+                  display: flex;
+                  align-items: center;
+                  gap: 0.75rem;
+                  padding: 0.75rem 1rem;
+                  border-radius: 10px;
+                  background: #f8f9fa;
+                  border: 1px dashed #ced4da;
+                  margin-bottom: 0.75rem;
+                ">
+                  <i class="bi bi-shield-lock" style="font-size:1.3rem; color:#6c757d;"></i>
+                  <span id="firma-status-text" style="color:#6c757d; font-size:0.9rem;">
+                    Se requiere tu firma facial para guardar este registro
+                  </span>
+                </div>
+
+                <div id="firma-camera-section" style="display:none; flex-direction:column; align-items:center; gap:0.75rem;">
+                  <video id="firma-video" autoplay playsinline muted
+                    style="width:100%; max-width:340px; border-radius:10px; border:2px solid #0d6efd; background:#000;">
+                  </video>
+                  <canvas id="firma-canvas" style="display:none;"></canvas>
+                </div>
+
+                <input type="hidden" id="firma-imagen" name="firma_imagen" />
+
+                <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:0.5rem;">
+                  <button type="button" id="btn-activar-firma" onclick="activarCamaraFirma()" style="
+                    background: #0d6efd; color: white; border: none;
+                    padding: 0.6rem 1.25rem; border-radius: 8px;
+                    font-weight: 600; cursor: pointer; display:inline-flex; align-items:center; gap:0.4rem;
+                  ">
+                    <i class="bi bi-camera-video"></i> Activar cámara
+                  </button>
+                  <button type="button" id="btn-capturar-firma" onclick="capturarFirma()" style="
+                    background: #198754; color: white; border: none;
+                    padding: 0.6rem 1.25rem; border-radius: 8px;
+                    font-weight: 600; cursor: pointer; display:none; align-items:center; gap:0.4rem;
+                  ">
+                    <i class="bi bi-camera"></i> Capturar firma
+                  </button>
+                  <button type="button" id="btn-repetir-firma" onclick="resetFirmaCapture()" style="
+                    background: #6c757d; color: white; border: none;
+                    padding: 0.6rem 1.25rem; border-radius: 8px;
+                    font-weight: 600; cursor: pointer; display:none; align-items:center; gap:0.4rem;
+                  ">
+                    <i class="bi bi-arrow-counterclockwise"></i> Repetir
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div
               class="form-row"
               style="justify-content: center; margin-top: 2rem"
@@ -2517,6 +2574,7 @@
 
         form.reset();
         document.getElementById("especie-messages").innerHTML = "";
+        resetFirmaCapture();
 
         if (especieId) {
           title.innerHTML =
@@ -2570,8 +2628,105 @@
       }
 
       function closeEspecieModal() {
+        detenerCamaraFirma();
+        resetFirmaCapture();
         document.getElementById("especieModal").classList.remove("active");
       }
+
+      // ── Cámara de firma biométrica ──────────────────────────────────────────
+      let firmaCameraStream = null;
+
+      async function activarCamaraFirma() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert("Tu navegador no soporta acceso a la cámara.");
+          return;
+        }
+        try {
+          firmaCameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }
+          });
+          const video = document.getElementById("firma-video");
+          video.srcObject = firmaCameraStream;
+
+          document.getElementById("firma-camera-section").style.display = "flex";
+          document.getElementById("btn-activar-firma").style.display    = "none";
+          document.getElementById("btn-capturar-firma").style.display   = "inline-flex";
+        } catch (err) {
+          let msg = "No se pudo acceder a la cámara.";
+          if (err.name === "NotAllowedError")  msg = "Permiso de cámara denegado.";
+          if (err.name === "NotFoundError")    msg = "No se encontró cámara en este dispositivo.";
+          if (err.name === "NotReadableError") msg = "La cámara está en uso por otra aplicación.";
+          alert(msg);
+        }
+      }
+
+      function detenerCamaraFirma() {
+        if (firmaCameraStream) {
+          firmaCameraStream.getTracks().forEach(t => t.stop());
+          firmaCameraStream = null;
+        }
+        const video = document.getElementById("firma-video");
+        if (video) video.srcObject = null;
+      }
+
+      function capturarFirma() {
+        const video  = document.getElementById("firma-video");
+        const canvas = document.getElementById("firma-canvas");
+        const btn    = document.getElementById("btn-capturar-firma");
+
+        if (!firmaCameraStream) { alert("Activa la cámara primero."); return; }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Capturando...';
+
+        canvas.width  = video.videoWidth  || 640;
+        canvas.height = video.videoHeight || 480;
+        canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageBase64 = canvas.toDataURL("image/jpeg", 0.85);
+        document.getElementById("firma-imagen").value = imageBase64;
+
+        detenerCamaraFirma();
+        document.getElementById("firma-camera-section").style.display = "none";
+        document.getElementById("btn-capturar-firma").style.display   = "none";
+        document.getElementById("btn-repetir-firma").style.display    = "inline-flex";
+
+        const statusBox  = document.getElementById("firma-status");
+        const statusText = document.getElementById("firma-status-text");
+        statusBox.style.background = "#d1e7dd";
+        statusBox.style.borderColor = "#198754";
+        statusBox.innerHTML = `
+          <i class="bi bi-shield-check" style="font-size:1.3rem; color:#198754;"></i>
+          <span style="color:#198754; font-weight:600;">Firma capturada correctamente</span>
+          <button type="button" onclick="resetFirmaCapture()" style="
+            margin-left:auto; background:none; border:none; color:#198754;
+            cursor:pointer; font-size:0.85rem; text-decoration:underline;
+          ">Repetir</button>
+        `;
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-camera"></i> Capturar firma';
+      }
+
+      function resetFirmaCapture() {
+        detenerCamaraFirma();
+        document.getElementById("firma-imagen").value = "";
+        document.getElementById("firma-camera-section").style.display = "none";
+        document.getElementById("btn-activar-firma").style.display    = "inline-flex";
+        document.getElementById("btn-capturar-firma").style.display   = "none";
+        document.getElementById("btn-repetir-firma").style.display    = "none";
+
+        const statusBox = document.getElementById("firma-status");
+        statusBox.style.background   = "#f8f9fa";
+        statusBox.style.borderColor  = "#ced4da";
+        statusBox.innerHTML = `
+          <i class="bi bi-shield-lock" style="font-size:1.3rem; color:#6c757d;"></i>
+          <span id="firma-status-text" style="color:#6c757d; font-size:0.9rem;">
+            Se requiere tu firma facial para guardar este registro
+          </span>
+        `;
+      }
+      // ────────────────────────────────────────────────────────────────────────
 
       function closeDeleteModal() {
         console.log("Cerrando modal de eliminación");
@@ -2783,6 +2938,18 @@
           return;
         }
 
+        const firmaImagen = document.getElementById("firma-imagen").value;
+        if (!firmaImagen) {
+          messagesContainer.innerHTML = `
+                    <div class="alert-message alert-error">
+                        <i class="bi bi-shield-exclamation"></i>
+                        Se requiere firma biométrica. Activa la cámara y captura tu rostro.
+                    </div>
+                `;
+          document.getElementById("firma-status").scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+
         // Recopilar amenazas y hábitats seleccionados de los dropdowns
         const amenazasSelected =
           document.getElementById("amenazas-selected").value;
@@ -2811,6 +2978,7 @@
           imagen_url: formData.get("imagen_url") || null,
           amenazas: amenazas,
           habitats: habitats,
+          firma_imagen: firmaImagen,
         };
 
         try {

@@ -11,7 +11,7 @@ from decimal import Decimal
 
 from models import (
     get_session, Usuario, Colaborador, EspecieMarina, EstadoConservacion,
-    Producto, CategoriaProducto, Pedido, DetallePedido, CarritoCompra
+    FirmaBiometrica, Producto, CategoriaProducto, Pedido, DetallePedido, CarritoCompra
 )
 from validators import (
     validate_user_registration, validate_user_login, validate_colaborador_registration,
@@ -521,35 +521,70 @@ def register_especies_routes(app):
         finally:
             db.close()
     
+    def _verificar_firma_biometrica(data, colaborador_id, db):
+        """
+        Verifica la imagen facial del request contra el colaborador en sesión.
+        Retorna (True, colaborador) si es válido, o (False, mensaje_error).
+        """
+        from face_service import decode_base64_image, extract_face_encoding, compare_face
+        import json as _json
+
+        image_b64 = data.get('firma_imagen')
+        if not image_b64:
+            return False, 'Se requiere firma biométrica (firma_imagen)'
+
+        image_rgb = decode_base64_image(image_b64)
+        if image_rgb is None:
+            return False, 'Imagen de firma inválida'
+
+        candidate_encoding = extract_face_encoding(image_rgb)
+        if candidate_encoding is None:
+            return False, 'No se detectó un rostro en la firma'
+
+        colaborador = db.query(Colaborador).filter_by(id=colaborador_id).first()
+        if not colaborador or not colaborador.face_encoding:
+            return False, 'El colaborador no tiene rostro registrado'
+
+        if not compare_face(colaborador.face_encoding, candidate_encoding):
+            return False, 'La firma biométrica no coincide'
+
+        return True, colaborador
+
     @app.route('/api/especies', methods=['POST'])
     def create_especie_orm():
-        """Crear nueva especie (solo colaboradores autenticados)"""
-        # Verificar autenticación de colaborador
+        """Crear nueva especie con firma biométrica obligatoria"""
         if 'colab_colaborador_id' not in session:
             return jsonify({'success': False, 'error': 'No autorizado'}), 401
-        
+
         db = get_session()
         try:
             data = request.get_json()
-            
-            # Validación del lado del servidor
+
+            # Validación de datos de especie
             try:
                 validated_data = validate_especie_marina(data)
             except ValidationError as e:
                 return jsonify({'success': False, 'error': str(e)}), 400
-            
-            # Verificar que no exista especie con mismo nombre científico
+
+            # Verificar firma biométrica
+            print(f"[firma] tiene firma_imagen: {'firma_imagen' in data and bool(data.get('firma_imagen'))}")
+            valido, resultado = _verificar_firma_biometrica(data, session['colab_colaborador_id'], db)
+            print(f"[firma] POST resultado verificacion: valido={valido}, msg={resultado if not valido else 'ok'}")
+            if not valido:
+                return jsonify({'success': False, 'error': resultado}), 403
+
+            colaborador = resultado
+
+            # Verificar nombre científico duplicado
             existing = db.query(EspecieMarina).filter_by(
                 nombre_cientifico=validated_data['nombre_cientifico']
             ).first()
-            
             if existing:
-                return jsonify({
-                    'success': False,
-                    'error': 'Ya existe una especie con ese nombre científico'
-                }), 400
-            
-            # Crear nueva especie
+                return jsonify({'success': False, 'error': 'Ya existe una especie con ese nombre científico'}), 400
+
+            ahora = datetime.utcnow()
+
+            # Crear especie con firma
             nueva_especie = EspecieMarina(
                 nombre_comun=validated_data['nombre_comun'],
                 nombre_cientifico=validated_data['nombre_cientifico'],
@@ -557,19 +592,33 @@ def register_especies_routes(app):
                 esperanza_vida=validated_data.get('esperanza_vida'),
                 poblacion_estimada=validated_data.get('poblacion_estimada'),
                 id_estado_conservacion=validated_data['id_estado_conservacion'],
-                imagen_url=validated_data.get('imagen_url')
+                imagen_url=validated_data.get('imagen_url'),
+                firmado_por=colaborador.id,
+                fecha_firma=ahora
             )
-            
             db.add(nueva_especie)
+            db.flush()  # Para obtener nueva_especie.id antes del commit
+
+            # Registrar en historial de firmas
+            firma = FirmaBiometrica(
+                id_colaborador=colaborador.id,
+                tabla_afectada='Especies',
+                id_registro=nueva_especie.id,
+                accion='INSERT',
+                fecha_firma=ahora,
+                resultado=True,
+                ip_origen=request.remote_addr
+            )
+            db.add(firma)
             db.commit()
-            
+
             return jsonify({
                 'success': True,
-                'message': 'Especie creada exitosamente',
+                'message': 'Especie creada y firmada biométricamente',
                 'especie_id': nueva_especie.id
             }), 201
-            
-        except IntegrityError as e:
+
+        except IntegrityError:
             db.rollback()
             return jsonify({'success': False, 'error': 'Error de integridad de datos'}), 400
         except SQLAlchemyError as e:
@@ -578,30 +627,38 @@ def register_especies_routes(app):
             return jsonify({'success': False, 'error': 'Error al crear especie'}), 500
         finally:
             db.close()
-    
+
     @app.route('/api/especies/<int:id>', methods=['PUT'])
     def update_especie_orm(id):
-        """Actualizar especie existente"""
-        # Verificar autenticación
+        """Actualizar especie con firma biométrica obligatoria"""
         if 'colab_colaborador_id' not in session:
             return jsonify({'success': False, 'error': 'No autorizado'}), 401
-        
+
         db = get_session()
         try:
             data = request.get_json()
-            
-            # Buscar especie
+
             especie = db.query(EspecieMarina).filter_by(id=id).first()
             if not especie:
                 return jsonify({'success': False, 'error': 'Especie no encontrada'}), 404
-            
-            # Validación
+
+            # Validación de datos
             try:
                 validated_data = validate_especie_marina(data)
             except ValidationError as e:
                 return jsonify({'success': False, 'error': str(e)}), 400
-            
-            # Actualizar campos 
+
+            # Verificar firma biométrica
+            print(f"[firma] tiene firma_imagen: {'firma_imagen' in data and bool(data.get('firma_imagen'))}")
+            valido, resultado = _verificar_firma_biometrica(data, session['colab_colaborador_id'], db)
+            print(f"[firma] PUT resultado verificacion: valido={valido}, msg={resultado if not valido else 'ok'}")
+            if not valido:
+                return jsonify({'success': False, 'error': resultado}), 403
+
+            colaborador = resultado
+            ahora = datetime.utcnow()
+
+            # Actualizar campos
             especie.nombre_comun = validated_data['nombre_comun']
             especie.nombre_cientifico = validated_data['nombre_cientifico']
             especie.descripcion = validated_data.get('descripcion')
@@ -609,15 +666,28 @@ def register_especies_routes(app):
             especie.poblacion_estimada = validated_data.get('poblacion_estimada')
             especie.id_estado_conservacion = validated_data['id_estado_conservacion']
             especie.imagen_url = validated_data.get('imagen_url')
-            
+            especie.firmado_por = colaborador.id
+            especie.fecha_firma = ahora
+
+            # Registrar en historial de firmas
+            firma = FirmaBiometrica(
+                id_colaborador=colaborador.id,
+                tabla_afectada='Especies',
+                id_registro=especie.id,
+                accion='UPDATE',
+                fecha_firma=ahora,
+                resultado=True,
+                ip_origen=request.remote_addr
+            )
+            db.add(firma)
             db.commit()
-            
+
             return jsonify({
                 'success': True,
-                'message': 'Especie actualizada exitosamente'
+                'message': 'Especie actualizada y firmada biométricamente'
             })
-            
-        except IntegrityError as e:
+
+        except IntegrityError:
             db.rollback()
             return jsonify({'success': False, 'error': 'Error de integridad de datos'}), 400
         except SQLAlchemyError as e:
