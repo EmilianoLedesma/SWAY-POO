@@ -3232,46 +3232,55 @@ def create_especie():
         if not data.get('nombre_comun') or not data.get('nombre_cientifico'):
             return jsonify({'error': 'Nombre común y científico son requeridos'}), 400
 
-        # ── Verificar firma biométrica ────────────────────────────────────────
+        # ── Verificar sesión ──────────────────────────────────────────────────
         if 'colab_colaborador_id' not in session:
             return jsonify({'success': False, 'error': 'No autorizado'}), 401
 
-        from face_service import decode_base64_image, extract_face_encoding, compare_face
-        from models import get_session as orm_session, Colaborador, FirmaBiometrica
         from datetime import datetime as _dt
 
         firma_imagen = data.get('firma_imagen')
-        if not firma_imagen:
-            return jsonify({'success': False, 'error': 'Se requiere firma biométrica (firma_imagen)'}), 403
+        colaborador = None
+        db = None
 
-        image_rgb = decode_base64_image(firma_imagen)
-        if image_rgb is None:
-            return jsonify({'success': False, 'error': 'Imagen de firma inválida'}), 403
+        # Verificación biométrica solo si se envía firma_imagen (portal Flask)
+        # Web2 (React) puede crear sin biometría
+        if firma_imagen:
+            try:
+                from face_service import decode_base64_image, extract_face_encoding, compare_face
+                from models import get_session as orm_session, Colaborador, FirmaBiometrica
 
-        candidate_encoding = extract_face_encoding(image_rgb)
-        if candidate_encoding is None:
-            return jsonify({'success': False, 'error': 'No se detectó un rostro en la firma'}), 403
+                image_rgb = decode_base64_image(firma_imagen)
+                if image_rgb is None:
+                    return jsonify({'success': False, 'error': 'Imagen de firma inválida'}), 403
 
-        db = orm_session()
-        colaborador = db.query(Colaborador).filter_by(id=session['colab_colaborador_id']).first()
-        if not colaborador or not colaborador.face_encoding:
-            db.close()
-            return jsonify({'success': False, 'error': 'El colaborador no tiene rostro registrado'}), 403
+                candidate_encoding = extract_face_encoding(image_rgb)
+                if candidate_encoding is None:
+                    return jsonify({'success': False, 'error': 'No se detectó un rostro en la firma'}), 403
 
-        if not compare_face(colaborador.face_encoding, candidate_encoding):
-            db.close()
-            return jsonify({'success': False, 'error': 'La firma biométrica no coincide'}), 403
+                db = orm_session()
+                colaborador = db.query(Colaborador).filter_by(id=session['colab_colaborador_id']).first()
+                if not colaborador or not colaborador.face_encoding:
+                    db.close()
+                    return jsonify({'success': False, 'error': 'El colaborador no tiene rostro registrado'}), 403
+
+                if not compare_face(colaborador.face_encoding, candidate_encoding):
+                    db.close()
+                    return jsonify({'success': False, 'error': 'La firma biométrica no coincide'}), 403
+            except ImportError:
+                pass  # face_service no disponible, continuar sin biometría
         # ─────────────────────────────────────────────────────────────────────
 
         conn = get_db_connection()
         if not conn:
-            db.close()
+            if db:
+                db.close()
             return jsonify({'error': 'Error de conexión a la base de datos'}), 500
 
         cursor = conn.cursor()
         ahora = _dt.utcnow()
+        colaborador_id_firma = colaborador.id if colaborador else session.get('colab_colaborador_id')
 
-        # Insertar especie con firma
+        # Insertar especie
         cursor.execute("""
             INSERT INTO Especies (nombre_comun, nombre_cientifico, descripcion,
                                   esperanza_vida, poblacion_estimada, id_estado_conservacion,
@@ -3286,7 +3295,7 @@ def create_especie():
             data.get('poblacion_estimada'),
             data.get('id_estado_conservacion'),
             data.get('imagen_url'),
-            colaborador.id,
+            colaborador_id_firma,
             ahora
         ))
 
@@ -3322,25 +3331,27 @@ def create_especie():
         conn.commit()
         conn.close()
 
-        # Registrar en historial de firmas biométricas
-        try:
-            firma = FirmaBiometrica(
-                id_colaborador=colaborador.id,
-                tabla_afectada='Especies',
-                id_registro=especie_id,
-                accion='INSERT',
-                fecha_firma=ahora,
-                resultado=True,
-                ip_origen=request.remote_addr
-            )
-            db.add(firma)
-            db.commit()
-        except Exception as e:
-            print(f"[firma] Error al registrar FirmaBiometrica: {e}")
-        finally:
-            db.close()
+        # Registrar en historial de firmas biométricas (solo si hubo biometría)
+        if colaborador and db:
+            try:
+                from models import FirmaBiometrica
+                firma = FirmaBiometrica(
+                    id_colaborador=colaborador.id,
+                    tabla_afectada='Especies',
+                    id_registro=especie_id,
+                    accion='INSERT',
+                    fecha_firma=ahora,
+                    resultado=True,
+                    ip_origen=request.remote_addr
+                )
+                db.add(firma)
+                db.commit()
+            except Exception as e:
+                print(f"[firma] Error al registrar FirmaBiometrica: {e}")
+            finally:
+                db.close()
 
-        return jsonify({'success': True, 'especie_id': especie_id, 'message': 'Especie creada y firmada biométricamente'})
+        return jsonify({'success': True, 'especie_id': especie_id, 'message': 'Especie creada correctamente'})
 
     except Exception as e:
         print(f"Error en create_especie: {e}")
@@ -3355,47 +3366,55 @@ def update_especie(especie_id):
     try:
         data = request.get_json()
 
-        # ── Verificar firma biométrica ────────────────────────────────────────
+        # ── Verificar sesión ──────────────────────────────────────────────────
         if 'colab_colaborador_id' not in session:
             return jsonify({'success': False, 'error': 'No autorizado'}), 401
 
-        from face_service import decode_base64_image, extract_face_encoding, compare_face
-        from models import get_session as orm_session, Colaborador, FirmaBiometrica
-        import json as _json
         from datetime import datetime as _dt
 
         firma_imagen = data.get('firma_imagen')
-        if not firma_imagen:
-            return jsonify({'success': False, 'error': 'Se requiere firma biométrica (firma_imagen)'}), 403
+        colaborador = None
+        db = None
 
-        image_rgb = decode_base64_image(firma_imagen)
-        if image_rgb is None:
-            return jsonify({'success': False, 'error': 'Imagen de firma inválida'}), 403
+        # Verificación biométrica solo si se envía firma_imagen (portal Flask)
+        # Web2 (React) puede actualizar sin biometría
+        if firma_imagen:
+            try:
+                from face_service import decode_base64_image, extract_face_encoding, compare_face
+                from models import get_session as orm_session, Colaborador, FirmaBiometrica
 
-        candidate_encoding = extract_face_encoding(image_rgb)
-        if candidate_encoding is None:
-            return jsonify({'success': False, 'error': 'No se detectó un rostro en la firma'}), 403
+                image_rgb = decode_base64_image(firma_imagen)
+                if image_rgb is None:
+                    return jsonify({'success': False, 'error': 'Imagen de firma inválida'}), 403
 
-        db = orm_session()
-        colaborador = db.query(Colaborador).filter_by(id=session['colab_colaborador_id']).first()
-        if not colaborador or not colaborador.face_encoding:
-            db.close()
-            return jsonify({'success': False, 'error': 'El colaborador no tiene rostro registrado'}), 403
+                candidate_encoding = extract_face_encoding(image_rgb)
+                if candidate_encoding is None:
+                    return jsonify({'success': False, 'error': 'No se detectó un rostro en la firma'}), 403
 
-        if not compare_face(colaborador.face_encoding, candidate_encoding):
-            db.close()
-            return jsonify({'success': False, 'error': 'La firma biométrica no coincide'}), 403
+                db = orm_session()
+                colaborador = db.query(Colaborador).filter_by(id=session['colab_colaborador_id']).first()
+                if not colaborador or not colaborador.face_encoding:
+                    db.close()
+                    return jsonify({'success': False, 'error': 'El colaborador no tiene rostro registrado'}), 403
+
+                if not compare_face(colaborador.face_encoding, candidate_encoding):
+                    db.close()
+                    return jsonify({'success': False, 'error': 'La firma biométrica no coincide'}), 403
+            except ImportError:
+                pass  # face_service no disponible, continuar sin biometría
         # ─────────────────────────────────────────────────────────────────────
 
         conn = get_db_connection()
         if not conn:
-            db.close()
+            if db:
+                db.close()
             return jsonify({'error': 'Error de conexión a la base de datos'}), 500
 
         cursor = conn.cursor()
         ahora = _dt.utcnow()
+        colaborador_id_firma = colaborador.id if colaborador else session.get('colab_colaborador_id')
 
-        # Actualizar datos básicos de la especie + firma
+        # Actualizar datos básicos de la especie
         cursor.execute("""
             UPDATE Especies SET
                 nombre_comun = ?, nombre_cientifico = ?, descripcion = ?,
@@ -3411,7 +3430,7 @@ def update_especie(especie_id):
             data.get('poblacion_estimada'),
             data.get('id_estado_conservacion'),
             data.get('imagen_url'),
-            colaborador.id,
+            colaborador_id_firma,
             ahora,
             especie_id
         ))
@@ -3447,25 +3466,27 @@ def update_especie(especie_id):
         conn.commit()
         conn.close()
 
-        # Registrar en historial de firmas biométricas
-        try:
-            firma = FirmaBiometrica(
-                id_colaborador=colaborador.id,
-                tabla_afectada='Especies',
-                id_registro=especie_id,
-                accion='UPDATE',
-                fecha_firma=ahora,
-                resultado=True,
-                ip_origen=request.remote_addr
-            )
-            db.add(firma)
-            db.commit()
-        except Exception as e:
-            print(f"[firma] Error al registrar FirmaBiometrica: {e}")
-        finally:
-            db.close()
+        # Registrar en historial de firmas biométricas (solo si hubo biometría)
+        if colaborador and db:
+            try:
+                from models import FirmaBiometrica
+                firma = FirmaBiometrica(
+                    id_colaborador=colaborador.id,
+                    tabla_afectada='Especies',
+                    id_registro=especie_id,
+                    accion='UPDATE',
+                    fecha_firma=ahora,
+                    resultado=True,
+                    ip_origen=request.remote_addr
+                )
+                db.add(firma)
+                db.commit()
+            except Exception as e:
+                print(f"[firma] Error al registrar FirmaBiometrica: {e}")
+            finally:
+                db.close()
 
-        return jsonify({'success': True, 'message': 'Especie actualizada y firmada biométricamente'})
+        return jsonify({'success': True, 'message': 'Especie actualizada correctamente'})
 
     except Exception as e:
         print(f"Error en update_especie: {e}")
