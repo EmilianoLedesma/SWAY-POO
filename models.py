@@ -86,7 +86,6 @@ class Usuario(Base):
     password_hash = Column(String(254))
     telefono = Column(String(15))
     fecha_nacimiento = Column(Date)
-    id_direccion = Column(Integer, ForeignKey('Direcciones.id'))
     suscrito_newsletter = Column(Boolean, default=False)
     activo = Column(Boolean, default=True)
     fecha_registro = Column(DateTime, default=datetime.utcnow)
@@ -110,7 +109,8 @@ class Colaborador(Base):
     estado_solicitud = Column(String(20), default='pendiente')
     activo = Column(Boolean, default=True)
     fecha_solicitud = Column(DateTime, default=datetime.utcnow)
-    
+    face_encoding = Column(Text, nullable=True)
+
     # Relaciones
     usuario = relationship('Usuario', back_populates='colaborador')
 
@@ -145,18 +145,36 @@ class TipoAmenaza(Base):
     descripcion = Column(Text)
 
 class EspecieMarina(Base):
-    __tablename__ = 'Especies'  
+    __tablename__ = 'Especies'
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre_comun = Column(String(100), nullable=False)
     nombre_cientifico = Column(String(100), unique=True, nullable=False)
     descripcion = Column(Text)
     esperanza_vida = Column(Integer)
-    poblacion_estimada = Column(Integer)  
+    poblacion_estimada = Column(Integer)
     id_estado_conservacion = Column(Integer, ForeignKey('EstadosConservacion.id'))
-    imagen_url = Column(String(255))  
+    imagen_url = Column(String(255))
+    firmado_por = Column(Integer, ForeignKey('Colaboradores.id'), nullable=True)
+    fecha_firma = Column(DateTime, nullable=True)
 
     # Relaciones
     estado_conservacion = relationship('EstadoConservacion', back_populates='especies')
+    colaborador_firma = relationship('Colaborador', foreign_keys=[firmado_por])
+
+
+class FirmaBiometrica(Base):
+    __tablename__ = 'FirmasBiometricas'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    id_colaborador = Column(Integer, ForeignKey('Colaboradores.id'), nullable=False)
+    tabla_afectada = Column(String(100), nullable=False)
+    id_registro = Column(Integer, nullable=False)
+    accion = Column(String(50), nullable=False)
+    fecha_firma = Column(DateTime, default=datetime.utcnow)
+    resultado = Column(Boolean, nullable=False, default=True)
+    ip_origen = Column(String(45), nullable=True)
+
+    colaborador = relationship('Colaborador')
 
 class EspecieHabitat(Base):
     __tablename__ = 'EspeciesHabitats'

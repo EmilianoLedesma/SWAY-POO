@@ -20,7 +20,14 @@
       "Bash(start http://localhost:5000/tienda)",
       "Bash(explorer \"http://localhost:5000/tienda\")",
       "Bash(NUL)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "WebSearch",
+      "Bash(py:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(wc -l \"/c/Users/Emiliano/Videos/SWAY POO\"/*.sql 2>/dev/null)",
+      "Bash(ls -lh \"/c/Users/Emiliano/Videos/SWAY POO\"/*.py 2>/dev/null)",
+      "Bash(cd \"C:\\\\Users\\\\Emiliano\\\\Videos\\\\SWAY POO\\\\web2\" && npm install)",
+      "Bash(cd \"C:\\\\Users\\\\Emiliano\\\\Videos\\\\SWAY POO\\\\web2\" && npm run dev)"
     ],
     "deny": []
   }

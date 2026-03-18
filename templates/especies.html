@@ -678,7 +678,6 @@
                         </option>
                       </select>
                     </div>
-
                   </div>
 
                   <button class="btn-search w-100">
@@ -1125,7 +1124,7 @@
             <div class="col-lg-4" data-aos="fade-up">
               <div class="card success-story-card h-100">
                 <img
-                  src="https://blog.waterfronthotel.com.mx/wp-content/uploads/2022/10/P19-96036.jpg"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxKQ4u_94pBTGG5BBcRaiAPDCr-vbO2uLQTg&s"
                   class="card-img-top"
                   alt="Ballena Gris"
                 />
@@ -1567,11 +1566,7 @@
                   class="form-control-readonly"
                   placeholder="Especie será auto-rellenada"
                 />
-                <input
-                  type="hidden"
-                  id="id-especie"
-                  name="id_especie"
-                />
+                <input type="hidden" id="id-especie" name="id_especie" />
               </div>
             </div>
 
@@ -1584,7 +1579,7 @@
                   type="datetime-local"
                   id="fecha-avistamiento"
                   name="fecha_avistamiento"
-                max=""
+                  max=""
                   data-validation="fechaPasada"
                 />
               </div>
@@ -1600,7 +1595,7 @@
                   step="any"
                   id="latitud"
                   name="latitud"
-                min="-90"
+                  min="-90"
                   max="90"
                   placeholder="Ej: 20.6296"
                   data-validation="latitud"
@@ -1615,7 +1610,7 @@
                   step="any"
                   id="longitud"
                   name="longitud"
-                min="-180"
+                  min="-180"
                   max="180"
                   placeholder="Ej: -87.0739"
                   data-validation="longitud"
@@ -1649,7 +1644,7 @@
                     type="text"
                     id="nombre-usuario"
                     name="nombre_usuario"
-                minlength="2"
+                    minlength="2"
                     maxlength="50"
                     placeholder="Juan"
                     data-validation="soloTexto"
@@ -1663,7 +1658,7 @@
                     type="text"
                     id="apellido-paterno-usuario"
                     name="apellido_paterno_usuario"
-                minlength="2"
+                    minlength="2"
                     maxlength="50"
                     placeholder="Pérez"
                     data-validation="soloTexto"
@@ -1691,7 +1686,7 @@
                     type="email"
                     id="email-usuario"
                     name="email_usuario"
-                maxlength="150"
+                    maxlength="150"
                     placeholder="juan.perez@gmail.com"
                     data-validation="email"
                   />
@@ -1762,7 +1757,7 @@
                   type="email"
                   id="login-email"
                   name="email"
-                placeholder="tu@email.com"
+                  placeholder="tu@email.com"
                 />
               </div>
 
@@ -1774,7 +1769,7 @@
                   type="password"
                   id="login-password"
                   name="password"
-                placeholder="••••••••"
+                  placeholder="••••••••"
                 />
               </div>
 
@@ -1784,6 +1779,16 @@
                 </button>
               </div>
             </form>
+
+            <!-- Separador y login facial -->
+            <div style="display:flex;align-items:center;gap:1rem;margin:1rem 0;">
+              <hr style="flex:1;border-color:#ccc;" />
+              <span style="color:#888;font-size:.85rem;white-space:nowrap;">o también</span>
+              <hr style="flex:1;border-color:#ccc;" />
+            </div>
+            <button type="button" onclick="openFaceLoginModal()" style="width:100%;padding:.75rem;background:#1a3a5c;color:#fff;border:none;border-radius:6px;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;">
+              <i class="bi bi-camera-video"></i> Entrar con reconocimiento facial
+            </button>
           </div>
 
           <!-- Formulario de Registro -->
@@ -1805,7 +1810,7 @@
                       type="text"
                       id="reg-nombre"
                       name="nombre"
-                minlength="2"
+                      minlength="2"
                       maxlength="50"
                       placeholder="Juan"
                       data-validation="soloTexto"
@@ -1819,7 +1824,7 @@
                       type="text"
                       id="reg-apellido-paterno"
                       name="apellidoPaterno"
-                minlength="2"
+                      minlength="2"
                       maxlength="50"
                       placeholder="Pérez"
                       data-validation="soloTexto"
@@ -1847,7 +1852,7 @@
                       type="email"
                       id="reg-email"
                       name="email"
-                placeholder="juan.perez@universidad.edu"
+                      placeholder="juan.perez@universidad.edu"
                     />
                   </div>
                 </div>
@@ -1861,7 +1866,7 @@
                       type="password"
                       id="reg-password"
                       name="password"
-                minlength="8"
+                      minlength="8"
                       placeholder="Mínimo 8 caracteres"
                     />
                   </div>
@@ -1873,7 +1878,7 @@
                       type="password"
                       id="reg-confirm-password"
                       name="confirm_password"
-                placeholder="Repetir contraseña"
+                      placeholder="Repetir contraseña"
                     />
                   </div>
                 </div>
@@ -1889,8 +1894,7 @@
                     <label for="reg-especialidad">
                       <i class="bi bi-bookmark"></i> Especialidad *
                     </label>
-                    <select id="reg-especialidad" name="especialidad"
-                >
+                    <select id="reg-especialidad" name="especialidad">
                       <option value="">Selecciona tu especialidad</option>
                       <option value="biologia-marina">Biología Marina</option>
                       <option value="oceanografia">Oceanografía</option>
@@ -1907,10 +1911,7 @@
                     <label for="reg-grado-academico">
                       <i class="bi bi-award"></i> Grado Académico *
                     </label>
-                    <select
-                      id="reg-grado-academico"
-                      name="grado_academico"
-                >
+                    <select id="reg-grado-academico" name="grado_academico">
                       <option value="">Selecciona tu grado</option>
                       <option value="licenciatura">Licenciatura</option>
                       <option value="maestria">Maestría</option>
@@ -1929,7 +1930,7 @@
                       type="text"
                       id="reg-institucion"
                       name="institucion"
-                maxlength="200"
+                      maxlength="200"
                       placeholder="Universidad o Centro de Investigación"
                     />
                   </div>
@@ -1941,7 +1942,7 @@
                       type="number"
                       id="reg-anos-experiencia"
                       name="años_experiencia"
-                min="0"
+                      min="0"
                       max="100"
                       placeholder="Ingresa tus años de experiencia (0-100)"
                     />
@@ -1986,7 +1987,7 @@
                     id="reg-motivacion"
                     name="motivacion"
                     rows="4"
-                minlength="50"
+                    minlength="50"
                     maxlength="500"
                     placeholder="Describe tu motivación para colaborar en el proyecto y tu experiencia relevante en especies marinas..."
                   ></textarea>
@@ -1996,8 +1997,7 @@
 
               <div class="terms-section">
                 <label class="checkbox-container">
-                  <input type="checkbox" id="reg-terms" name="terms"
-                />
+                  <input type="checkbox" id="reg-terms" name="terms" />
                   <span class="checkmark"></span>
                   <span class="terms-text">
                     Acepto los
@@ -2378,7 +2378,11 @@
             "Los años de experiencia son obligatorios"
           );
           isValid = false;
-        } else if (isNaN(valorAnosExperiencia) || valorAnosExperiencia < 0 || valorAnosExperiencia > 100) {
+        } else if (
+          isNaN(valorAnosExperiencia) ||
+          valorAnosExperiencia < 0 ||
+          valorAnosExperiencia > 100
+        ) {
           validacionesSway.mostrarError(
             anosExperiencia,
             "Los años de experiencia deben ser un número entre 0 y 100"
@@ -2568,7 +2572,12 @@
             // Limpiar error mientras escribe
             anosExp.addEventListener("input", function () {
               const valor = parseInt(this.value);
-              if (this.value.trim() && !isNaN(valor) && valor >= 0 && valor <= 100) {
+              if (
+                this.value.trim() &&
+                !isNaN(valor) &&
+                valor >= 0 &&
+                valor <= 100
+              ) {
                 validacionesSway.mostrarExito(this);
               }
             });
@@ -2777,6 +2786,103 @@
         console.log("Testing modal with tab:", tab);
         openCollaboratorModal(null, tab);
       };
+    </script>
+
+    <!-- =============================================
+         MODAL DE RECONOCIMIENTO FACIAL (LOGIN)
+         ============================================= -->
+    <div id="face-login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:10000;justify-content:center;align-items:center;">
+      <div style="background:#fff;border-radius:10px;padding:2rem;width:360px;max-width:95vw;text-align:center;position:relative;">
+        <button onclick="closeFaceLoginModal()" style="position:absolute;top:.75rem;right:1rem;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#555;">&times;</button>
+        <h3 style="margin-bottom:.5rem;color:#1a3a5c;"><i class="bi bi-camera-video"></i> Reconocimiento Facial</h3>
+        <p style="color:#666;font-size:.85rem;margin-bottom:1rem;">Centra tu rostro y presiona Capturar</p>
+
+        <div id="face-login-alert" style="display:none;padding:.6rem 1rem;border-radius:5px;margin-bottom:1rem;font-size:.85rem;"></div>
+
+        <div style="border:2px solid #1a3a5c;border-radius:8px;overflow:hidden;margin-bottom:1rem;">
+          <video id="face-login-video" width="320" height="240" autoplay playsinline muted style="display:block;"></video>
+        </div>
+        <canvas id="face-login-canvas" width="320" height="240" style="display:none;"></canvas>
+
+        <div style="display:flex;gap:.75rem;justify-content:center;">
+          <button onclick="activarCamaraFaceLogin()" style="padding:.6rem 1.2rem;background:#1a3a5c;color:#fff;border:none;border-radius:6px;cursor:pointer;">
+            <i class="bi bi-camera"></i> Activar cámara
+          </button>
+          <button onclick="capturarFaceLogin()" style="padding:.6rem 1.2rem;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;">
+            <i class="bi bi-check-circle"></i> Capturar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let faceLoginStream = null;
+
+      function openFaceLoginModal() {
+        document.getElementById('face-login-modal').style.display = 'flex';
+        document.getElementById('face-login-alert').style.display = 'none';
+      }
+
+      function closeFaceLoginModal() {
+        document.getElementById('face-login-modal').style.display = 'none';
+        if (faceLoginStream) {
+          faceLoginStream.getTracks().forEach(t => t.stop());
+          faceLoginStream = null;
+        }
+      }
+
+      async function activarCamaraFaceLogin() {
+        try {
+          faceLoginStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          document.getElementById('face-login-video').srcObject = faceLoginStream;
+          mostrarAlertaFaceLogin('Cámara activa. Centra tu rostro y presiona Capturar.', '#1a3a5c');
+        } catch (err) {
+          mostrarAlertaFaceLogin('No se pudo acceder a la cámara: ' + err.message, '#dc3545');
+        }
+      }
+
+      async function capturarFaceLogin() {
+        const video = document.getElementById('face-login-video');
+        const canvas = document.getElementById('face-login-canvas');
+        if (!faceLoginStream) {
+          mostrarAlertaFaceLogin('Primero activa la cámara.', '#dc3545');
+          return;
+        }
+        canvas.getContext('2d').drawImage(video, 0, 0, 320, 240);
+        const imageBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+        mostrarAlertaFaceLogin('Verificando...', '#888');
+
+        try {
+          const res = await fetch('/api/colaboradores/login-face', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: imageBase64 })
+          });
+          const data = await res.json();
+          if (data.success) {
+            mostrarAlertaFaceLogin('Bienvenido/a, ' + data.colaborador.nombre + '!', '#28a745');
+            setTimeout(() => { window.location.href = '/portal-colaboradores'; }, 1000);
+          } else {
+            mostrarAlertaFaceLogin(data.error || 'Rostro no reconocido', '#dc3545');
+          }
+        } catch (e) {
+          mostrarAlertaFaceLogin('Error de conexión.', '#dc3545');
+        }
+      }
+
+      function mostrarAlertaFaceLogin(msg, color) {
+        const el = document.getElementById('face-login-alert');
+        el.textContent = msg;
+        el.style.background = color + '22';
+        el.style.color = color;
+        el.style.border = '1px solid ' + color;
+        el.style.display = 'block';
+      }
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeFaceLoginModal();
+      });
     </script>
   </body>
 </html>

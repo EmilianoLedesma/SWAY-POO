@@ -3224,26 +3224,69 @@ def get_especie(especie_id):
 
 @app.route('/api/especies', methods=['POST'])
 def create_especie():
-    """Crear nueva especie"""
+    """Crear nueva especie con firma biométrica obligatoria"""
     try:
         data = request.get_json()
-        
+
         # Validar datos requeridos
         if not data.get('nombre_comun') or not data.get('nombre_cientifico'):
             return jsonify({'error': 'Nombre común y científico son requeridos'}), 400
-        
+
+        # ── Verificar sesión ──────────────────────────────────────────────────
+        if 'colab_colaborador_id' not in session:
+            return jsonify({'success': False, 'error': 'No autorizado'}), 401
+
+        from datetime import datetime as _dt
+
+        firma_imagen = data.get('firma_imagen')
+        colaborador = None
+        db = None
+
+        # Verificación biométrica solo si se envía firma_imagen (portal Flask)
+        # Web2 (React) puede crear sin biometría
+        if firma_imagen:
+            try:
+                from face_service import decode_base64_image, extract_face_encoding, compare_face
+                from models import get_session as orm_session, Colaborador, FirmaBiometrica
+
+                image_rgb = decode_base64_image(firma_imagen)
+                if image_rgb is None:
+                    return jsonify({'success': False, 'error': 'Imagen de firma inválida'}), 403
+
+                candidate_encoding = extract_face_encoding(image_rgb)
+                if candidate_encoding is None:
+                    return jsonify({'success': False, 'error': 'No se detectó un rostro en la firma'}), 403
+
+                db = orm_session()
+                colaborador = db.query(Colaborador).filter_by(id=session['colab_colaborador_id']).first()
+                if not colaborador or not colaborador.face_encoding:
+                    db.close()
+                    return jsonify({'success': False, 'error': 'El colaborador no tiene rostro registrado'}), 403
+
+                if not compare_face(colaborador.face_encoding, candidate_encoding):
+                    db.close()
+                    return jsonify({'success': False, 'error': 'La firma biométrica no coincide'}), 403
+            except ImportError:
+                pass  # face_service no disponible, continuar sin biometría
+        # ─────────────────────────────────────────────────────────────────────
+
         conn = get_db_connection()
         if not conn:
+            if db:
+                db.close()
             return jsonify({'error': 'Error de conexión a la base de datos'}), 500
-        
+
         cursor = conn.cursor()
-        
+        ahora = _dt.utcnow()
+        colaborador_id_firma = colaborador.id if colaborador else session.get('colab_colaborador_id')
+
         # Insertar especie
         cursor.execute("""
-            INSERT INTO Especies (nombre_comun, nombre_cientifico, descripcion, 
-                                esperanza_vida, poblacion_estimada, id_estado_conservacion, imagen_url)
+            INSERT INTO Especies (nombre_comun, nombre_cientifico, descripcion,
+                                  esperanza_vida, poblacion_estimada, id_estado_conservacion,
+                                  imagen_url, firmado_por, fecha_firma)
             OUTPUT INSERTED.id
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             data['nombre_comun'],
             data['nombre_cientifico'],
@@ -3251,45 +3294,65 @@ def create_especie():
             data.get('esperanza_vida'),
             data.get('poblacion_estimada'),
             data.get('id_estado_conservacion'),
-            data.get('imagen_url')
+            data.get('imagen_url'),
+            colaborador_id_firma,
+            ahora
         ))
-        
+
         especie_result = cursor.fetchone()
         if not especie_result:
             raise Exception("No se pudo obtener el ID de la especie creada")
         especie_id = especie_result[0]
-        
-        # Insertar amenazas asociadas - Validar que no sean NULL o vacías
+
+        # Insertar amenazas asociadas
         if data.get('amenazas') and isinstance(data['amenazas'], list):
             for amenaza_id in data['amenazas']:
                 if amenaza_id and str(amenaza_id).strip() and str(amenaza_id) != 'null':
                     try:
-                        amenaza_id_int = int(amenaza_id)
-                        cursor.execute("""
-                            INSERT INTO EspeciesAmenazas (id_especie, id_amenaza) VALUES (?, ?)
-                        """, (especie_id, amenaza_id_int))
+                        cursor.execute(
+                            "INSERT INTO EspeciesAmenazas (id_especie, id_amenaza) VALUES (?, ?)",
+                            (especie_id, int(amenaza_id))
+                        )
                     except (ValueError, TypeError):
-                        print(f"ID de amenaza inválido ignorado: {amenaza_id}")
                         continue
-        
-        # Insertar hábitats asociados - Validar que no sean NULL or vacías
+
+        # Insertar hábitats asociados
         if data.get('habitats') and isinstance(data['habitats'], list):
             for habitat_id in data['habitats']:
                 if habitat_id and str(habitat_id).strip() and str(habitat_id) != 'null':
                     try:
-                        habitat_id_int = int(habitat_id)
-                        cursor.execute("""
-                            INSERT INTO EspeciesHabitats (id_especie, id_habitat) VALUES (?, ?)
-                        """, (especie_id, habitat_id_int))
+                        cursor.execute(
+                            "INSERT INTO EspeciesHabitats (id_especie, id_habitat) VALUES (?, ?)",
+                            (especie_id, int(habitat_id))
+                        )
                     except (ValueError, TypeError):
-                        print(f"ID de hábitat inválido ignorado: {habitat_id}")
                         continue
-        
+
         conn.commit()
         conn.close()
-        
-        return jsonify({'success': True, 'especie_id': especie_id})
-        
+
+        # Registrar en historial de firmas biométricas (solo si hubo biometría)
+        if colaborador and db:
+            try:
+                from models import FirmaBiometrica
+                firma = FirmaBiometrica(
+                    id_colaborador=colaborador.id,
+                    tabla_afectada='Especies',
+                    id_registro=especie_id,
+                    accion='INSERT',
+                    fecha_firma=ahora,
+                    resultado=True,
+                    ip_origen=request.remote_addr
+                )
+                db.add(firma)
+                db.commit()
+            except Exception as e:
+                print(f"[firma] Error al registrar FirmaBiometrica: {e}")
+            finally:
+                db.close()
+
+        return jsonify({'success': True, 'especie_id': especie_id, 'message': 'Especie creada correctamente'})
+
     except Exception as e:
         print(f"Error en create_especie: {e}")
         if 'conn' in locals():
@@ -3299,22 +3362,65 @@ def create_especie():
 
 @app.route('/api/especies/<int:especie_id>', methods=['PUT'])
 def update_especie(especie_id):
-    """Actualizar especie existente"""
+    """Actualizar especie existente con firma biométrica obligatoria"""
     try:
         data = request.get_json()
-        
+
+        # ── Verificar sesión ──────────────────────────────────────────────────
+        if 'colab_colaborador_id' not in session:
+            return jsonify({'success': False, 'error': 'No autorizado'}), 401
+
+        from datetime import datetime as _dt
+
+        firma_imagen = data.get('firma_imagen')
+        colaborador = None
+        db = None
+
+        # Verificación biométrica solo si se envía firma_imagen (portal Flask)
+        # Web2 (React) puede actualizar sin biometría
+        if firma_imagen:
+            try:
+                from face_service import decode_base64_image, extract_face_encoding, compare_face
+                from models import get_session as orm_session, Colaborador, FirmaBiometrica
+
+                image_rgb = decode_base64_image(firma_imagen)
+                if image_rgb is None:
+                    return jsonify({'success': False, 'error': 'Imagen de firma inválida'}), 403
+
+                candidate_encoding = extract_face_encoding(image_rgb)
+                if candidate_encoding is None:
+                    return jsonify({'success': False, 'error': 'No se detectó un rostro en la firma'}), 403
+
+                db = orm_session()
+                colaborador = db.query(Colaborador).filter_by(id=session['colab_colaborador_id']).first()
+                if not colaborador or not colaborador.face_encoding:
+                    db.close()
+                    return jsonify({'success': False, 'error': 'El colaborador no tiene rostro registrado'}), 403
+
+                if not compare_face(colaborador.face_encoding, candidate_encoding):
+                    db.close()
+                    return jsonify({'success': False, 'error': 'La firma biométrica no coincide'}), 403
+            except ImportError:
+                pass  # face_service no disponible, continuar sin biometría
+        # ─────────────────────────────────────────────────────────────────────
+
         conn = get_db_connection()
         if not conn:
+            if db:
+                db.close()
             return jsonify({'error': 'Error de conexión a la base de datos'}), 500
-        
+
         cursor = conn.cursor()
-        
+        ahora = _dt.utcnow()
+        colaborador_id_firma = colaborador.id if colaborador else session.get('colab_colaborador_id')
+
         # Actualizar datos básicos de la especie
         cursor.execute("""
-            UPDATE Especies SET 
+            UPDATE Especies SET
                 nombre_comun = ?, nombre_cientifico = ?, descripcion = ?,
-                esperanza_vida = ?, poblacion_estimada = ?, 
-                id_estado_conservacion = ?, imagen_url = ?
+                esperanza_vida = ?, poblacion_estimada = ?,
+                id_estado_conservacion = ?, imagen_url = ?,
+                firmado_por = ?, fecha_firma = ?
             WHERE id = ?
         """, (
             data['nombre_comun'],
@@ -3324,44 +3430,64 @@ def update_especie(especie_id):
             data.get('poblacion_estimada'),
             data.get('id_estado_conservacion'),
             data.get('imagen_url'),
+            colaborador_id_firma,
+            ahora,
             especie_id
         ))
-        
+
         # Eliminar relaciones existentes
         cursor.execute("DELETE FROM EspeciesAmenazas WHERE id_especie = ?", (especie_id,))
         cursor.execute("DELETE FROM EspeciesHabitats WHERE id_especie = ?", (especie_id,))
-        
-        # Insertar nuevas amenazas - Validar que no sean NULL o vacías
+
+        # Insertar nuevas amenazas
         if data.get('amenazas') and isinstance(data['amenazas'], list):
             for amenaza_id in data['amenazas']:
                 if amenaza_id and str(amenaza_id).strip() and str(amenaza_id) != 'null':
                     try:
-                        amenaza_id_int = int(amenaza_id)
-                        cursor.execute("""
-                            INSERT INTO EspeciesAmenazas (id_especie, id_amenaza) VALUES (?, ?)
-                        """, (especie_id, amenaza_id_int))
+                        cursor.execute(
+                            "INSERT INTO EspeciesAmenazas (id_especie, id_amenaza) VALUES (?, ?)",
+                            (especie_id, int(amenaza_id))
+                        )
                     except (ValueError, TypeError):
-                        print(f"ID de amenaza inválido ignorado: {amenaza_id}")
                         continue
-        
-        # Insertar nuevos hábitats - Validar que no sean NULL o vacías
+
+        # Insertar nuevos hábitats
         if data.get('habitats') and isinstance(data['habitats'], list):
             for habitat_id in data['habitats']:
                 if habitat_id and str(habitat_id).strip() and str(habitat_id) != 'null':
                     try:
-                        habitat_id_int = int(habitat_id)
-                        cursor.execute("""
-                            INSERT INTO EspeciesHabitats (id_especie, id_habitat) VALUES (?, ?)
-                        """, (especie_id, habitat_id_int))
+                        cursor.execute(
+                            "INSERT INTO EspeciesHabitats (id_especie, id_habitat) VALUES (?, ?)",
+                            (especie_id, int(habitat_id))
+                        )
                     except (ValueError, TypeError):
-                        print(f"ID de hábitat inválido ignorado: {habitat_id}")
                         continue
-        
+
         conn.commit()
         conn.close()
-        
-        return jsonify({'success': True})
-        
+
+        # Registrar en historial de firmas biométricas (solo si hubo biometría)
+        if colaborador and db:
+            try:
+                from models import FirmaBiometrica
+                firma = FirmaBiometrica(
+                    id_colaborador=colaborador.id,
+                    tabla_afectada='Especies',
+                    id_registro=especie_id,
+                    accion='UPDATE',
+                    fecha_firma=ahora,
+                    resultado=True,
+                    ip_origen=request.remote_addr
+                )
+                db.add(firma)
+                db.commit()
+            except Exception as e:
+                print(f"[firma] Error al registrar FirmaBiometrica: {e}")
+            finally:
+                db.close()
+
+        return jsonify({'success': True, 'message': 'Especie actualizada correctamente'})
+
     except Exception as e:
         print(f"Error en update_especie: {e}")
         if 'conn' in locals():
