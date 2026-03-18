@@ -13,7 +13,8 @@
 9. [Por qué "desacoplado"](#9-por-qué-desacoplado)
 10. [Autenticación compartida entre Web 1 y Web 2](#10-autenticación-compartida-entre-web-1-y-web-2)
 11. [El problema del CORS y cómo se resuelve](#11-el-problema-del-cors-y-cómo-se-resuelve)
-12. [Resumen visual](#12-resumen-visual)
+12. [Separación interna con Flask Blueprints](#12-separación-interna-con-flask-blueprints)
+13. [Resumen visual](#13-resumen-visual)
 
 ---
 
@@ -86,7 +87,7 @@ Esto significa que si mañana se decide cambiar de SQL Server a PostgreSQL o Mon
 
 ## 4. Capa 2 — La API
 
-Definida en `app.py`, es el **corazón del sistema**. Su única función es recibir peticiones HTTP, ejecutar lógica de negocio, hablar con la BD y devolver JSON.
+Definida en los módulos de `blueprints/api/`, es el **corazón del sistema**. Su única función es recibir peticiones HTTP, ejecutar lógica de negocio, hablar con la BD y devolver JSON. `app.py` solo la inicializa y registra — no contiene lógica de negocio.
 
 ### Endpoints principales
 
@@ -153,13 +154,19 @@ Y ante un error, como `PUT /api/especies/999`:
 
 Con código HTTP `404`. El cliente lee ese código para saber si la operación tuvo éxito o no.
 
-### Cómo se define un endpoint en Flask
+### Cómo se define un endpoint en Flask (blueprints/api/especies.py)
 
 ```python
-@app.route('/api/especies/<int:especie_id>', methods=['PUT'])
+# blueprints/api/especies.py
+from flask import Blueprint, request, jsonify, session
+from db import get_db_connection
+
+especies_bp = Blueprint('especies', __name__)
+
+@especies_bp.route('/api/especies/<int:especie_id>', methods=['PUT'])
 def update_especie(especie_id):
     # 1. Verificar que el usuario está autenticado
-    if 'colaborador_id' not in session:
+    if 'colab_colaborador_id' not in session:
         return jsonify({'error': 'No autenticado'}), 401
 
     # 2. Leer el cuerpo JSON de la petición
@@ -177,12 +184,13 @@ def update_especie(especie_id):
         (data['nombre_comun'], data['nombre_cientifico'], especie_id)
     )
     conn.commit()
+    conn.close()
 
     # 5. Responder con JSON
     return jsonify({'success': True, 'message': 'Especie actualizada'})
 ```
 
-Flask no sabe ni le importa si quien hizo esa petición fue Web 1, Web 2, una app móvil o Postman. Solo lee el JSON que llega y responde con JSON.
+Flask no sabe ni le importa si quien hizo esa petición fue Web 1, Web 2, una app móvil o Postman. Solo lee el JSON que llega y responde con JSON. El blueprint tampoco sabe que existe Web 2 — solo conoce el contrato HTTP.
 
 ---
 
@@ -413,7 +421,7 @@ Cada flecha representa una petición HTTP estándar — el mismo mecanismo que u
    La redirige a http://localhost:5000/api/especies/1
    (Evita el error de CORS entre puertos 5173 y 5000)
 
-8. FLASK API (app.py → update_especie)
+8. FLASK API (blueprints/api/especies.py → update_especie)
    Verifica que session['colaborador_id'] existe
    Lee el JSON del cuerpo de la petición
    Valida los datos
@@ -541,30 +549,205 @@ En producción no existe el proxy de Vite. La solución habitual es:
 
 ---
 
-## 12. Resumen visual
+## 12. Separación interna con Flask Blueprints
+
+### El problema original
+
+Durante el desarrollo inicial, todo el código de la API y de Web 1 vivía en un solo archivo `app.py` de **3899 líneas**. Arquitecturalmente las capas existían en concepto, pero físicamente estaban mezcladas:
+
+```
+app.py (3899 líneas)
+├── @app.route('/')                    ← página Web 1
+├── @app.route('/tienda')              ← página Web 1
+├── @app.route('/api/especies')        ← API
+├── @app.route('/api/colaboradores/login') ← API
+├── ... 70+ rutas más sin orden claro
+```
+
+Esto generaba un problema de credibilidad: cualquier evaluador que abriera el código podía señalar que la API y Web 1 no estaban realmente separadas — compartían el mismo archivo, las mismas variables globales y el mismo espacio de nombres.
+
+---
+
+### La solución: Flask Blueprints
+
+Un **Blueprint** es un mecanismo de Flask para agrupar rutas relacionadas en módulos independientes que luego se registran en la aplicación principal. Funciona exactamente igual que `@app.route(...)`, pero en lugar de `app` se usa el nombre del blueprint:
+
+```python
+# Antes — todo en app.py
+@app.route('/api/especies', methods=['GET'])
+def get_especies():
+    return jsonify(...)
+
+# Después — en blueprints/api/especies.py
+from flask import Blueprint
+especies_bp = Blueprint('especies', __name__)
+
+@especies_bp.route('/api/especies', methods=['GET'])
+def get_especies():
+    return jsonify(...)  # código idéntico
+```
+
+Y en `app.py` solo se registran:
+
+```python
+from blueprints.api.especies import especies_bp
+app.register_blueprint(especies_bp)
+```
+
+El comportamiento es **100% idéntico** para el navegador y para Web 2. Las URLs no cambian. Los clientes no notan ninguna diferencia.
+
+---
+
+### Estructura resultante
+
+```
+SWAY POO/
+│
+├── app.py                        (100 líneas — solo config + registro)
+├── db.py                         (helpers de BD compartidos)
+│
+├── blueprints/
+│   └── api/
+│       ├── especies.py           /api/especies/* — CRUD completo
+│       ├── colaboradores.py      /api/colaboradores/* — autenticación
+│       ├── auth.py               /api/user/*, /api/auth/*
+│       ├── pedidos.py            /api/pedidos/*, /api/carrito/*
+│       ├── productos.py          /api/productos, /api/producto/*
+│       ├── eventos.py            /api/eventos/*
+│       ├── estadisticas.py       /api/estadisticas, /api/avistamientos
+│       ├── direcciones.py        /api/direcciones/*
+│       └── catalogos.py          /api/newsletter, /api/contacto, etc.
+│
+├── templates/                    sin cambios
+├── static/                       sin cambios
+└── web2/                         sin cambios
+```
+
+Las rutas de páginas HTML de Web 1 se mantienen directamente en `app.py` (sin blueprint) por una razón técnica: los templates Jinja2 usan `url_for('nombre_funcion')` para generar URLs. Si las rutas estuvieran en un blueprint llamado `web`, Flask requeriría `url_for('web.nombre_funcion')`, lo que obligaría a modificar los 11 templates existentes. Mantenerlas en `app.py` preserva la compatibilidad sin cambios innecesarios.
+
+---
+
+### app.py antes y después
+
+**Antes (3899 líneas):**
+```python
+from flask import Flask, ...
+app = Flask(__name__)
+
+# Mezclado sin orden:
+@app.route('/')              # Web 1
+def index(): ...
+
+@app.route('/api/especies')  # API
+def get_especies(): ...
+
+@app.route('/tienda')        # Web 1
+def tienda(): ...
+
+@app.route('/api/pedidos/crear')  # API
+def crear_pedido(): ...
+
+# ... 3800 líneas más
+```
+
+**Después (100 líneas):**
+```python
+from flask import Flask, render_template, send_from_directory
+from flask_cors import CORS
+import os
+
+app = Flask(__name__, static_folder='assets', static_url_path='/static')
+app.secret_key = os.environ.get('SECRET_KEY', '...')
+CORS(app, supports_credentials=True)
+
+# Páginas Web 1 (13 rutas simples)
+@app.route('/')
+def index():
+    return render_template('index.html')
+# ... 12 rutas más idénticas
+
+# API — registrada desde blueprints
+from blueprints.api.especies      import especies_bp
+from blueprints.api.colaboradores import colaboradores_bp
+from blueprints.api.pedidos       import pedidos_bp
+# ... resto de blueprints
+
+app.register_blueprint(especies_bp)
+app.register_blueprint(colaboradores_bp)
+app.register_blueprint(pedidos_bp)
+# ...
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
+```
+
+---
+
+### Qué cambia y qué no cambia
+
+| Aspecto | Antes | Después |
+|---------|-------|---------|
+| Comportamiento del servidor | Idéntico | Idéntico |
+| URLs de la API | Idénticas | Idénticas |
+| Respuestas JSON | Idénticas | Idénticas |
+| Web 2 (React) | Funciona igual | Funciona igual |
+| Tamaño de app.py | 3899 líneas | 100 líneas |
+| Organización del código | Un solo archivo mezclado | 9 módulos temáticos |
+| Separación visible API / Web 1 | Solo conceptual | Física y estructural |
+
+---
+
+### Por qué esto refuerza el requisito de arquitectura desacoplada
+
+El requisito evalúa que exista una **separación real** entre las capas del sistema. Con todo en `app.py`, la separación era solo nominal — la API y Web 1 compartían el mismo archivo, las mismas importaciones y el mismo espacio de ejecución.
+
+Con blueprints, la separación es **estructuralmente demostrable**:
+
+- Abrir `blueprints/api/` muestra todos los endpoints de la API como módulos independientes
+- Cada módulo importa solo lo que necesita (`from db import get_db_connection`)
+- Ningún blueprint de API importa código de otro blueprint de API
+- Web 1 (rutas de páginas) y la API (rutas JSON) están en lugares distintos del proyecto
+
+Si el día de mañana se quisiera extraer la API a un proyecto Python completamente separado, el trabajo sería mover los archivos de `blueprints/api/` y `db.py` — nada más.
+
+---
+
+## 13. Resumen visual
 
 ```
 NAVEGADOR DEL USUARIO
 │
 ├── Abre localhost:5000/especies (Web 1)
 │     │
-│     └── Flask devuelve HTML (template Jinja2)
+│     └── Flask (app.py) devuelve HTML (template Jinja2)
 │           └── El HTML contiene JS que llama a /api/especies
-│                 └── Flask responde JSON → JS renderiza las tarjetas
+│                 └── Flask (blueprints/api/especies.py) responde JSON
+│                       └── JS renderiza las tarjetas en el DOM
 │
 └── Abre localhost:5173 (Web 2 — React)
       │
       └── Vite devuelve index.html + bundle JS
             └── React se monta, llama a /api/especies (via proxy Vite)
-                  └── Flask responde JSON → React renderiza componentes
+                  └── Flask (blueprints/api/especies.py) responde JSON
+                        └── React renderiza componentes
 
 
 SERVIDOR (mismo proceso Python)
 │
 ├── Puerto 5000 — Flask
-│     ├── Sirve páginas HTML (Web 1) → GET /especies, /tienda, /login...
-│     └── Sirve la API (JSON)        → GET /api/especies, POST /api/colaboradores/login...
-│           └── SQLAlchemy + pyodbc → SQL Server
+│     │
+│     ├── app.py — Inicialización + páginas Web 1
+│     │     ├── GET /          → index.html
+│     │     ├── GET /especies  → especies.html
+│     │     └── GET /tienda    → tienda.html  (etc.)
+│     │
+│     └── blueprints/api/ — API REST (JSON)
+│           ├── especies.py      → GET/POST/PUT/DELETE /api/especies
+│           ├── colaboradores.py → POST /api/colaboradores/login, etc.
+│           ├── pedidos.py       → POST /api/pedidos/crear, etc.
+│           ├── productos.py     → GET /api/productos, etc.
+│           └── ...              → 73 endpoints en total
+│                 └── db.py → get_db_connection() → SQL Server
 │
 └── Puerto 5173 — Vite (solo en desarrollo)
       └── Sirve archivos estáticos de React (JS, CSS, HTML)

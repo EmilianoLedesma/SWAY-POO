@@ -70,7 +70,7 @@ export default function Portal() {
   if (loading) {
     return (
       <div className="portal-loading">
-        <div className="loading-logo-mark">S</div>
+        <div className="loading-mark">SWAY</div>
         <p className="loading-text">Cargando portal científico…</p>
       </div>
     )
@@ -139,6 +139,8 @@ export default function Portal() {
         <Navbar
           title={activeView === 'especies' ? 'Especies Marinas' : 'Reportes de Avistamientos'}
           onCreateEspecie={activeView === 'especies' ? () => setModal({ open: true, especie: null }) : null}
+          initials={initials}
+          onLogout={handleLogout}
         />
 
         <div className="portal-content">

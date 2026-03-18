@@ -24,6 +24,12 @@ export default function AvistamientosList({ avistamientos }) {
 
   return (
     <div>
+      <div style={{ marginBottom: 4 }}>
+        <p className="section-eyebrow">Datos de campo</p>
+        <h2 className="section-headline">Avistamientos</h2>
+        <p className="section-sub">Historial de reportes ordenados cronológicamente.</p>
+      </div>
+
       <div className="avistamientos-header">
         <span className="count-pill">
           {avistamientos.length} {avistamientos.length === 1 ? 'registro' : 'registros'}

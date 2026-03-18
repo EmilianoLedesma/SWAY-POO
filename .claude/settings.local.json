@@ -27,7 +27,9 @@
       "Bash(wc -l \"/c/Users/Emiliano/Videos/SWAY POO\"/*.sql 2>/dev/null)",
       "Bash(ls -lh \"/c/Users/Emiliano/Videos/SWAY POO\"/*.py 2>/dev/null)",
       "Bash(cd \"C:\\\\Users\\\\Emiliano\\\\Videos\\\\SWAY POO\\\\web2\" && npm install)",
-      "Bash(cd \"C:\\\\Users\\\\Emiliano\\\\Videos\\\\SWAY POO\\\\web2\" && npm run dev)"
+      "Bash(cd \"C:\\\\Users\\\\Emiliano\\\\Videos\\\\SWAY POO\\\\web2\" && npm run dev)",
+      "Bash(wc:*)",
+      "Bash(python -c \":*)"
     ],
     "deny": []
   }

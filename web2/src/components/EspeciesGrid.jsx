@@ -1,13 +1,13 @@
 const STATUS_CODES = [
-  { keys: ['extinto', 'extincion', 'extinción'],                              code: 'EX', color: '#ff3b30', bg: '#fff0ef' },
-  { keys: ['crítico', 'critico', 'critical'],                                 code: 'CR', color: '#ff6b35', bg: '#fff3ef' },
-  { keys: ['peligro', 'endangered', 'danger'],                                code: 'EN', color: '#ff9500', bg: '#fff6e5' },
-  { keys: ['vulnerable'],                                                      code: 'VU', color: '#f59e0b', bg: '#fffbeb' },
-  { keys: ['casi', 'near', 'amenazado'],                                       code: 'NT', color: '#5ac8fa', bg: '#eaf8ff' },
-  { keys: ['preocupacion', 'preocupación', 'menor', 'least', 'concern'],      code: 'LC', color: '#34c759', bg: '#edfaf2' },
+  { keys: ['extinto', 'extincion', 'extinción'],                              code: 'EX', color: '#ff3b30', bg: 'rgba(255,59,48,0.14)' },
+  { keys: ['crítico', 'critico', 'critical'],                                 code: 'CR', color: '#ff6b35', bg: 'rgba(255,107,53,0.14)' },
+  { keys: ['peligro', 'endangered', 'danger'],                                code: 'EN', color: '#ff9500', bg: 'rgba(255,149,0,0.14)' },
+  { keys: ['vulnerable'],                                                      code: 'VU', color: '#f59e0b', bg: 'rgba(245,158,11,0.14)' },
+  { keys: ['casi', 'near', 'amenazado'],                                       code: 'NT', color: '#5ac8fa', bg: 'rgba(90,200,250,0.18)' },
+  { keys: ['preocupacion', 'preocupación', 'menor', 'least', 'concern'],      code: 'LC', color: '#34c759', bg: 'rgba(52,199,89,0.14)' },
 ]
 
-const DEFAULT_BADGE = { code: '??', color: '#aeaeb2', bg: '#f5f5f7' }
+const DEFAULT_BADGE = { code: '??', color: '#aeaeb2', bg: 'rgba(174,174,178,0.16)' }
 
 function getStatusBadge(name) {
   if (!name) return DEFAULT_BADGE
@@ -21,7 +21,7 @@ function getStatusBadge(name) {
 function PlaceholderPhoto() {
   return (
     <div className="card-photo-placeholder">
-      <svg viewBox="0 0 64 64" fill="none" stroke="rgba(0,81,168,0.22)" strokeWidth="1.2" width="52" height="52">
+      <svg viewBox="0 0 64 64" fill="none" stroke="rgba(55,81,126,0.25)" strokeWidth="1.2" width="54" height="54">
         <path d="M8 32s6-14 24-14 24 14 24 14-6 14-24 14S8 32 8 32z" />
         <circle cx="32" cy="32" r="8" />
         <circle cx="32" cy="32" r="2" />
@@ -89,7 +89,7 @@ export default function EspeciesGrid({ especies, onEdit, onDelete }) {
   if (especies.length === 0) {
     return (
       <div className="empty-state">
-        <svg viewBox="0 0 64 64" fill="none" stroke="rgba(0,81,168,0.2)" strokeWidth="1.2" width="64" height="64">
+        <svg viewBox="0 0 64 64" fill="none" stroke="rgba(55,81,126,0.2)" strokeWidth="1.2" width="64" height="64">
           <path d="M8 32s6-14 24-14 24 14 24 14-6 14-24 14S8 32 8 32z" />
           <circle cx="32" cy="32" r="8" />
           <circle cx="32" cy="32" r="2" />
@@ -111,22 +111,34 @@ export default function EspeciesGrid({ especies, onEdit, onDelete }) {
 
   return (
     <>
+      {/* Section header — Apple big-type */}
+      <div style={{ marginBottom: 4 }}>
+        <p className="section-eyebrow">Catálogo científico</p>
+        <h2 className="section-headline">Especies Marinas</h2>
+        <p className="section-sub">Registro y seguimiento del estado de conservación.</p>
+      </div>
+
+      {/* Stats — Apple at-a-glance */}
       <div className="stats-strips">
         <div className="stat-strip">
+          <div className="stat-strip-accent"></div>
           <span className="stat-num">{total}</span>
           <span className="stat-lbl">Especies en catálogo</span>
         </div>
         <div className="stat-strip strip-danger">
+          <div className="stat-strip-accent"></div>
           <span className="stat-num">{enPeligro}</span>
-          <span className="stat-lbl">En peligro (CR / EN / EX)</span>
+          <span className="stat-lbl">En peligro crítico</span>
         </div>
         <div className="stat-strip strip-warning">
+          <div className="stat-strip-accent"></div>
           <span className="stat-num">{vulnerables}</span>
-          <span className="stat-lbl">Vulnerables (VU)</span>
+          <span className="stat-lbl">Vulnerables</span>
         </div>
         <div className="stat-strip strip-success">
+          <div className="stat-strip-accent"></div>
           <span className="stat-num">{estables}</span>
-          <span className="stat-lbl">Estables (NT / LC)</span>
+          <span className="stat-lbl">Estables</span>
         </div>
       </div>
 
