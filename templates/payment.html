@@ -606,7 +606,7 @@
         }
 
         // Send to server
-        fetch("/api/procesar-donacion", {
+        fetch("http://localhost:8000/api/procesar-donacion", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

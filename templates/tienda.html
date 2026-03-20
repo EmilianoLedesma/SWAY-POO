@@ -1409,7 +1409,7 @@
         console.log("Order data prepared:", orderData);
 
         // Send to server
-        fetch("/api/pedidos/crear", {
+        fetch("http://localhost:8000/api/pedidos/crear", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

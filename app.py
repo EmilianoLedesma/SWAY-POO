@@ -84,34 +84,9 @@ def portal_colaboradores():
 def test_dropdown():
     return send_from_directory('.', 'test_dropdown.html')
 
-# ── Registro de Blueprints — API ─────────────────────────────────
-from blueprints.api.especies     import especies_bp
-from blueprints.api.colaboradores import colaboradores_bp
-from blueprints.api.auth         import auth_bp
-from blueprints.api.pedidos      import pedidos_bp
-from blueprints.api.productos    import productos_bp
-from blueprints.api.eventos      import eventos_bp
-from blueprints.api.estadisticas import estadisticas_bp
-from blueprints.api.direcciones  import direcciones_bp
-from blueprints.api.catalogos    import catalogos_bp
-
-app.register_blueprint(especies_bp)
-app.register_blueprint(colaboradores_bp)
-app.register_blueprint(auth_bp)
-app.register_blueprint(pedidos_bp)
-app.register_blueprint(productos_bp)
-app.register_blueprint(eventos_bp)
-app.register_blueprint(estadisticas_bp)
-app.register_blueprint(direcciones_bp)
-app.register_blueprint(catalogos_bp)
-
-# ── Integración ORM (legacy) ──────────────────────────────────────
-try:
-    from routes_orm import register_all_orm_routes
-    register_all_orm_routes(app)
-    print("Sistema ORM SQLAlchemy integrado correctamente")
-except ImportError as e:
-    print(f" No se pudo cargar routes_orm: {e}")
+# ── APIs migradas a FastAPI (puerto 8000) ─────────────────────────
+# Los blueprints de API han sido migrados a app/main.py (FastAPI)
+# Ejecutar: uvicorn app.main:app --port 8000 --reload
 
 # ── Punto de entrada ──────────────────────────────────────────────
 if __name__ == '__main__':

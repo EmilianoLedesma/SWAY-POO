@@ -1542,6 +1542,34 @@
         </div>
       </div>
 
+      <!-- Estadísticas con Chart.js -->
+      <div class="portal-section" style="margin-bottom: 2rem;">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="bi bi-bar-chart-line"></i> Estadísticas del Catálogo
+          </h2>
+          <a href="http://localhost:8000/api/reportes/especies"
+             target="_blank"
+             class="btn-sway-success">
+            <i class="bi bi-file-earmark-pdf"></i> Descargar Reporte PDF
+          </a>
+        </div>
+        <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; align-items: flex-start;">
+          <!-- Gráfica Doughnut: Especies por Estado de Conservación -->
+          <div style="flex: 1; min-width: 280px; max-width: 380px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(55,81,126,0.08); padding: 1.5rem; text-align: center;">
+            <h5 style="color: var(--primary-color); margin-bottom: 1rem; font-weight: 600;">Especies por Estado de Conservación</h5>
+            <canvas id="chartConservacion" width="300" height="300"></canvas>
+            <p id="chartConservacion-error" style="display:none; color: #dc3545; font-size: 0.85rem; margin-top: 0.5rem;">No se pudieron cargar los datos.</p>
+          </div>
+          <!-- Gráfica Bar: Estadísticas Generales -->
+          <div style="flex: 1; min-width: 280px; max-width: 480px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(55,81,126,0.08); padding: 1.5rem; text-align: center;">
+            <h5 style="color: var(--primary-color); margin-bottom: 1rem; font-weight: 600;">Estadísticas Generales</h5>
+            <canvas id="chartEstadisticas" width="400" height="300"></canvas>
+            <p id="chartEstadisticas-error" style="display:none; color: #dc3545; font-size: 0.85rem; margin-top: 0.5rem;">No se pudieron cargar los datos.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Secciones del Portal -->
       <div class="portal-sections">
         <!-- Gestión de Especies -->
@@ -2079,7 +2107,7 @@
       // Cargar información del colaborador desde la API
       async function loadColaboradorFromAPI() {
         try {
-          const response = await fetch("/api/colaboradores/profile", {
+          const response = await fetch("http://localhost:8000/api/colaboradores/profile", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -2184,7 +2212,7 @@
       async function loadEspecies() {
         try {
           console.log("Cargando especies...");
-          const response = await fetch("/api/especies", {
+          const response = await fetch("http://localhost:8000/api/especies", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -2336,7 +2364,7 @@
           );
 
           // Buscar avistamientos por email del colaborador (temporal hasta que tengas el endpoint específico)
-          const response = await fetch("/api/avistamientos");
+          const response = await fetch("http://localhost:8000/api/avistamientos");
           const data = await response.json();
 
           if (data.success && data.avistamientos) {
@@ -2411,9 +2439,9 @@
 
           const [conservacionRes, amenazasRes, habitatsRes] = await Promise.all(
             [
-              fetch("/api/estados-conservacion"),
-              fetch("/api/amenazas"),
-              fetch("/api/habitats"),
+              fetch("http://localhost:8000/api/estados-conservacion"),
+              fetch("http://localhost:8000/api/amenazas"),
+              fetch("http://localhost:8000/api/habitats"),
             ]
           );
 
@@ -2764,7 +2792,7 @@
       async function loadEspecieData(especieId) {
         try {
           console.log("Cargando datos de especie:", especieId);
-          const response = await fetch(`/api/especies/${especieId}`);
+          const response = await fetch(`http://localhost:8000/api/especies/${especieId}`);
           const data = await response.json();
 
           console.log("Datos de especie recibidos:", data);
@@ -2983,8 +3011,8 @@
 
         try {
           const url = especieData.id
-            ? `/api/especies/${especieData.id}`
-            : "/api/especies";
+            ? `http://localhost:8000/api/especies/${especieData.id}`
+            : "http://localhost:8000/api/especies";
           const method = especieData.id ? "PUT" : "POST";
 
           console.log("Enviando datos de especie:", especieData);
@@ -3124,7 +3152,7 @@
 
           // Usar el parámetro cascade=true para eliminar todos los registros relacionados
           const response = await fetch(
-            `/api/especies/${especieToDelete}?cascade=true`,
+            `http://localhost:8000/api/especies/${especieToDelete}?cascade=true`,
             {
               method: "DELETE",
               headers: {
@@ -3383,8 +3411,8 @@
 
           // Determinar endpoint según modo
           const endpoint = faceModalMode === "enroll"
-            ? "/api/colaboradores/enroll-face"
-            : "/api/colaboradores/login-face";
+            ? "http://localhost:8000/api/colaboradores/enroll-face"
+            : "http://localhost:8000/api/colaboradores/login-face";
 
           console.log(`Enviando imagen a ${endpoint}...`);
 
@@ -3473,7 +3501,7 @@
        */
       async function verificarSesionParaBtnEnroll() {
         try {
-          const response = await fetch("/api/colaboradores/status", {
+          const response = await fetch("http://localhost:8000/api/colaboradores/status", {
             method: "GET",
             headers: { "Content-Type": "application/json" }
           });
@@ -3498,6 +3526,113 @@
       document.addEventListener("DOMContentLoaded", function () {
         verificarSesionParaBtnEnroll();
       });
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      // =============================================
+      // GRÁFICAS ESTADÍSTICAS CON CHART.JS
+      // =============================================
+
+      (function () {
+        const token = localStorage.getItem("colab_token");
+        const authHeaders = {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        };
+
+        // --- Gráfica 1: Doughnut — Especies por Estado de Conservación ---
+        fetch("http://localhost:8000/api/especies/estadisticas", {
+          headers: authHeaders,
+        })
+          .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(function (data) {
+            const ctx = document.getElementById("chartConservacion").getContext("2d");
+            new Chart(ctx, {
+              type: "doughnut",
+              data: {
+                labels: ["En Peligro Crítico", "En Peligro", "Vulnerables"],
+                datasets: [
+                  {
+                    data: [
+                      data.en_peligro_critico || 0,
+                      data.en_peligro || 0,
+                      data.vulnerables || 0,
+                    ],
+                    backgroundColor: ["#dc3545", "#fd7e14", "#ffc107"],
+                    borderWidth: 2,
+                    borderColor: "#ffffff",
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: { position: "bottom" },
+                },
+              },
+            });
+          })
+          .catch(function () {
+            document.getElementById("chartConservacion-error").style.display = "block";
+          });
+
+        // --- Gráfica 2: Bar — Estadísticas Generales ---
+        fetch("http://localhost:8000/api/estadisticas", {
+          headers: authHeaders,
+        })
+          .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then(function (data) {
+            const ctx = document.getElementById("chartEstadisticas").getContext("2d");
+            new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels: [
+                  "Especies Catalogadas",
+                  "En Peligro",
+                  "Especies Protegidas",
+                ],
+                datasets: [
+                  {
+                    label: "Cantidad",
+                    data: [
+                      data.especies_catalogadas || 0,
+                      data.en_peligro || 0,
+                      data.especies_protegidas || 0,
+                    ],
+                    backgroundColor: "#47b2e4",
+                    borderColor: "#37517e",
+                    borderWidth: 1,
+                    borderRadius: 6,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: { display: false },
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 },
+                  },
+                },
+              },
+            });
+          })
+          .catch(function () {
+            document.getElementById("chartEstadisticas-error").style.display = "block";
+          });
+      })();
     </script>
   </body>
 </html>

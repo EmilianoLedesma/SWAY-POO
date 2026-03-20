@@ -67,7 +67,7 @@ async function cargarEspecies() {
     params.append('limit', itemsPerPage);
     params.append('sort', 'nombre'); // Ordenamiento alfabético por defecto
     
-    const response = await fetch(`/api/especies?${params}`);
+    const response = await fetch(`${API_BASE}/especies?${params}`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -120,7 +120,7 @@ async function cargarEspecies() {
  */
 async function loadStatistics() {
   try {
-    const response = await fetch('/api/estadisticas');
+    const response = await fetch(API_BASE + '/estadisticas');
     const data = await response.json();
     
     if (data && !data.error) {
@@ -301,7 +301,7 @@ async function applyFilters() {
       limit: itemsPerPage
     });
     
-    const response = await fetch(`/api/especies?${params}`);
+    const response = await fetch(`${API_BASE}/especies?${params}`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -747,8 +747,8 @@ function openSightingModal(speciesId) {
   
   // Pre-llenar los datos de la especie obtenidos de la API
   if (speciesId) {
-    // Buscar la especie en especiesData
-    const especieData = especiesData.find(e => e.id == speciesId);
+    // Buscar la especie en especiesData o filteredEspecies (cuando hay filtros activos)
+    const especieData = especiesData.find(e => e.id == speciesId) || filteredEspecies.find(e => e.id == speciesId);
     if (especieData) {
       // Llenar nombre de especie (campo de solo lectura)
       const especieNombreInput = document.getElementById('especie-nombre');
@@ -940,7 +940,7 @@ async function submitSightingForm(event) {
   submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando...';
   
   try {
-    const response = await fetch('/api/reportar-avistamiento', {
+    const response = await fetch(API_BASE + '/reportar-avistamiento', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1017,7 +1017,7 @@ async function obtenerDetallesEspecie(especieId) {
     console.log('Haciendo fetch a /api/especies/' + especieId);
     
     // Agregar headers para evitar problemas de cache
-    const response = await fetch(`/api/especies/${especieId}`, {
+    const response = await fetch(`${API_BASE}/especies/${especieId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -1043,7 +1043,7 @@ async function obtenerDetallesEspecie(especieId) {
     // Si hay error de red, intentar una vez más
     try {
       console.log('Reintentando fetch...');
-      const retryResponse = await fetch(`/api/especies/${especieId}`);
+      const retryResponse = await fetch(`${API_BASE}/especies/${especieId}`);
       if (retryResponse.ok) {
         const retryData = await retryResponse.json();
         console.log('Retry successful:', retryData);
@@ -1401,7 +1401,7 @@ function showErrorMessage(message) {
 // Función para reportar avistamiento a la API
 async function reportarAvistamiento(formData) {
   try {
-    const response = await fetch('/api/reportar-avistamiento', {
+    const response = await fetch(API_BASE + '/reportar-avistamiento', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1428,7 +1428,7 @@ async function reportarAvistamiento(formData) {
 // Función para suscribir al newsletter
 async function suscribirNewsletter(email) {
   try {
-    const response = await fetch('/api/newsletter', {
+    const response = await fetch(API_BASE + '/newsletter', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1452,7 +1452,7 @@ async function suscribirNewsletter(email) {
 // Función para obtener detalles de una especie
 async function obtenerDetallesEspecie(especieId) {
   try {
-    const response = await fetch(`/api/especies/${especieId}`);
+    const response = await fetch(`${API_BASE}/especies/${especieId}`);
     const especie = await response.json();
     
     if (response.ok) {

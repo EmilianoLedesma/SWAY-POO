@@ -1469,14 +1469,6 @@
                   >Registrarse como Colaborador</a
                 >
               </li>
-              <li>
-                <i class="bi bi-chevron-right"></i>
-                <a
-                  href="javascript:void(0)"
-                  onclick="openCollaboratorModal(event, 'login')"
-                  >Acceso Colaboradores</a
-                >
-              </li>
             </ul>
           </div>
 
@@ -1727,72 +1719,8 @@
             </p>
           </div>
 
-          <!-- Pestañas -->
-          <div class="tab-navigation">
-            <button
-              class="tab-btn active"
-              type="button"
-              onclick="switchCollaboratorTab('login')"
-            >
-              <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
-            </button>
-            <button
-              class="tab-btn"
-              type="button"
-              onclick="switchCollaboratorTab('register')"
-            >
-              <i class="bi bi-person-plus"></i> Registrarse
-            </button>
-          </div>
-
-          <!-- Formulario de Login -->
-          <div id="login-tab" class="tab-content active">
-            <div id="login-message-container" class="message-container"></div>
-            <form id="collaborator-login-form" class="collaborator-form">
-              <div class="form-group">
-                <label for="login-email">
-                  <i class="bi bi-envelope"></i> Correo Electrónico *
-                </label>
-                <input
-                  type="email"
-                  id="login-email"
-                  name="email"
-                  placeholder="tu@email.com"
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="login-password">
-                  <i class="bi bi-lock"></i> Contraseña *
-                </label>
-                <input
-                  type="password"
-                  id="login-password"
-                  name="password"
-                  placeholder="••••••••"
-                />
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn-primary full-width">
-                  <i class="bi bi-box-arrow-in-right"></i> Acceder al Panel
-                </button>
-              </div>
-            </form>
-
-            <!-- Separador y login facial -->
-            <div style="display:flex;align-items:center;gap:1rem;margin:1rem 0;">
-              <hr style="flex:1;border-color:#ccc;" />
-              <span style="color:#888;font-size:.85rem;white-space:nowrap;">o también</span>
-              <hr style="flex:1;border-color:#ccc;" />
-            </div>
-            <button type="button" onclick="openFaceLoginModal()" style="width:100%;padding:.75rem;background:#1a3a5c;color:#fff;border:none;border-radius:6px;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;">
-              <i class="bi bi-camera-video"></i> Entrar con reconocimiento facial
-            </button>
-          </div>
-
           <!-- Formulario de Registro -->
-          <div id="register-tab" class="tab-content">
+          <div id="register-tab" class="tab-content active">
             <div
               id="register-message-container"
               class="message-container"
@@ -2111,7 +2039,7 @@
       });
 
       // Funciones principales del modal
-      function openCollaboratorModal(event, initialTab = "login") {
+      function openCollaboratorModal(event, initialTab = "register") {
         console.log("Opening collaborator modal with tab:", initialTab);
 
         if (event) {
@@ -2182,19 +2110,11 @@
             document.body.style.overflow = "auto";
             document.body.classList.remove("modal-open");
 
-            // Reset formularios
-            const loginForm = document.getElementById(
-              "collaborator-login-form"
-            );
+            // Reset formulario
             const registerForm = document.getElementById(
               "collaborator-register-form"
             );
-
-            if (loginForm) loginForm.reset();
             if (registerForm) registerForm.reset();
-
-            // Reset pestañas
-            switchCollaboratorTab("login");
             console.log("Modal closed successfully");
           }
         } catch (error) {
@@ -2227,20 +2147,6 @@
       }
 
       // Funciones de validación usando el sistema existente
-      function validateLoginForm() {
-        const loginForm = document.getElementById("collaborator-login-form");
-
-        const configLogin = {
-          "login-email": { tipo: "email" },
-          "login-password": { tipo: "password" },
-        };
-
-        return validacionesSway.validarFormularioCompleto(
-          loginForm,
-          configLogin
-        );
-      }
-
       function validateRegisterForm() {
         const registerForm = document.getElementById(
           "collaborator-register-form"
@@ -2409,7 +2315,7 @@
       // Función para verificar email duplicado
       async function checkEmailExists(email) {
         try {
-          const response = await fetch("/api/colaboradores/check-email", {
+          const response = await fetch("http://localhost:8000/api/colaboradores/check-email", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -2583,88 +2489,6 @@
             });
           }
 
-          // Configurar formularios con validaciones
-          const loginForm = document.getElementById("collaborator-login-form");
-          if (loginForm) {
-            loginForm.addEventListener("submit", function (e) {
-              e.preventDefault();
-
-              if (!validateLoginForm()) {
-                return;
-              }
-
-              // Limpiar mensajes anteriores
-              clearMessages("login-message-container");
-
-              const formData = new FormData(this);
-              const loginData = {
-                email: formData.get("email"),
-                password: formData.get("password"),
-              };
-
-              // Deshabilitar botón mientras se procesa
-              const submitBtn = this.querySelector('button[type="submit"]');
-              const originalText = submitBtn.innerHTML;
-              submitBtn.disabled = true;
-              submitBtn.innerHTML =
-                '<i class="bi bi-hourglass-split"></i> Iniciando sesión...';
-
-              // Enviar datos al servidor
-              fetch("/api/colaboradores/login", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(loginData),
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  if (data.success) {
-                    showMessage(
-                      "login-message-container",
-                      "success",
-                      `¡Bienvenido ${data.user.nombre}! Redirigiendo al portal de colaboradores...`
-                    );
-
-                    // Guardar datos del colaborador en sessionStorage
-                    sessionStorage.setItem(
-                      "colaborador-session",
-                      JSON.stringify({
-                        id: data.user.id,
-                        nombre: data.user.nombre,
-                        especialidad: data.user.especialidad,
-                        institucion: data.user.institucion,
-                        email: data.user.email,
-                      })
-                    );
-
-                    setTimeout(() => {
-                      window.location.href = "/portal-colaboradores";
-                    }, 1500);
-                  } else {
-                    showMessage(
-                      "login-message-container",
-                      "error",
-                      data.error || "Error desconocido al iniciar sesión"
-                    );
-                  }
-                })
-                .catch((error) => {
-                  console.error("Error:", error);
-                  showMessage(
-                    "login-message-container",
-                    "error",
-                    "Error de conexión. Por favor intenta de nuevo."
-                  );
-                })
-                .finally(() => {
-                  // Restaurar botón
-                  submitBtn.disabled = false;
-                  submitBtn.innerHTML = originalText;
-                });
-            });
-          }
-
           const registerForm = document.getElementById(
             "collaborator-register-form"
           );
@@ -2711,7 +2535,7 @@
                 '<i class="bi bi-hourglass-split"></i> Enviando solicitud...';
 
               // Enviar datos al servidor
-              fetch("/api/colaboradores/register", {
+              fetch("http://localhost:8000/api/colaboradores/register", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -2727,16 +2551,9 @@
                       `¡Registro exitoso! ${data.message}. Ya puedes iniciar sesión como colaborador.`
                     );
 
-                    // Limpiar formulario y cambiar a pestaña de login después de un momento
+                    // Limpiar formulario después de un momento
                     setTimeout(() => {
                       this.reset();
-                      switchCollaboratorTab("login");
-
-                      // Opcional: rellenar el email en el formulario de login
-                      const loginEmail = document.getElementById("login-email");
-                      if (loginEmail) {
-                        loginEmail.value = registerData.email;
-                      }
                     }, 2000);
                   } else {
                     showMessage(
@@ -2782,107 +2599,10 @@
       }
 
       // Debug: Función para probar el modal
-      window.testCollaboratorModal = function (tab = "login") {
-        console.log("Testing modal with tab:", tab);
-        openCollaboratorModal(null, tab);
+      window.testCollaboratorModal = function () {
+        openCollaboratorModal(null, "register");
       };
     </script>
 
-    <!-- =============================================
-         MODAL DE RECONOCIMIENTO FACIAL (LOGIN)
-         ============================================= -->
-    <div id="face-login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:10000;justify-content:center;align-items:center;">
-      <div style="background:#fff;border-radius:10px;padding:2rem;width:360px;max-width:95vw;text-align:center;position:relative;">
-        <button onclick="closeFaceLoginModal()" style="position:absolute;top:.75rem;right:1rem;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#555;">&times;</button>
-        <h3 style="margin-bottom:.5rem;color:#1a3a5c;"><i class="bi bi-camera-video"></i> Reconocimiento Facial</h3>
-        <p style="color:#666;font-size:.85rem;margin-bottom:1rem;">Centra tu rostro y presiona Capturar</p>
-
-        <div id="face-login-alert" style="display:none;padding:.6rem 1rem;border-radius:5px;margin-bottom:1rem;font-size:.85rem;"></div>
-
-        <div style="border:2px solid #1a3a5c;border-radius:8px;overflow:hidden;margin-bottom:1rem;">
-          <video id="face-login-video" width="320" height="240" autoplay playsinline muted style="display:block;"></video>
-        </div>
-        <canvas id="face-login-canvas" width="320" height="240" style="display:none;"></canvas>
-
-        <div style="display:flex;gap:.75rem;justify-content:center;">
-          <button onclick="activarCamaraFaceLogin()" style="padding:.6rem 1.2rem;background:#1a3a5c;color:#fff;border:none;border-radius:6px;cursor:pointer;">
-            <i class="bi bi-camera"></i> Activar cámara
-          </button>
-          <button onclick="capturarFaceLogin()" style="padding:.6rem 1.2rem;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;">
-            <i class="bi bi-check-circle"></i> Capturar
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <script>
-      let faceLoginStream = null;
-
-      function openFaceLoginModal() {
-        document.getElementById('face-login-modal').style.display = 'flex';
-        document.getElementById('face-login-alert').style.display = 'none';
-      }
-
-      function closeFaceLoginModal() {
-        document.getElementById('face-login-modal').style.display = 'none';
-        if (faceLoginStream) {
-          faceLoginStream.getTracks().forEach(t => t.stop());
-          faceLoginStream = null;
-        }
-      }
-
-      async function activarCamaraFaceLogin() {
-        try {
-          faceLoginStream = await navigator.mediaDevices.getUserMedia({ video: true });
-          document.getElementById('face-login-video').srcObject = faceLoginStream;
-          mostrarAlertaFaceLogin('Cámara activa. Centra tu rostro y presiona Capturar.', '#1a3a5c');
-        } catch (err) {
-          mostrarAlertaFaceLogin('No se pudo acceder a la cámara: ' + err.message, '#dc3545');
-        }
-      }
-
-      async function capturarFaceLogin() {
-        const video = document.getElementById('face-login-video');
-        const canvas = document.getElementById('face-login-canvas');
-        if (!faceLoginStream) {
-          mostrarAlertaFaceLogin('Primero activa la cámara.', '#dc3545');
-          return;
-        }
-        canvas.getContext('2d').drawImage(video, 0, 0, 320, 240);
-        const imageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-
-        mostrarAlertaFaceLogin('Verificando...', '#888');
-
-        try {
-          const res = await fetch('/api/colaboradores/login-face', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: imageBase64 })
-          });
-          const data = await res.json();
-          if (data.success) {
-            mostrarAlertaFaceLogin('Bienvenido/a, ' + data.colaborador.nombre + '!', '#28a745');
-            setTimeout(() => { window.location.href = '/portal-colaboradores'; }, 1000);
-          } else {
-            mostrarAlertaFaceLogin(data.error || 'Rostro no reconocido', '#dc3545');
-          }
-        } catch (e) {
-          mostrarAlertaFaceLogin('Error de conexión.', '#dc3545');
-        }
-      }
-
-      function mostrarAlertaFaceLogin(msg, color) {
-        const el = document.getElementById('face-login-alert');
-        el.textContent = msg;
-        el.style.background = color + '22';
-        el.style.color = color;
-        el.style.border = '1px solid ' + color;
-        el.style.display = 'block';
-      }
-
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeFaceLoginModal();
-      });
-    </script>
   </body>
 </html>

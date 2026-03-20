@@ -3,6 +3,11 @@
 // Sistema de gestión y visualización de pedidos de usuario
 // =============================================
 
+function authHeaders() {
+  const token = localStorage.getItem('tienda_token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 console.log('Cargando mis-pedidos.js...');
 
 /**
@@ -86,7 +91,7 @@ class MisPedidos {
                 return;
             }
             
-            const response = await fetch('/api/user/status');
+            const response = await fetch(API_BASE + '/user/status', { headers: { ...authHeaders() } });
             const data = await response.json();
             
             // Verificar nuevamente el flag de logout manual antes de autenticar
@@ -219,7 +224,7 @@ class MisPedidos {
 
         try {
             // Usar endpoint seguro que obtiene pedidos del usuario autenticado
-            const response = await fetch('/api/pedidos/mis-pedidos');
+            const response = await fetch(API_BASE + '/pedidos/mis-pedidos', { headers: { ...authHeaders() } });
             const data = await response.json();
 
             ordersLoading.style.display = 'none';
@@ -291,7 +296,7 @@ class MisPedidos {
      */
     async verDetallesPedido(pedidoId) {
         try {
-            const response = await fetch(`/api/pedidos/detalle/${pedidoId}`);
+            const response = await fetch(`${API_BASE}/pedidos/detalle/${pedidoId}`, { headers: { ...authHeaders() } });
             const data = await response.json();
 
             if (data.pedido) {
@@ -430,8 +435,9 @@ class MisPedidos {
      */
     async reordenar(pedidoId) {
         try {
-            const response = await fetch(`/api/pedidos/reordenar/${pedidoId}`, {
-                method: 'POST'
+            const response = await fetch(`${API_BASE}/pedidos/reordenar/${pedidoId}`, {
+                method: 'POST',
+                headers: { ...authHeaders() }
             });
             const data = await response.json();
 
@@ -492,19 +498,21 @@ class MisPedidos {
     async logout() {
         try {
             // Cerrar sesión en el servidor
-            await fetch('/api/logout', {
+            await fetch(API_BASE + '/user/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...authHeaders()
                 }
             });
             
             // Limpiar almacenamiento local
+            localStorage.removeItem('tienda_token');
             localStorage.removeItem('usuario-sway');
             localStorage.removeItem('carrito-sway');
             sessionStorage.removeItem('usuario-sway');
             sessionStorage.removeItem('carrito-sway');
-            
+
             // Marcar logout manual para evitar auto-login
             localStorage.setItem('manual-logout', 'true');
             localStorage.setItem('logout-flag', Date.now().toString());

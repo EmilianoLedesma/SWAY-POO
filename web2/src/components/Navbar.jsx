@@ -1,7 +1,16 @@
-export default function Navbar({ title, onCreateEspecie, initials, onLogout }) {
+export default function Navbar({ title, onCreateEspecie, initials, onLogout, onMenuToggle }) {
   return (
     <header className="top-navbar">
-      <h1 className="page-title">{title}</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <button className="navbar-menu-btn" onClick={onMenuToggle} title="Menú">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
+            <line x1="3" y1="6"  x2="21" y2="6"  />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+        <h1 className="page-title">{title}</h1>
+      </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {onCreateEspecie && (

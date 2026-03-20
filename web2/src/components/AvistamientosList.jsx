@@ -7,6 +7,23 @@ function formatDate(dateStr) {
   } catch { return dateStr }
 }
 
+function formatDateTime(dateStr) {
+  if (!dateStr) return '—'
+  try {
+    return new Date(dateStr).toLocaleString('es-MX', {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    })
+  } catch { return dateStr }
+}
+
+function formatCoords(lat, lng) {
+  if (lat == null || lng == null) return null
+  const latDir = lat >= 0 ? 'N' : 'S'
+  const lngDir = lng >= 0 ? 'E' : 'O'
+  return `${Math.abs(lat).toFixed(4)}° ${latDir}, ${Math.abs(lng).toFixed(4)}° ${lngDir}`
+}
+
 export default function AvistamientosList({ avistamientos }) {
   if (!avistamientos || avistamientos.length === 0) {
     return (
@@ -38,39 +55,49 @@ export default function AvistamientosList({ avistamientos }) {
 
       <div className="timeline">
         {avistamientos.map((av, idx) => {
-          const species  = av.nombre_comun || av.especie || av.nombre_especie || 'Especie desconocida'
-          const date     = av.fecha_avistamiento || av.fecha || av.created_at
-          const location = av.ubicacion || av.lugar || av.localizacion
-          const notes    = av.notas || av.notas_adicionales || av.observaciones
+          const coords = formatCoords(av.latitud, av.longitud)
 
           return (
-            <div key={av.id_avistamiento || idx} className="timeline-item">
+            <div key={av.id || idx} className="timeline-item">
               <div className="timeline-dot" />
               <div className="timeline-card">
+
+                {/* Encabezado: especie + fecha */}
                 <div className="timeline-header">
-                  <h3 className="timeline-species">{species}</h3>
-                  <span className="timeline-date">{formatDate(date)}</span>
+                  <div>
+                    <h3 className="timeline-species">{av.especie_nombre || 'Especie desconocida'}</h3>
+                    {av.especie_cientifica && (
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: '#6b7280', fontStyle: 'italic' }}>
+                        {av.especie_cientifica}
+                      </p>
+                    )}
+                  </div>
+                  <span className="timeline-date">{formatDateTime(av.fecha)}</span>
                 </div>
 
-                {location && (
+                {/* Coordenadas */}
+                {coords && (
                   <div className="timeline-location">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                       <circle cx="12" cy="10" r="3" />
                     </svg>
-                    {location}
+                    {coords}
+                    {av.latitud != null && av.longitud != null && (
+                      <a
+                        href={`https://www.google.com/maps?q=${av.latitud},${av.longitud}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ marginLeft: 6, fontSize: '0.7rem', color: '#0051a8' }}
+                      >
+                        Ver mapa
+                      </a>
+                    )}
                   </div>
                 )}
 
-                {(av.temperatura || av.profundidad || av.visibilidad) && (
-                  <div className="timeline-data">
-                    {av.temperatura && <span className="data-chip">T° {av.temperatura}°C</span>}
-                    {av.profundidad  && <span className="data-chip">↓ {av.profundidad} m</span>}
-                    {av.visibilidad  && <span className="data-chip">VIS {av.visibilidad} m</span>}
-                  </div>
-                )}
-
-                {notes && <p className="timeline-notes">{notes}</p>}
+                {/* Notas */}
+                {av.notas && <p className="timeline-notes">{av.notas}</p>}
               </div>
             </div>
           )

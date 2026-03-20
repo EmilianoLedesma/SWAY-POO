@@ -1,0 +1,5 @@
+API = uvicorn app.main:app --port 8000 --reload
+React (Portal Colaboradores) = cd web2 / npm run dev
+Flask (Templates HTML) = python -u "c:\Users\Emiliano\Videos\SWAY POO\app.py"
+
+Si el tema se tuerce, llamar al top global = claude
