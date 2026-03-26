@@ -4,7 +4,7 @@
      con formularios para avistamientos y colaboradores
      ============================================= -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="utf-8" />
@@ -388,8 +388,43 @@
       }
 
       .checkbox-container input[type="checkbox"] {
-        width: auto;
-        margin: 0;
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .checkmark {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #adb5bd;
+        border-radius: 50%;
+        margin-top: 1px;
+        transition: border-color 0.2s, background-color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .checkbox-container:hover .checkmark {
+        border-color: #0d6efd;
+      }
+
+      .checkbox-container input[type="checkbox"]:checked ~ .checkmark {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+      }
+
+      .checkbox-container input[type="checkbox"]:checked ~ .checkmark::after {
+        content: "";
+        width: 5px;
+        height: 9px;
+        border: 2px solid #fff;
+        border-top: none;
+        border-left: none;
+        transform: rotate(45deg) translateY(-1px);
+        display: block;
       }
 
       .terms-text {
@@ -1884,26 +1919,27 @@
                 <div class="form-group">
                   <label for="reg-numero-cedula">
                     <i class="bi bi-card-text"></i> Número de Cédula Profesional
+                    *
                   </label>
                   <input
                     type="text"
                     id="reg-numero-cedula"
                     name="numero_cedula"
                     maxlength="20"
-                    placeholder="Número de cédula (si aplica)"
+                    placeholder="Número de cédula"
                   />
                 </div>
 
                 <div class="form-group">
                   <label for="reg-orcid">
-                    <i class="bi bi-link-45deg"></i> ORCID ID
+                    <i class="bi bi-link-45deg"></i> ORCID ID *
                   </label>
                   <input
                     type="text"
                     id="reg-orcid"
                     name="orcid"
                     maxlength="50"
-                    placeholder="0000-0000-0000-0000 (opcional)"
+                    placeholder="0000-0000-0000-0000"
                   />
                 </div>
 
@@ -2074,7 +2110,7 @@
             console.log("Modal classes:", collaboratorModal.className);
             console.log(
               "Modal display:",
-              window.getComputedStyle(collaboratorModal).display
+              window.getComputedStyle(collaboratorModal).display,
             );
 
             // Verificar si el modal sigue visible después de un momento
@@ -2112,7 +2148,7 @@
 
             // Reset formulario
             const registerForm = document.getElementById(
-              "collaborator-register-form"
+              "collaborator-register-form",
             );
             if (registerForm) registerForm.reset();
             console.log("Modal closed successfully");
@@ -2134,7 +2170,7 @@
           // Mostrar pestaña seleccionada
           const selectedTab = document.getElementById(tabName + "-tab");
           const selectedBtn = document.querySelector(
-            `[onclick*="switchCollaboratorTab('${tabName}')"]`
+            `[onclick*="switchCollaboratorTab('${tabName}')"]`,
           );
 
           if (selectedTab) selectedTab.classList.add("active");
@@ -2149,7 +2185,7 @@
       // Funciones de validación usando el sistema existente
       function validateRegisterForm() {
         const registerForm = document.getElementById(
-          "collaborator-register-form"
+          "collaborator-register-form",
         );
         const passwordField = document.getElementById("reg-password");
 
@@ -2181,7 +2217,7 @@
         if (cedula.value.trim() && !isValidCedula(cedula.value)) {
           validacionesSway.mostrarError(
             cedula,
-            "Formato de cédula profesional inválido (7-8 dígitos)"
+            "Formato de cédula profesional inválido (7-8 dígitos)",
           );
           isValid = false;
         } else if (cedula.value.trim()) {
@@ -2193,7 +2229,7 @@
         if (orcid.value.trim() && !isValidOrcid(orcid.value)) {
           validacionesSway.mostrarError(
             orcid,
-            "Formato de ORCID inválido (0000-0000-0000-0000)"
+            "Formato de ORCID inválido (0000-0000-0000-0000)",
           );
           isValid = false;
         } else if (orcid.value.trim()) {
@@ -2205,19 +2241,19 @@
         if (!motivacion.value.trim()) {
           validacionesSway.mostrarError(
             motivacion,
-            "La motivación para colaborar es obligatoria"
+            "La motivación para colaborar es obligatoria",
           );
           isValid = false;
         } else if (motivacion.value.trim().length < 50) {
           validacionesSway.mostrarError(
             motivacion,
-            "La motivación debe tener al menos 50 caracteres"
+            "La motivación debe tener al menos 50 caracteres",
           );
           isValid = false;
         } else if (motivacion.value.trim().length > 500) {
           validacionesSway.mostrarError(
             motivacion,
-            "La motivación no puede exceder 500 caracteres"
+            "La motivación no puede exceder 500 caracteres",
           );
           isValid = false;
         } else {
@@ -2229,7 +2265,7 @@
         if (!terms.checked) {
           validacionesSway.mostrarError(
             terms,
-            "Debes aceptar los términos y condiciones"
+            "Debes aceptar los términos y condiciones",
           );
           isValid = false;
         } else {
@@ -2250,7 +2286,7 @@
               opciones: { passwordField: passwordField },
             },
             "reg-institucion": { tipo: "soloTexto" },
-          }
+          },
         );
 
         // Validar selects obligatorios
@@ -2258,7 +2294,7 @@
         if (!especialidad.value) {
           validacionesSway.mostrarError(
             especialidad,
-            "La especialidad es obligatoria"
+            "La especialidad es obligatoria",
           );
           isValid = false;
         } else {
@@ -2269,7 +2305,7 @@
         if (!gradoAcademico.value) {
           validacionesSway.mostrarError(
             gradoAcademico,
-            "El grado académico es obligatorio"
+            "El grado académico es obligatorio",
           );
           isValid = false;
         } else {
@@ -2281,7 +2317,7 @@
         if (!anosExperiencia.value) {
           validacionesSway.mostrarError(
             anosExperiencia,
-            "Los años de experiencia son obligatorios"
+            "Los años de experiencia son obligatorios",
           );
           isValid = false;
         } else if (
@@ -2291,7 +2327,7 @@
         ) {
           validacionesSway.mostrarError(
             anosExperiencia,
-            "Los años de experiencia deben ser un número entre 0 y 100"
+            "Los años de experiencia deben ser un número entre 0 y 100",
           );
           isValid = false;
         } else {
@@ -2315,18 +2351,53 @@
       // Función para verificar email duplicado
       async function checkEmailExists(email) {
         try {
-          const response = await fetch("http://localhost:8000/api/colaboradores/check-email", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+          const response = await fetch(
+            "http://localhost:8000/api/colaboradores/check-email",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: email }),
             },
-            body: JSON.stringify({ email: email }),
-          });
-
-          const data = await response.json();
-          return data;
+          );
+          return await response.json();
         } catch (error) {
           console.error("Error checking email:", error);
+          return { exists: false, can_register: true };
+        }
+      }
+
+      // Función para verificar ORCID duplicado
+      async function checkOrcidExists(orcid) {
+        try {
+          const response = await fetch(
+            "http://localhost:8000/api/colaboradores/check-orcid",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orcid: orcid }),
+            },
+          );
+          return await response.json();
+        } catch (error) {
+          console.error("Error checking ORCID:", error);
+          return { exists: false, can_register: true };
+        }
+      }
+
+      // Función para verificar cédula profesional duplicada
+      async function checkCedulaExists(cedula) {
+        try {
+          const response = await fetch(
+            "http://localhost:8000/api/colaboradores/check-cedula",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ cedula: cedula }),
+            },
+          );
+          return await response.json();
+        } catch (error) {
+          console.error("Error checking cédula:", error);
           return { exists: false, can_register: true };
         }
       }
@@ -2388,7 +2459,7 @@
                 if (emailCheck.exists && !emailCheck.can_register) {
                   validacionesSway.mostrarError(
                     this,
-                    "Este email ya está registrado"
+                    "Este email ya está registrado",
                   );
                 } else {
                   validacionesSway.mostrarExito(this);
@@ -2400,14 +2471,22 @@
           // Configurar validación de campos especiales
           const cedula = document.getElementById("reg-cedula");
           if (cedula) {
-            cedula.addEventListener("blur", function () {
+            cedula.addEventListener("blur", async function () {
               if (this.value.trim()) {
                 if (isValidCedula(this.value)) {
-                  validacionesSway.mostrarExito(this);
+                  const cedulaCheck = await checkCedulaExists(this.value);
+                  if (cedulaCheck.exists && !cedulaCheck.can_register) {
+                    validacionesSway.mostrarError(
+                      this,
+                      cedulaCheck.message || "Esta cédula ya está registrada",
+                    );
+                  } else {
+                    validacionesSway.mostrarExito(this);
+                  }
                 } else {
                   validacionesSway.mostrarError(
                     this,
-                    "Formato de cédula inválido (7-8 dígitos)"
+                    "Formato de cédula inválido (7-8 dígitos)",
                   );
                 }
               }
@@ -2416,14 +2495,22 @@
 
           const orcid = document.getElementById("reg-orcid");
           if (orcid) {
-            orcid.addEventListener("blur", function () {
+            orcid.addEventListener("blur", async function () {
               if (this.value.trim()) {
                 if (isValidOrcid(this.value)) {
-                  validacionesSway.mostrarExito(this);
+                  const orcidCheck = await checkOrcidExists(this.value);
+                  if (orcidCheck.exists && !orcidCheck.can_register) {
+                    validacionesSway.mostrarError(
+                      this,
+                      orcidCheck.message || "Este ORCID ya está registrado",
+                    );
+                  } else {
+                    validacionesSway.mostrarExito(this);
+                  }
                 } else {
                   validacionesSway.mostrarError(
                     this,
-                    "Formato de ORCID inválido (0000-0000-0000-0000)"
+                    "Formato de ORCID inválido (0000-0000-0000-0000)",
                   );
                 }
               }
@@ -2437,17 +2524,17 @@
               if (length === 0) {
                 validacionesSway.mostrarError(
                   this,
-                  "La motivación para colaborar es obligatoria"
+                  "La motivación para colaborar es obligatoria",
                 );
               } else if (length < 50) {
                 validacionesSway.mostrarError(
                   this,
-                  "La motivación debe tener al menos 50 caracteres"
+                  "La motivación debe tener al menos 50 caracteres",
                 );
               } else if (length > 500) {
                 validacionesSway.mostrarError(
                   this,
-                  "La motivación no puede exceder 500 caracteres"
+                  "La motivación no puede exceder 500 caracteres",
                 );
               } else {
                 validacionesSway.mostrarExito(this);
@@ -2463,12 +2550,12 @@
               if (!this.value.trim()) {
                 validacionesSway.mostrarError(
                   this,
-                  "Los años de experiencia son obligatorios"
+                  "Los años de experiencia son obligatorios",
                 );
               } else if (isNaN(valor) || valor < 0 || valor > 100) {
                 validacionesSway.mostrarError(
                   this,
-                  "Los años de experiencia deben ser un número entre 0 y 100"
+                  "Los años de experiencia deben ser un número entre 0 y 100",
                 );
               } else {
                 validacionesSway.mostrarExito(this);
@@ -2490,7 +2577,7 @@
           }
 
           const registerForm = document.getElementById(
-            "collaborator-register-form"
+            "collaborator-register-form",
           );
           if (registerForm) {
             registerForm.addEventListener("submit", function (e) {
@@ -2548,7 +2635,7 @@
                     showMessage(
                       "register-message-container",
                       "success",
-                      `¡Registro exitoso! ${data.message}. Ya puedes iniciar sesión como colaborador.`
+                      `¡Registro exitoso! ${data.message}. Ya puedes iniciar sesión como colaborador.`,
                     );
 
                     // Limpiar formulario después de un momento
@@ -2561,7 +2648,7 @@
                       "error",
                       `Error en el registro: ${
                         data.error || "Error desconocido"
-                      }`
+                      }`,
                     );
                   }
                 })
@@ -2570,7 +2657,7 @@
                   showMessage(
                     "register-message-container",
                     "error",
-                    "Error de conexión. Por favor intenta de nuevo."
+                    "Error de conexión. Por favor intenta de nuevo.",
                   );
                 })
                 .finally(() => {
@@ -2603,6 +2690,5 @@
         openCollaboratorModal(null, "register");
       };
     </script>
-
   </body>
 </html>

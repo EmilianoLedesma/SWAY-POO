@@ -87,6 +87,21 @@ class CheckEmail(BaseModel):
     )
 
 
+class CheckOrcid(BaseModel):
+    orcid: str = Field(
+        ..., min_length=1, max_length=50,
+        description="ORCID a verificar disponibilidad",
+        example="0000-0002-1825-0097"
+    )
+
+
+class CheckCedula(BaseModel):
+    cedula: str = Field(
+        ..., min_length=1, max_length=20,
+        description="Cédula profesional a verificar disponibilidad"
+    )
+
+
 class ColaboradorPerfilUpdate(BaseModel):
     # Partial update — campos con default "" no generan anyOf en Swagger
     # Campos de tabla Usuarios

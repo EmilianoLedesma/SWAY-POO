@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from app.data.database import get_db_connection, construir_nombre_completo
 from app.security.auth import create_token, get_current_colaborador
-from app.models.colaboradores import ColaboradorLogin, ColaboradorRegister, CheckEmail, ColaboradorPerfilUpdate, ColaboradorPasswordChange
+from app.models.colaboradores import ColaboradorLogin, ColaboradorRegister, CheckEmail, CheckOrcid, CheckCedula, ColaboradorPerfilUpdate, ColaboradorPasswordChange
 from app.services.email_service import send_welcome_email
 
 router = APIRouter(tags=["colaboradores"])
@@ -293,6 +293,80 @@ def check_collaborator_email(data: CheckEmail):
         raise
     except Exception as e:
         print(f"Error en check_collaborator_email: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/api/colaboradores/check-orcid")
+def check_collaborator_orcid(data: CheckOrcid):
+    try:
+        orcid = data.orcid.strip()
+        conn = get_db_connection()
+        if not conn:
+            raise HTTPException(status_code=500, detail="Error de conexión")
+
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT estado_solicitud, activo
+            FROM Colaboradores
+            WHERE orcid = ? AND orcid != ''
+        """, (orcid,))
+
+        result = cursor.fetchone()
+        conn.close()
+
+        if not result:
+            return {"exists": False, "can_register": True}
+
+        estado_solicitud, activo = result
+
+        if estado_solicitud == 'pendiente':
+            return {"exists": True, "can_register": False, "message": "Este ORCID ya tiene una solicitud pendiente"}
+        elif estado_solicitud == 'aprobada' and activo:
+            return {"exists": True, "can_register": False, "message": "Este ORCID ya pertenece a un colaborador activo"}
+        else:
+            return {"exists": True, "can_register": True}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error en check_collaborator_orcid: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/api/colaboradores/check-cedula")
+def check_collaborator_cedula(data: CheckCedula):
+    try:
+        cedula = data.cedula.strip()
+        conn = get_db_connection()
+        if not conn:
+            raise HTTPException(status_code=500, detail="Error de conexión")
+
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT estado_solicitud, activo
+            FROM Colaboradores
+            WHERE numero_cedula = ? AND numero_cedula != ''
+        """, (cedula,))
+
+        result = cursor.fetchone()
+        conn.close()
+
+        if not result:
+            return {"exists": False, "can_register": True}
+
+        estado_solicitud, activo = result
+
+        if estado_solicitud == 'pendiente':
+            return {"exists": True, "can_register": False, "message": "Esta cédula ya tiene una solicitud pendiente"}
+        elif estado_solicitud == 'aprobada' and activo:
+            return {"exists": True, "can_register": False, "message": "Esta cédula ya pertenece a un colaborador activo"}
+        else:
+            return {"exists": True, "can_register": True}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error en check_collaborator_cedula: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

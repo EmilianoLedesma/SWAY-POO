@@ -147,11 +147,11 @@ def _build_text(nombre: str, institucion: str) -> str:
 
 
 def send_welcome_email(nombre: str, email: str, institucion: str) -> None:
-    """Envía el correo de bienvenida vía SMTP de MailerSend.
+    """Envía el correo de bienvenida vía Gmail SMTP.
     Se ejecuta en background — los errores se loguean sin interrumpir el flujo."""
     try:
-        smtp_host = os.getenv("MAIL_HOST", "smtp.mailersend.net")
-        smtp_port = int(os.getenv("MAIL_PORT", "2525"))
+        smtp_host = os.getenv("MAIL_HOST", "smtp.gmail.com")
+        smtp_port = int(os.getenv("MAIL_PORT", "587"))
         smtp_user = os.getenv("MAIL_USER", "")
         smtp_pass = os.getenv("MAIL_PASS", "")
 
