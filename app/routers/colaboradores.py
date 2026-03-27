@@ -98,6 +98,8 @@ def colaborador_register(data: ColaboradorRegister, background_tasks: Background
                 elif estado == 'aprobada':
                     raise HTTPException(status_code=400, detail="Ya eres un colaborador activo")
             user_id = existing_user[0]
+            # Reactivar usuario si fue desactivado previamente
+            cursor.execute("UPDATE Usuarios SET activo = 1 WHERE id = ?", (user_id,))
         else:
             if data.apellidoPaterno:
                 primer_nombre = data.nombre
@@ -125,9 +127,9 @@ def colaborador_register(data: ColaboradorRegister, background_tasks: Background
             INSERT INTO Colaboradores (
                 id_usuario, especialidad, grado_academico, institucion,
                 años_experiencia, numero_cedula, orcid, motivacion,
-                estado_solicitud, fecha_aprobacion, aprobado_por
+                estado_solicitud, fecha_aprobacion, aprobado_por, activo
             ) OUTPUT INSERTED.id
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'aprobada', GETDATE(), NULL)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'aprobada', GETDATE(), NULL, 1)
         """, (
             user_id, data.especialidad, data.grado_academico, data.institucion,
             data.años_experiencia, data.numero_cedula, data.orcid, data.motivacion
