@@ -993,6 +993,7 @@
     <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
 
     <!-- Archivos JavaScript principales de la tienda -->
+    <script src="/config.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tienda.js') }}"></script>
@@ -1409,7 +1410,7 @@
         console.log("Order data prepared:", orderData);
 
         // Send to server
-        fetch("http://localhost:8000/api/pedidos/crear", {
+        fetch("/api/pedidos/crear", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

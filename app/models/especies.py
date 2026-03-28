@@ -1,7 +1,7 @@
 # Para los modelos de validaciones el nombre debe reflejar la entidad que protege.
 # Se usa Field para agregar validaciones adicionales: longitud, rangos, descripción y ejemplos.
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 
 
 class EspecieCreate(BaseModel):
@@ -21,13 +21,13 @@ class EspecieCreate(BaseModel):
         "", max_length=2000,
         description="Descripción general de la especie"
     )
-    esperanza_vida: int = Field(
-        0, ge=0, le=500,
-        description="Esperanza de vida en años (0 = no especificada, máx. 500)"
+    esperanza_vida: Optional[int] = Field(
+        None, ge=0, le=500,
+        description="Esperanza de vida en años (None = no especificada, máx. 500)"
     )
-    poblacion_estimada: int = Field(
-        0, ge=0,
-        description="Número estimado de individuos en la naturaleza (0 = no especificado)"
+    poblacion_estimada: Optional[int] = Field(
+        None, ge=0,
+        description="Número estimado de individuos en la naturaleza (None = no especificado)"
     )
     id_estado_conservacion: int = Field(
         ..., ge=1,
@@ -63,18 +63,17 @@ class EspecieUpdate(BaseModel):
         description="Nombre científico en nomenclatura binomial",
         example="Dermochelys coriacea"
     )
-    # Nullable en BD — valor por defecto vacío o cero; nunca Optional para evitar anyOf en Swagger
     descripcion: str = Field(
         "", max_length=2000,
         description="Descripción general de la especie"
     )
-    esperanza_vida: int = Field(
-        0, ge=0, le=500,
-        description="Esperanza de vida en años (0 = no especificada, máx. 500)"
+    esperanza_vida: Optional[int] = Field(
+        None, ge=0, le=500,
+        description="Esperanza de vida en años (None = no especificada, máx. 500)"
     )
-    poblacion_estimada: int = Field(
-        0, ge=0,
-        description="Número estimado de individuos en la naturaleza (0 = no especificado)"
+    poblacion_estimada: Optional[int] = Field(
+        None, ge=0,
+        description="Número estimado de individuos en la naturaleza (None = no especificado)"
     )
     id_estado_conservacion: int = Field(
         ..., ge=1,

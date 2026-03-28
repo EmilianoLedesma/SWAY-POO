@@ -3,7 +3,6 @@
 // Sistema principal de funcionalidades de la página
 // =============================================
 
-const API_BASE = 'http://localhost:8000/api';
 
 function authHeaders() {
   const token = localStorage.getItem('tienda_token');

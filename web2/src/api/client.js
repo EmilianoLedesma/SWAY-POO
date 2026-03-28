@@ -1,4 +1,4 @@
-const BASE = 'http://localhost:8000/api'
+const BASE = '/api'
 
 function getToken() {
   return localStorage.getItem('colab_token')
@@ -20,7 +20,11 @@ async function request(method, path, body) {
   const data = text ? JSON.parse(text) : {}
 
   if (!res.ok) {
-    throw new Error(data.detail || data.error || data.message || `Error ${res.status}`)
+    let detail = data.detail || data.error || data.message || `Error ${res.status}`
+    if (Array.isArray(detail)) {
+      detail = detail.map(d => `${d.loc?.slice(-1)[0] ?? ''}: ${d.msg}`).join('; ')
+    }
+    throw new Error(String(detail))
   }
   return data
 }

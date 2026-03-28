@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, Response
 from flask_cors import CORS
 import os
 from sqlalchemy.orm import scoped_session
@@ -31,6 +31,12 @@ def internal_error(error):
 
 # ── Web 1 — Rutas de páginas HTML ────────────────────────────────
 # Se mantienen en app.py para que url_for() en templates funcione sin prefijo de blueprint
+
+@app.route('/config.js')
+def config_js():
+    api_base = os.getenv('API_BASE_URL', 'http://localhost:8000/api')
+    return Response(f'const API_BASE = "{api_base}";', mimetype='application/javascript')
+
 
 @app.route('/')
 def index():
@@ -76,9 +82,6 @@ def login_page():
 def register_page():
     return render_template('register.html')
 
-@app.route('/portal-colaboradores')
-def portal_colaboradores():
-    return render_template('portal-colaboradores.html')
 
 @app.route('/test_dropdown.html')
 def test_dropdown():

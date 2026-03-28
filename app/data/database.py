@@ -1,5 +1,24 @@
-import pyodbc
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
 import os
+
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+psycopg://sway_app:sway123@localhost:5433/sway"
+)
+
+engine = create_engine(DATABASE_URL)
+sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+
+def get_db():
+    db = sessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 def construir_nombre_completo(nombre, apellido_paterno, apellido_materno, prefijo=""):
@@ -17,34 +36,3 @@ def construir_nombre_completo(nombre, apellido_paterno, apellido_materno, prefij
             return f"{prefijo}{nombre} {' '.join(apellidos)}".strip()
         else:
             return f"{prefijo}{nombre}".strip()
-
-
-def get_db_connection():
-    try:
-        server = 'DESKTOP-VAT773J'
-        database = 'sway'
-        username = 'EmilianoLedesma'
-        password = 'Emiliano1'
-        connection_string = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
-        connection = pyodbc.connect(connection_string)
-        return connection
-    except Exception as e:
-        print(f"Error de conexión: {e}")
-        return None
-
-
-def get_engine():
-    from sqlalchemy import create_engine
-    server = 'DESKTOP-VAT773J'
-    database = 'sway'
-    username = 'EmilianoLedesma'
-    password = 'Emiliano1'
-    connection_string = f'mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server'
-    return create_engine(connection_string, echo=False)
-
-
-def get_session():
-    from sqlalchemy.orm import sessionmaker
-    engine = get_engine()
-    Session = sessionmaker(bind=engine)
-    return Session()

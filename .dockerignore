@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.git
+.gitignore
+venv/
+node_modules/
+web2/node_modules/
+*.md
+legacy/
+LEGACY_FLASK/
+test/
+docs/

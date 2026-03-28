@@ -149,7 +149,6 @@ export default function EspeciesGrid({ especies, onEdit, onDelete }) {
             especie={especie}
             onEdit={onEdit}
             onDelete={onDelete}
-            featured={idx === 0}
           />
         ))}
       </div>

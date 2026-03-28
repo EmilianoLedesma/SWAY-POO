@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: sway_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: sway_app
+      POSTGRES_PASSWORD: sway123
+      POSTGRES_DB: sway
+      POSTGRES_HOST_AUTH_METHOD: trust
+    command: postgres -c log_statement=all
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./SWAY_PostgreSQL.sql:/docker-entrypoint-initdb.d/01_init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sway_app -d sway"]
+      interval: 5s
+      retries: 5
+      timeout: 5s
+
+  api:
+    build: .
+    container_name: sway_api
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://sway_app:sway123@postgres:5432/sway
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -1,126 +1,152 @@
 from fastapi import APIRouter, HTTPException, Depends
-from app.data.database import get_db_connection
+from sqlalchemy.orm import Session
+from app.data.database import get_db
+from app.data.models import (
+    Pedido, DetallePedido, PagoPedido, Producto,
+    Estado, Municipio, Colonia, Calle, Direccion, Estatus
+)
 from app.security.auth import get_current_tienda_user
 from app.models.pedidos import PedidoCreate, CarritoAgregar
 
-router = APIRouter(tags=["pedidos"])
+router = APIRouter(prefix="/api", tags=["pedidos"])
 
 
-@router.post("/api/pedidos/crear")
-def crear_pedido(data: PedidoCreate):
+def _buscar_o_crear_calle(db: Session, direccion_info) -> int:
+    """Busca o crea la cadena estado->municipio->colonia->calle y retorna el id de calle."""
+    estado = db.query(Estado).filter(Estado.nombre == direccion_info.estado).first()
+    if not estado:
+        estado = Estado(nombre=direccion_info.estado)
+        db.add(estado)
+        db.commit()
+        db.refresh(estado)
+
+    municipio = db.query(Municipio).filter(
+        Municipio.nombre == direccion_info.municipio,
+        Municipio.id_estado == estado.id
+    ).first()
+    if not municipio:
+        municipio = Municipio(nombre=direccion_info.municipio, id_estado=estado.id)
+        db.add(municipio)
+        db.commit()
+        db.refresh(municipio)
+
+    colonia = db.query(Colonia).filter(
+        Colonia.nombre == direccion_info.colonia,
+        Colonia.id_municipio == municipio.id
+    ).first()
+    if not colonia:
+        colonia = Colonia(
+            nombre=direccion_info.colonia,
+            id_municipio=municipio.id,
+            cp=direccion_info.codigo_postal
+        )
+        db.add(colonia)
+        db.commit()
+        db.refresh(colonia)
+
+    calle = db.query(Calle).filter(
+        Calle.nombre == direccion_info.calle,
+        Calle.id_colonia == colonia.id
+    ).first()
+    if not calle:
+        calle = Calle(
+            nombre=direccion_info.calle,
+            id_colonia=colonia.id,
+            n_exterior=direccion_info.numero_exterior,
+            n_interior=direccion_info.numero_interior
+        )
+        db.add(calle)
+        db.commit()
+        db.refresh(calle)
+
+    return calle.id
+
+
+@router.post("/pedidos/crear")
+async def crear_pedido(data: PedidoCreate, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
+        id_calle = _buscar_o_crear_calle(db, data.direccion)
 
-        cursor = conn.cursor()
+        nueva_direccion = Direccion(id_calle=id_calle)
+        db.add(nueva_direccion)
+        db.commit()
+        db.refresh(nueva_direccion)
 
-        def buscar_o_crear_direccion(direccion_info):
-            cursor.execute("SELECT id FROM Estados WHERE nombre = ?", (direccion_info.estado,))
-            estado = cursor.fetchone()
-            if not estado:
-                cursor.execute("INSERT INTO Estados (nombre) VALUES (?)", (direccion_info.estado,))
-                cursor.execute("SELECT @@IDENTITY")
-                estado_id = cursor.fetchone()[0]
-            else:
-                estado_id = estado[0]
-
-            cursor.execute("SELECT id FROM Municipios WHERE nombre = ? AND id_estado = ?", (direccion_info.municipio, estado_id))
-            municipio = cursor.fetchone()
-            if not municipio:
-                cursor.execute("INSERT INTO Municipios (nombre, id_estado) VALUES (?, ?)", (direccion_info.municipio, estado_id))
-                cursor.execute("SELECT @@IDENTITY")
-                municipio_id = cursor.fetchone()[0]
-            else:
-                municipio_id = municipio[0]
-
-            cursor.execute("SELECT id FROM Colonias WHERE nombre = ? AND id_municipio = ?", (direccion_info.colonia, municipio_id))
-            colonia = cursor.fetchone()
-            if not colonia:
-                cp = direccion_info.codigo_postal
-                cursor.execute("INSERT INTO Colonias (nombre, id_municipio, cp) VALUES (?, ?, ?)", (direccion_info.colonia, municipio_id, cp))
-                cursor.execute("SELECT @@IDENTITY")
-                colonia_id = cursor.fetchone()[0]
-            else:
-                colonia_id = colonia[0]
-
-            cursor.execute("SELECT id FROM Calles WHERE nombre = ? AND id_colonia = ?", (direccion_info.calle, colonia_id))
-            calle = cursor.fetchone()
-            if not calle:
-                cursor.execute("INSERT INTO Calles (nombre, id_colonia, n_exterior, n_interior) VALUES (?, ?, ?, ?)",
-                             (direccion_info.calle, colonia_id, direccion_info.numero_exterior, direccion_info.numero_interior))
-                cursor.execute("SELECT @@IDENTITY")
-                calle_id = cursor.fetchone()[0]
-            else:
-                calle_id = calle[0]
-
-            return calle_id
-
-        id_calle = buscar_o_crear_direccion(data.direccion)
-
-        cursor.execute("INSERT INTO Direcciones (id_calle) VALUES (?)", (id_calle,))
-        cursor.execute("SELECT @@IDENTITY")
-        direccion_id = cursor.fetchone()[0]
-
-        total = 0
+        total = 0.0
         for item in data.productos:
-            item_id = item.get('id') if isinstance(item, dict) else getattr(item, 'id', None)
-            item_qty = item.get('quantity', item.get('cantidad', 1)) if isinstance(item, dict) else getattr(item, 'quantity', 1)
-            cursor.execute("SELECT precio FROM Productos WHERE id = ?", (item_id,))
-            producto = cursor.fetchone()
+            item_id = item.get("id") if isinstance(item, dict) else getattr(item, "id", None)
+            item_qty = int(item.get("quantity", item.get("cantidad", 1)) if isinstance(item, dict) else getattr(item, "quantity", 1))
+            producto = db.query(Producto).filter(Producto.id == item_id).first()
             if producto:
-                total += float(producto[0]) * int(item_qty)
+                total += float(producto.precio) * item_qty
 
-        cursor.execute("""
-            INSERT INTO Pedidos (id_usuario, total, id_estatus, id_direccion, telefono_contacto)
-            VALUES (?, ?, ?, ?, ?)
-        """, (data.user_id, total, 1, direccion_id, data.direccion.telefono_contacto or ''))
-
-        cursor.execute("SELECT @@IDENTITY")
-        pedido_id = cursor.fetchone()[0]
+        nuevo_pedido = Pedido(
+            id_usuario=data.user_id,
+            total=total,
+            id_estatus=1,
+            id_direccion=nueva_direccion.id,
+            telefono_contacto=data.direccion.telefono_contacto or ""
+        )
+        db.add(nuevo_pedido)
+        db.commit()
+        db.refresh(nuevo_pedido)
 
         for item in data.productos:
-            item_id = item.get('id') if isinstance(item, dict) else getattr(item, 'id', None)
-            item_qty = int(item.get('quantity', item.get('cantidad', 1)) if isinstance(item, dict) else getattr(item, 'quantity', 1))
-            cursor.execute("SELECT precio FROM Productos WHERE id = ?", (item_id,))
-            producto = cursor.fetchone()
+            item_id = item.get("id") if isinstance(item, dict) else getattr(item, "id", None)
+            item_qty = int(item.get("quantity", item.get("cantidad", 1)) if isinstance(item, dict) else getattr(item, "quantity", 1))
+            producto = db.query(Producto).filter(Producto.id == item_id).first()
             if producto:
-                precio_unitario = float(producto[0])
+                precio_unitario = float(producto.precio)
                 subtotal = precio_unitario * item_qty
-                cursor.execute("""
-                    INSERT INTO DetallesPedido (id_pedido, id_producto, cantidad, precio_unitario, subtotal)
-                    VALUES (?, ?, ?, ?, ?)
-                """, (pedido_id, item_id, item_qty, precio_unitario, subtotal))
+                db.add(DetallePedido(
+                    id_pedido=nuevo_pedido.id,
+                    id_producto=item_id,
+                    cantidad=item_qty,
+                    precio_unitario=precio_unitario,
+                    subtotal=subtotal
+                ))
 
         pago = data.pago
-        if pago.tipo_pago == 'paypal':
-            cursor.execute("""
-                INSERT INTO PagosPedidos (id_pedido, numero_tarjeta, fecha_expiracion, cvv, nombre_tarjeta, id_tipoTarjeta, monto, id_estatus)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 3)
-            """, (pedido_id, 'PAYPAL_TRANS', 'N/A', 'N/A', 'PayPal User', 5, total))
+        if pago.tipo_pago == "paypal":
+            db.add(PagoPedido(
+                id_pedido=nuevo_pedido.id,
+                numero_tarjeta="PAYPAL_TRANS",
+                fecha_expiracion="N/A",
+                cvv="N/A",
+                nombre_tarjeta="PayPal User",
+                id_tipotarjeta=5,
+                monto=total,
+                id_estatus=3
+            ))
         else:
-            numero_limpio = (pago.numero_tarjeta or '').replace(' ', '')
+            numero_limpio = (pago.numero_tarjeta or "").replace(" ", "")
             tipo_tarjeta_id = 1
-            if numero_limpio.startswith('5'):
+            if numero_limpio.startswith("5"):
                 tipo_tarjeta_id = 2
-            elif numero_limpio.startswith('3'):
+            elif numero_limpio.startswith("3"):
                 tipo_tarjeta_id = 3
-            cursor.execute("""
-                INSERT INTO PagosPedidos (id_pedido, numero_tarjeta, fecha_expiracion, cvv, nombre_tarjeta, id_tipoTarjeta, monto, id_estatus)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 3)
-            """, (pedido_id, numero_limpio, pago.fecha_expiracion or '', pago.cvv or '', pago.nombre_tarjeta or '', tipo_tarjeta_id, total))
+            db.add(PagoPedido(
+                id_pedido=nuevo_pedido.id,
+                numero_tarjeta=numero_limpio,
+                fecha_expiracion=pago.fecha_expiracion or "",
+                cvv=pago.cvv or "",
+                nombre_tarjeta=pago.nombre_tarjeta or "",
+                id_tipotarjeta=tipo_tarjeta_id,
+                monto=total,
+                id_estatus=3
+            ))
 
         for item in data.productos:
-            item_id = item.get('id') if isinstance(item, dict) else getattr(item, 'id', None)
-            item_qty = int(item.get('quantity', item.get('cantidad', 1)) if isinstance(item, dict) else getattr(item, 'quantity', 1))
-            cursor.execute("UPDATE Productos SET stock = stock - ? WHERE id = ?", (item_qty, item_id))
+            item_id = item.get("id") if isinstance(item, dict) else getattr(item, "id", None)
+            item_qty = int(item.get("quantity", item.get("cantidad", 1)) if isinstance(item, dict) else getattr(item, "quantity", 1))
+            producto = db.query(Producto).filter(Producto.id == item_id).first()
+            if producto:
+                producto.stock = producto.stock - item_qty
 
-        cursor.execute("UPDATE Pedidos SET id_estatus = 3 WHERE id = ?", (pedido_id,))
+        nuevo_pedido.id_estatus = 3
+        db.commit()
 
-        conn.commit()
-        conn.close()
-
-        return {'success': True, 'pedido_id': pedido_id, 'total': total, 'message': 'Pedido creado exitosamente'}
+        return {"success": True, "pedido_id": nuevo_pedido.id, "total": total, "message": "Pedido creado exitosamente"}
 
     except HTTPException:
         raise
@@ -130,34 +156,30 @@ def crear_pedido(data: PedidoCreate):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/pedidos/mis-pedidos")
-def get_mis_pedidos(current_user: dict = Depends(get_current_tienda_user)):
+@router.get("/pedidos/mis-pedidos")
+async def get_mis_pedidos(current_user: dict = Depends(get_current_tienda_user), db: Session = Depends(get_db)):
     try:
         user_id = int(current_user["sub"])
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
 
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT p.id, p.fecha_pedido, p.total, e.nombre as estatus
-            FROM Pedidos p
-            JOIN Estatus e ON p.id_estatus = e.id
-            WHERE p.id_usuario = ?
-            ORDER BY p.fecha_pedido DESC
-        """, (user_id,))
+        pedidos_db = (
+            db.query(Pedido, Estatus)
+            .join(Estatus, Pedido.id_estatus == Estatus.id)
+            .filter(Pedido.id_usuario == user_id)
+            .order_by(Pedido.fecha_pedido.desc())
+            .all()
+        )
 
-        pedidos = []
-        for row in cursor.fetchall():
-            pedidos.append({
-                'id': row.id,
-                'fecha_pedido': row.fecha_pedido.isoformat() if row.fecha_pedido else None,
-                'total': float(row.total),
-                'estatus': row.estatus
-            })
+        pedidos = [
+            {
+                "id": p.id,
+                "fecha_pedido": p.fecha_pedido.isoformat() if p.fecha_pedido else None,
+                "total": float(p.total),
+                "estatus": e.nombre
+            }
+            for p, e in pedidos_db
+        ]
 
-        conn.close()
-        return {'pedidos': pedidos}
+        return {"pedidos": pedidos}
 
     except HTTPException:
         raise
@@ -165,28 +187,35 @@ def get_mis_pedidos(current_user: dict = Depends(get_current_tienda_user)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/pedidos/usuario/{user_id}")
-def get_pedidos_usuario(user_id: int, current_user: dict = Depends(get_current_tienda_user)):
+@router.get("/pedidos/usuario/{user_id}")
+async def get_pedidos_usuario(
+    user_id: int,
+    current_user: dict = Depends(get_current_tienda_user),
+    db: Session = Depends(get_db)
+):
     try:
         if int(current_user["sub"]) != user_id:
             raise HTTPException(status_code=403, detail="No autorizado para ver estos pedidos")
 
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
+        pedidos_db = (
+            db.query(Pedido, Estatus)
+            .join(Estatus, Pedido.id_estatus == Estatus.id)
+            .filter(Pedido.id_usuario == user_id)
+            .order_by(Pedido.fecha_pedido.desc())
+            .all()
+        )
 
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT p.id, p.fecha_pedido, p.total, e.nombre as estatus
-            FROM Pedidos p
-            JOIN Estatus e ON p.id_estatus = e.id
-            WHERE p.id_usuario = ?
-            ORDER BY p.fecha_pedido DESC
-        """, (user_id,))
+        pedidos = [
+            {
+                "id": p.id,
+                "fecha_pedido": p.fecha_pedido.isoformat() if p.fecha_pedido else None,
+                "total": float(p.total),
+                "estatus": e.nombre
+            }
+            for p, e in pedidos_db
+        ]
 
-        pedidos = [{'id': r.id, 'fecha_pedido': r.fecha_pedido.isoformat() if r.fecha_pedido else None, 'total': float(r.total), 'estatus': r.estatus} for r in cursor.fetchall()]
-        conn.close()
-        return {'pedidos': pedidos}
+        return {"pedidos": pedidos}
 
     except HTTPException:
         raise
@@ -194,58 +223,63 @@ def get_pedidos_usuario(user_id: int, current_user: dict = Depends(get_current_t
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/pedidos/detalle/{pedido_id}")
-def get_pedido_detalle(pedido_id: int, current_user: dict = Depends(get_current_tienda_user)):
+@router.get("/pedidos/detalle/{pedido_id}")
+async def get_pedido_detalle(
+    pedido_id: int,
+    current_user: dict = Depends(get_current_tienda_user),
+    db: Session = Depends(get_db)
+):
     try:
         user_id = int(current_user["sub"])
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
 
-        cursor = conn.cursor()
-        cursor.execute("SELECT id_usuario FROM Pedidos WHERE id = ?", (pedido_id,))
-        pedido_owner = cursor.fetchone()
-
-        if not pedido_owner or pedido_owner.id_usuario != user_id:
-            conn.close()
+        pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+        if not pedido or pedido.id_usuario != user_id:
             raise HTTPException(status_code=403, detail="No autorizado para ver este pedido")
 
-        cursor.execute("""
-            SELECT p.id, p.fecha_pedido, p.total, e.nombre as estatus, p.telefono_contacto,
-                   CONCAT(ca.nombre, ', ', co.nombre, ', ', m.nombre, ', ', es.nombre) as direccion_completa
-            FROM Pedidos p
-            JOIN Estatus e ON p.id_estatus = e.id
-            LEFT JOIN Direcciones d ON p.id_direccion = d.id
-            LEFT JOIN Calles ca ON d.id_calle = ca.id
-            LEFT JOIN Colonias co ON ca.id_colonia = co.id
-            LEFT JOIN Municipios m ON co.id_municipio = m.id
-            LEFT JOIN Estados es ON m.id_estado = es.id
-            WHERE p.id = ?
-        """, (pedido_id,))
+        estatus = db.query(Estatus).filter(Estatus.id == pedido.id_estatus).first()
 
-        pedido_row = cursor.fetchone()
-        if not pedido_row:
-            conn.close()
-            raise HTTPException(status_code=404, detail="Pedido no encontrado")
+        direccion_completa = None
+        if pedido.id_direccion:
+            direccion_obj = db.query(Direccion).filter(Direccion.id == pedido.id_direccion).first()
+            if direccion_obj and direccion_obj.id_calle:
+                calle = db.query(Calle).filter(Calle.id == direccion_obj.id_calle).first()
+                if calle:
+                    colonia = db.query(Colonia).filter(Colonia.id == calle.id_colonia).first()
+                    municipio = db.query(Municipio).filter(Municipio.id == colonia.id_municipio).first() if colonia else None
+                    estado_geo = db.query(Estado).filter(Estado.id == municipio.id_estado).first() if municipio else None
+                    partes = [
+                        calle.nombre,
+                        colonia.nombre if colonia else None,
+                        municipio.nombre if municipio else None,
+                        estado_geo.nombre if estado_geo else None
+                    ]
+                    direccion_completa = ", ".join(p for p in partes if p)
 
-        cursor.execute("""
-            SELECT dp.cantidad, dp.precio_unitario, dp.subtotal, pr.nombre as producto_nombre
-            FROM DetallesPedido dp
-            JOIN Productos pr ON dp.id_producto = pr.id
-            WHERE dp.id_pedido = ?
-        """, (pedido_id,))
+        detalles_db = (
+            db.query(DetallePedido, Producto)
+            .join(Producto, DetallePedido.id_producto == Producto.id)
+            .filter(DetallePedido.id_pedido == pedido_id)
+            .all()
+        )
 
-        detalles = [{'cantidad': r.cantidad, 'precio_unitario': float(r.precio_unitario), 'subtotal': float(r.subtotal), 'producto_nombre': r.producto_nombre} for r in cursor.fetchall()]
-        conn.close()
+        detalles = [
+            {
+                "cantidad": dp.cantidad,
+                "precio_unitario": float(dp.precio_unitario),
+                "subtotal": float(dp.subtotal),
+                "producto_nombre": prod.nombre
+            }
+            for dp, prod in detalles_db
+        ]
 
-        return {'pedido': {
-            'id': pedido_row.id,
-            'fecha_pedido': pedido_row.fecha_pedido.isoformat() if pedido_row.fecha_pedido else None,
-            'total': float(pedido_row.total),
-            'estatus': pedido_row.estatus,
-            'telefono_contacto': pedido_row.telefono_contacto,
-            'direccion': pedido_row.direccion_completa,
-            'detalles': detalles
+        return {"pedido": {
+            "id": pedido.id,
+            "fecha_pedido": pedido.fecha_pedido.isoformat() if pedido.fecha_pedido else None,
+            "total": float(pedido.total),
+            "estatus": estatus.nombre if estatus else None,
+            "telefono_contacto": pedido.telefono_contacto,
+            "direccion": direccion_completa,
+            "detalles": detalles
         }}
 
     except HTTPException:
@@ -254,40 +288,42 @@ def get_pedido_detalle(pedido_id: int, current_user: dict = Depends(get_current_
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/api/pedidos/reordenar/{pedido_id}")
-def reordenar_pedido(pedido_id: int, current_user: dict = Depends(get_current_tienda_user)):
+@router.post("/pedidos/reordenar/{pedido_id}")
+async def reordenar_pedido(
+    pedido_id: int,
+    current_user: dict = Depends(get_current_tienda_user),
+    db: Session = Depends(get_db)
+):
     try:
         user_id = int(current_user["sub"])
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
 
-        cursor = conn.cursor()
-        cursor.execute("SELECT id_usuario FROM Pedidos WHERE id = ?", (pedido_id,))
-        pedido_owner = cursor.fetchone()
-
-        if not pedido_owner or pedido_owner.id_usuario != user_id:
-            conn.close()
+        pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+        if not pedido or pedido.id_usuario != user_id:
             raise HTTPException(status_code=403, detail="No autorizado")
 
-        cursor.execute("""
-            SELECT dp.id_producto, dp.cantidad, pr.nombre, pr.precio, pr.stock, pr.imagen_url
-            FROM DetallesPedido dp
-            JOIN Productos pr ON dp.id_producto = pr.id
-            WHERE dp.id_pedido = ? AND pr.activo = 1
-        """, (pedido_id,))
+        detalles_db = (
+            db.query(DetallePedido, Producto)
+            .join(Producto, DetallePedido.id_producto == Producto.id)
+            .filter(DetallePedido.id_pedido == pedido_id, Producto.activo == True)
+            .all()
+        )
 
         productos = []
-        for row in cursor.fetchall():
-            if row.stock >= row.cantidad:
-                productos.append({'id': row.id_producto, 'nombre': row.nombre, 'precio': float(row.precio), 'cantidad': row.cantidad, 'imagen_url': row.imagen_url, 'stock': row.stock})
-
-        conn.close()
+        for dp, prod in detalles_db:
+            if prod.stock >= dp.cantidad:
+                productos.append({
+                    "id": prod.id,
+                    "nombre": prod.nombre,
+                    "precio": float(prod.precio),
+                    "cantidad": dp.cantidad,
+                    "imagen_url": prod.imagen_url,
+                    "stock": prod.stock
+                })
 
         if not productos:
             raise HTTPException(status_code=400, detail="No hay productos disponibles para reordenar")
 
-        return {'success': True, 'productos': productos, 'message': f'Se agregaron {len(productos)} productos al carrito'}
+        return {"success": True, "productos": productos, "message": f"Se agregaron {len(productos)} productos al carrito"}
 
     except HTTPException:
         raise
@@ -295,17 +331,10 @@ def reordenar_pedido(pedido_id: int, current_user: dict = Depends(get_current_ti
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/api/carrito/agregar")
-def agregar_al_carrito(data: CarritoAgregar):
+@router.post("/carrito/agregar")
+async def agregar_al_carrito(data: CarritoAgregar, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
-
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre, precio, stock, activo FROM Productos WHERE id = ?", (data.producto_id,))
-        producto = cursor.fetchone()
-        conn.close()
+        producto = db.query(Producto).filter(Producto.id == data.producto_id).first()
 
         if not producto or not producto.activo:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
@@ -313,7 +342,12 @@ def agregar_al_carrito(data: CarritoAgregar):
         if producto.stock < data.cantidad:
             raise HTTPException(status_code=400, detail="Stock insuficiente")
 
-        return {'success': True, 'producto': {'id': producto.id, 'nombre': producto.nombre, 'precio': float(producto.precio), 'stock': producto.stock}}
+        return {"success": True, "producto": {
+            "id": producto.id,
+            "nombre": producto.nombre,
+            "precio": float(producto.precio),
+            "stock": producto.stock
+        }}
 
     except HTTPException:
         raise
@@ -321,18 +355,11 @@ def agregar_al_carrito(data: CarritoAgregar):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/tipos-tarjeta")
-def get_tipos_tarjeta():
+@router.get("/tipos-tarjeta")
+async def get_tipos_tarjeta(db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre FROM TiposTarjeta ORDER BY nombre")
-        tipos = [{'id': row.id, 'nombre': row.nombre} for row in cursor.fetchall()]
-        conn.close()
-        return {'tipos_tarjeta': tipos}
-    except HTTPException:
-        raise
+        from app.data.models import TipoTarjeta
+        tipos = db.query(TipoTarjeta).order_by(TipoTarjeta.nombre).all()
+        return {"tipos_tarjeta": [{"id": t.id, "nombre": t.nombre} for t in tipos]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

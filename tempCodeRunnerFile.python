@@ -1,0 +1,14 @@
+import mailtrap as mt
+
+mail = mt.Mail(
+    sender=mt.Address(email="hello@proyecto-sway.site", name="Mailtrap Test"),
+    to=[mt.Address(email="123046244@upq.edu.mx")],
+    subject="You are awesome!",
+    text="Congrats for sending test email with Mailtrap!",
+    category="Integration Test",
+)
+
+client = mt.MailtrapClient(token="e867d9436c4f32dc5be37655ccb38204")
+response = client.send(mail)
+
+print(response)

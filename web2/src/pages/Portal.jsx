@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar.jsx'
 import EspeciesGrid from '../components/EspeciesGrid.jsx'
 import AvistamientosList from '../components/AvistamientosList.jsx'
 import EspecieModal from '../components/EspecieModal.jsx'
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal.jsx'
 import PerfilView from '../components/PerfilView.jsx'
 import DashboardView from '../components/DashboardView.jsx'
 
@@ -16,6 +17,7 @@ export default function Portal() {
   const [estadosConservacion, setEstados] = useState([])
   const [loading, setLoading]             = useState(true)
   const [modal, setModal]                 = useState({ open: false, especie: null })
+  const [confirmDelete, setConfirmDelete] = useState({ open: false, especie: null })
   const [sidebarOpen, setSidebarOpen]     = useState(() => window.innerWidth > 768)
   const [reporteLoading, setReporteLoading] = useState(false)
   const [reporteMsg, setReporteMsg]         = useState(null)
@@ -53,9 +55,14 @@ export default function Portal() {
     navigate('/')
   }
 
-  const handleDeleteEspecie = async (id) => {
-    if (!window.confirm('¿Eliminar esta especie? Esta acción no se puede deshacer.')) return
-    await api.deleteEspecie(id)
+  const handleDeleteEspecie = (id) => {
+    const especie = especies.find(e => e.id === id)
+    setConfirmDelete({ open: true, especie })
+  }
+
+  const handleConfirmDelete = async () => {
+    await api.deleteEspecie(confirmDelete.especie.id)
+    setConfirmDelete({ open: false, especie: null })
     await refreshEspecies()
   }
 
@@ -242,6 +249,14 @@ export default function Portal() {
           estadosConservacion={estadosConservacion}
           onSave={handleSaveEspecie}
           onClose={() => setModal({ open: false, especie: null })}
+        />
+      )}
+
+      {confirmDelete.open && (
+        <ConfirmDeleteModal
+          especie={confirmDelete.especie}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setConfirmDelete({ open: false, especie: null })}
         />
       )}
     </div>

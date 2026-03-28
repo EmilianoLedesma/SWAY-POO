@@ -1,56 +1,56 @@
-from fastapi import APIRouter, HTTPException
-from app.data.database import get_db_connection
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
+from app.data.database import get_db
+from app.data.models import (
+    Usuario, Contacto, Donador, Donacion, CategoriaProducto, Material
+)
 from app.models.catalogos import NewsletterSuscripcion, ContactoMensaje, DonacionCreate
 
-router = APIRouter(tags=["catalogos"])
+router = APIRouter(prefix="/api", tags=["catalogos"])
 
 
-@router.get("/api/regiones")
-def get_regiones():
+@router.get("/regiones")
+async def get_regiones():
     regiones = [
-        {'id': 'pacifico', 'nombre': 'Océano Pacífico', 'descripcion': 'El mayor océano del planeta'},
-        {'id': 'atlantico', 'nombre': 'Océano Atlántico', 'descripcion': 'Segundo océano más grande del mundo'},
-        {'id': 'indico', 'nombre': 'Océano Índico', 'descripcion': 'Tercer océano más grande'},
-        {'id': 'artico', 'nombre': 'Océano Ártico', 'descripcion': 'Océano polar del norte'},
-        {'id': 'antartico', 'nombre': 'Océano Antártico', 'descripcion': 'Océano que rodea la Antártida'},
-        {'id': 'mediterraneo', 'nombre': 'Mar Mediterráneo', 'descripcion': 'Mar semicerrado entre Europa, África y Asia'},
-        {'id': 'caribe', 'nombre': 'Mar Caribe', 'descripcion': 'Mar tropical en América Central'}
+        {"id": "pacifico", "nombre": "Océano Pacífico", "descripcion": "El mayor océano del planeta"},
+        {"id": "atlantico", "nombre": "Océano Atlántico", "descripcion": "Segundo océano más grande del mundo"},
+        {"id": "indico", "nombre": "Océano Índico", "descripcion": "Tercer océano más grande"},
+        {"id": "artico", "nombre": "Océano Ártico", "descripcion": "Océano polar del norte"},
+        {"id": "antartico", "nombre": "Océano Antártico", "descripcion": "Océano que rodea la Antártida"},
+        {"id": "mediterraneo", "nombre": "Mar Mediterráneo", "descripcion": "Mar semicerrado entre Europa, África y Asia"},
+        {"id": "caribe", "nombre": "Mar Caribe", "descripcion": "Mar tropical en América Central"}
     ]
-    return {'success': True, 'regiones': regiones}
+    return {"success": True, "regiones": regiones}
 
 
-@router.post("/api/newsletter")
-def suscribir_newsletter(data: NewsletterSuscripcion):
+@router.post("/newsletter")
+async def suscribir_newsletter(data: NewsletterSuscripcion, db: Session = Depends(get_db)):
     try:
         email = data.email
-        if not email or '@' not in email or '.' not in email:
+        if not email or "@" not in email or "." not in email:
             raise HTTPException(status_code=400, detail="Email inválido")
 
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
+        user = db.query(Usuario).filter(Usuario.email == email).first()
 
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, suscrito_newsletter FROM Usuarios WHERE email = ?", (email,))
-        user_row = cursor.fetchone()
-
-        if user_row:
-            if user_row[1]:
-                conn.close()
-                return {'success': True, 'message': 'Este email ya está suscrito al newsletter', 'already_subscribed': True}
+        if user:
+            if user.suscrito_newsletter:
+                return {"success": True, "message": "Este email ya está suscrito al newsletter", "already_subscribed": True}
             else:
-                cursor.execute("UPDATE Usuarios SET suscrito_newsletter = 1 WHERE email = ?", (email,))
-                conn.commit()
-                conn.close()
-                return {'success': True, 'message': 'Suscripción reactivada exitosamente'}
+                user.suscrito_newsletter = True
+                db.commit()
+                return {"success": True, "message": "Suscripción reactivada exitosamente"}
         else:
-            cursor.execute("""
-                INSERT INTO Usuarios (nombre, apellido_paterno, apellido_materno, email, suscrito_newsletter, fecha_registro, activo)
-                VALUES ('Usuario', 'Newsletter', NULL, ?, 1, GETDATE(), 1)
-            """, (email,))
-            conn.commit()
-            conn.close()
-            return {'success': True, 'message': 'Suscripción exitosa al newsletter'}
+            nuevo_usuario = Usuario(
+                nombre="Usuario",
+                apellido_paterno="Newsletter",
+                apellido_materno=None,
+                email=email,
+                suscrito_newsletter=True,
+                activo=True
+            )
+            db.add(nuevo_usuario)
+            db.commit()
+            return {"success": True, "message": "Suscripción exitosa al newsletter"}
 
     except HTTPException:
         raise
@@ -59,45 +59,44 @@ def suscribir_newsletter(data: NewsletterSuscripcion):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/api/contacto")
-def enviar_contacto(data: ContactoMensaje):
+@router.post("/contacto")
+async def enviar_contacto(data: ContactoMensaje, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
+        user = db.query(Usuario).filter(Usuario.email == data.email).first()
 
-        cursor = conn.cursor()
-        cursor.execute("SELECT id FROM Usuarios WHERE email = ?", (data.email,))
-        user_row = cursor.fetchone()
-
-        if user_row:
-            user_id = user_row.id
-        else:
+        if not user:
             if data.nombre and data.apellidoPaterno:
                 primer_nombre = data.nombre
                 apellido_paterno = data.apellidoPaterno
                 apellido_materno = data.apellidoMaterno
             else:
-                nombre_partes = data.name.split()
-                primer_nombre = nombre_partes[0] if nombre_partes else 'Usuario'
-                apellido_paterno = nombre_partes[1] if len(nombre_partes) > 1 else 'Sin Apellido'
-                apellido_materno = nombre_partes[2] if len(nombre_partes) > 2 else None
+                partes = data.name.split()
+                primer_nombre = partes[0] if partes else "Usuario"
+                apellido_paterno = partes[1] if len(partes) > 1 else "Sin Apellido"
+                apellido_materno = partes[2] if len(partes) > 2 else None
 
-            cursor.execute("""
-                INSERT INTO Usuarios (nombre, apellido_paterno, apellido_materno, email, suscrito_newsletter, activo)
-                VALUES (?, ?, ?, ?, 0, 1)
-            """, (primer_nombre, apellido_paterno, apellido_materno, data.email))
-            cursor.execute("SELECT @@IDENTITY")
-            user_id = cursor.fetchone()[0]
+            user = Usuario(
+                nombre=primer_nombre,
+                apellido_paterno=apellido_paterno,
+                apellido_materno=apellido_materno,
+                email=data.email,
+                suscrito_newsletter=False,
+                activo=True
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
 
-        cursor.execute("""
-            INSERT INTO Contactos (id_usuario, asunto, mensaje, fecha_contacto, respondido)
-            VALUES (?, ?, ?, GETDATE(), 0)
-        """, (user_id, data.subject, data.message))
+        nuevo_contacto = Contacto(
+            id_usuario=user.id,
+            asunto=data.subject,
+            mensaje=data.message,
+            respondido=False
+        )
+        db.add(nuevo_contacto)
+        db.commit()
 
-        conn.commit()
-        conn.close()
-        return {'success': True, 'message': 'Mensaje enviado exitosamente. Te contactaremos pronto.'}
+        return {"success": True, "message": "Mensaje enviado exitosamente. Te contactaremos pronto."}
 
     except HTTPException:
         raise
@@ -106,114 +105,108 @@ def enviar_contacto(data: ContactoMensaje):
         raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 
-@router.post("/api/procesar-donacion")
-def procesar_donacion(data: DonacionCreate):
+@router.post("/procesar-donacion")
+async def procesar_donacion(data: DonacionCreate, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
+        user = db.query(Usuario).filter(Usuario.email == data.contact_email).first()
 
-        cursor = conn.cursor()
-        cursor.execute("SELECT id FROM Usuarios WHERE email = ?", (data.contact_email,))
-        user_row = cursor.fetchone()
-
-        if user_row:
-            user_id = user_row[0]
-        else:
+        if not user:
             if data.contact_nombre and data.contact_apellido_paterno:
                 primer_nombre = data.contact_nombre
                 apellido_paterno = data.contact_apellido_paterno
                 apellido_materno = data.contact_apellido_materno
             else:
-                nombre_partes = data.contact_name.split()
-                primer_nombre = nombre_partes[0] if nombre_partes else 'Usuario'
-                apellido_paterno = nombre_partes[1] if len(nombre_partes) > 1 else 'Sin Apellido'
-                apellido_materno = nombre_partes[2] if len(nombre_partes) > 2 else None
+                partes = data.contact_name.split()
+                primer_nombre = partes[0] if partes else "Usuario"
+                apellido_paterno = partes[1] if len(partes) > 1 else "Sin Apellido"
+                apellido_materno = partes[2] if len(partes) > 2 else None
 
-            cursor.execute("""
-                INSERT INTO Usuarios (nombre, apellido_paterno, apellido_materno, email, suscrito_newsletter, fecha_registro, activo)
-                VALUES (?, ?, ?, ?, 0, GETDATE(), 1)
-            """, (primer_nombre, apellido_paterno, apellido_materno, data.contact_email))
-            cursor.execute("SELECT @@IDENTITY")
-            user_id = cursor.fetchone()[0]
+            user = Usuario(
+                nombre=primer_nombre,
+                apellido_paterno=apellido_paterno,
+                apellido_materno=apellido_materno,
+                email=data.contact_email,
+                suscrito_newsletter=False,
+                activo=True
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
 
-        cursor.execute("""
-            INSERT INTO Donadores (id_usuario, monto, fecha_donacion, id_tipoDonacion)
-            VALUES (?, ?, GETDATE(), 1)
-        """, (user_id, float(data.amount)))
-        cursor.execute("SELECT @@IDENTITY")
-        donador_id = cursor.fetchone()[0]
+        nuevo_donador = Donador(
+            id_usuario=user.id,
+            monto=float(data.amount),
+            id_tipodonacion=1
+        )
+        db.add(nuevo_donador)
+        db.commit()
+        db.refresh(nuevo_donador)
 
-        if data.payment_method == 'credit_card':
-            primer_digito = (data.card_number or '').replace(' ', '')[:1]
-            if primer_digito == '4':
+        if data.payment_method == "credit_card":
+            primer_digito = (data.card_number or "").replace(" ", "")[:1]
+            if primer_digito == "4":
                 tipo_tarjeta_id = 1
-            elif primer_digito in ['5', '2']:
+            elif primer_digito in ["5", "2"]:
                 tipo_tarjeta_id = 2
-            elif primer_digito == '3':
+            elif primer_digito == "3":
                 tipo_tarjeta_id = 3
             else:
                 tipo_tarjeta_id = 4
 
-            cursor.execute("""
-                INSERT INTO Donaciones (id_donador, numero_tarjeta_encriptado, fecha_expiracion_encriptada, cvv_encriptado, id_tipoTarjeta)
-                VALUES (?, ?, ?, ?, ?)
-            """, (donador_id, (data.card_number or '').replace(' ', ''), data.card_expiry, data.card_cvv, tipo_tarjeta_id))
-        elif data.payment_method == 'paypal':
-            cursor.execute("""
-                INSERT INTO Donaciones (id_donador, numero_tarjeta_encriptado, fecha_expiracion_encriptada, cvv_encriptado, id_tipoTarjeta)
-                VALUES (?, ?, ?, ?, ?)
-            """, (donador_id, 'PAYPAL_TRANSACTION', 'N/A', 'N/A', 5))
+            nueva_donacion = Donacion(
+                id_donador=nuevo_donador.id,
+                numero_tarjeta_encriptado=(data.card_number or "").replace(" ", ""),
+                fecha_expiracion_encriptada=data.card_expiry,
+                cvv_encriptado=data.card_cvv,
+                id_tipotarjeta=tipo_tarjeta_id
+            )
+            db.add(nueva_donacion)
+        elif data.payment_method == "paypal":
+            nueva_donacion = Donacion(
+                id_donador=nuevo_donador.id,
+                numero_tarjeta_encriptado="PAYPAL_TRANSACTION",
+                fecha_expiracion_encriptada="N/A",
+                cvv_encriptado="N/A",
+                id_tipotarjeta=5
+            )
+            db.add(nueva_donacion)
 
-        conn.commit()
-        conn.close()
-        return {'success': True, 'message': 'Donación procesada exitosamente', 'donador_id': donador_id}
+        db.commit()
+        return {"success": True, "message": "Donación procesada exitosamente", "donador_id": nuevo_donador.id}
 
     except HTTPException:
         raise
     except Exception as e:
         print(f"Error en procesar_donacion: {e}")
-        if 'conn' in dir() and conn:
-            try:
-                conn.rollback()
-                conn.close()
-            except:
-                pass
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/api/setup-tienda")
-def setup_tienda():
+@router.post("/setup-tienda")
+async def setup_tienda(db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
-
-        cursor = conn.cursor()
-
         categorias_ejemplo = [
-            ('Ropa Sostenible', 'Prendas fabricadas con materiales ecológicos'),
-            ('Accesorios Ecológicos', 'Productos útiles hechos con materiales reciclados'),
-            ('Educativos', 'Materiales educativos sobre conservación marina'),
-            ('Hogar Sustentable', 'Productos para el hogar que respetan el medio ambiente'),
-            ('Juguetes Ecológicos', 'Juguetes fabricados con materiales naturales')
+            ("Ropa Sostenible", "Prendas fabricadas con materiales ecológicos"),
+            ("Accesorios Ecológicos", "Productos útiles hechos con materiales reciclados"),
+            ("Educativos", "Materiales educativos sobre conservación marina"),
+            ("Hogar Sustentable", "Productos para el hogar que respetan el medio ambiente"),
+            ("Juguetes Ecológicos", "Juguetes fabricados con materiales naturales")
         ]
         for nombre, descripcion in categorias_ejemplo:
-            cursor.execute("""
-                IF NOT EXISTS (SELECT 1 FROM CategoriasProducto WHERE nombre = ?)
-                INSERT INTO CategoriasProducto (nombre, descripcion) VALUES (?, ?)
-            """, (nombre, nombre, descripcion))
+            existe = db.query(CategoriaProducto).filter(CategoriaProducto.nombre == nombre).first()
+            if not existe:
+                db.add(CategoriaProducto(nombre=nombre, descripcion=descripcion))
 
-        materiales_ejemplo = ['Algodón Orgánico', 'Plástico Reciclado', 'Bambú', 'Madera Certificada', 'Acero Inoxidable', 'Vidrio Reciclado', 'Materiales Naturales']
-        for material in materiales_ejemplo:
-            cursor.execute("""
-                IF NOT EXISTS (SELECT 1 FROM Materiales WHERE nombre = ?)
-                INSERT INTO Materiales (nombre) VALUES (?)
-            """, (material, material))
+        materiales_ejemplo = [
+            "Algodón Orgánico", "Plástico Reciclado", "Bambú",
+            "Madera Certificada", "Acero Inoxidable", "Vidrio Reciclado", "Materiales Naturales"
+        ]
+        for nombre in materiales_ejemplo:
+            existe = db.query(Material).filter(Material.nombre == nombre).first()
+            if not existe:
+                db.add(Material(nombre=nombre))
 
-        conn.commit()
-        conn.close()
-        return {'success': True, 'message': 'Tienda configurada con datos de ejemplo'}
+        db.commit()
+        return {"success": True, "message": "Tienda configurada con datos de ejemplo"}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

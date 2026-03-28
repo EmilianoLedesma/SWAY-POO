@@ -1,6 +1,5 @@
 Flask==2.3.3
 Flask-CORS==4.0.0
-pyodbc==4.0.39
 SQLAlchemy==2.0.35
 python-dotenv==1.0.0
 Werkzeug==2.3.7
@@ -15,7 +14,7 @@ pydantic>=2.0.0
 gunicorn==21.2.0
 
 # PostgreSQL support (para deployment en nube)
-psycopg2-binary==2.9.9
+psycopg[binary]>=3.1.0
 
 # Email
 mailersend>=0.6.0

@@ -1,71 +1,64 @@
-from fastapi import APIRouter, HTTPException
-from app.data.database import get_db_connection
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
+from app.data.database import get_db
+from app.data.models import Estado, Municipio, Colonia, Calle
 
-router = APIRouter(tags=["direcciones"])
+router = APIRouter(prefix="/api/direcciones", tags=["direcciones"])
 
 
-@router.get("/api/direcciones/estados")
-def get_estados():
+@router.get("/estados")
+async def get_estados(db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
-        cursor = conn.cursor()
-        cursor.execute("SELECT DISTINCT id, nombre FROM Estados ORDER BY nombre")
-        estados = [{'id': row.id, 'nombre': row.nombre} for row in cursor.fetchall()]
-        conn.close()
-        return {'estados': estados}
+        estados = db.query(Estado).order_by(Estado.nombre).distinct().all()
+        return {"estados": [{"id": e.id, "nombre": e.nombre} for e in estados]}
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/direcciones/municipios/{estado_id}")
-def get_municipios(estado_id: int):
+@router.get("/municipios/{estado_id}")
+async def get_municipios(estado_id: int, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre FROM Municipios WHERE id_estado = ? ORDER BY nombre", (estado_id,))
-        municipios = [{'id': row.id, 'nombre': row.nombre} for row in cursor.fetchall()]
-        conn.close()
-        return {'municipios': municipios}
+        municipios = (
+            db.query(Municipio)
+            .filter(Municipio.id_estado == estado_id)
+            .order_by(Municipio.nombre)
+            .all()
+        )
+        return {"municipios": [{"id": m.id, "nombre": m.nombre} for m in municipios]}
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/direcciones/colonias/{municipio_id}")
-def get_colonias(municipio_id: int):
+@router.get("/colonias/{municipio_id}")
+async def get_colonias(municipio_id: int, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre, cp FROM Colonias WHERE id_municipio = ? ORDER BY nombre", (municipio_id,))
-        colonias = [{'id': row.id, 'nombre': row.nombre, 'cp': row.cp} for row in cursor.fetchall()]
-        conn.close()
-        return {'colonias': colonias}
+        colonias = (
+            db.query(Colonia)
+            .filter(Colonia.id_municipio == municipio_id)
+            .order_by(Colonia.nombre)
+            .all()
+        )
+        return {"colonias": [{"id": c.id, "nombre": c.nombre, "cp": c.cp} for c in colonias]}
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/direcciones/calles/{colonia_id}")
-def get_calles(colonia_id: int):
+@router.get("/calles/{colonia_id}")
+async def get_calles(colonia_id: int, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre FROM Calles WHERE id_colonia = ? ORDER BY nombre", (colonia_id,))
-        calles = [{'id': row.id, 'nombre': row.nombre} for row in cursor.fetchall()]
-        conn.close()
-        return {'calles': calles}
+        calles = (
+            db.query(Calle)
+            .filter(Calle.id_colonia == colonia_id)
+            .order_by(Calle.nombre)
+            .all()
+        )
+        return {"calles": [{"id": c.id, "nombre": c.nombre} for c in calles]}
     except HTTPException:
         raise
     except Exception as e:

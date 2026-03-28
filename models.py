@@ -1,13 +1,16 @@
 """
 SWAY - Modelos SQLAlchemy
-Definición de modelos ORM para la base de datos SQL Server
+Definición de modelos ORM para la base de datos PostgreSQL
 """
 
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Date, Time, Numeric
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from datetime import datetime
-import pyodbc
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 Base = declarative_base()
 
@@ -309,16 +312,12 @@ class DetallePedido(Base):
 # ========================================
 
 def get_engine():
-    """Crear engine de SQLAlchemy para SQL Server"""
-    server = 'DESKTOP-VAT773J'
-    database = 'sway'
-    username = 'EmilianoLedesma'
-    password = 'Emiliano1'
-    
-    # Usar pyodbc para SQL Server
-    connection_string = f'mssql+pyodbc://{username}:{password}@{server}/{database}?driver=ODBC+Driver+17+for+SQL+Server'
-    
-    engine = create_engine(connection_string, echo=False)
+    """Crear engine de SQLAlchemy para PostgreSQL"""
+    database_url = os.environ.get(
+        'DATABASE_URL',
+        f"postgresql+psycopg2://{os.environ.get('DB_USER','sway_app')}:{os.environ.get('DB_PASSWORD','')}@{os.environ.get('DB_HOST','localhost')}:{os.environ.get('DB_PORT','5432')}/{os.environ.get('DB_NAME','sway')}"
+    )
+    engine = create_engine(database_url, echo=False)
     return engine
 
 def get_session():

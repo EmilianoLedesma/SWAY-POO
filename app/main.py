@@ -1,21 +1,20 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-
-load_dotenv(override=True)
 
 from app.routers import auth, colaboradores, especies, productos, pedidos, eventos, estadisticas, direcciones, catalogos
 
 app = FastAPI(title="SWAY API", description="API de conservación marina SWAY", version="2.0.0")
 
+_raw_origins = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:5000,http://localhost:5173,http://127.0.0.1:5000,http://127.0.0.1:5173"
+)
+_origins = [o.strip() for o in _raw_origins.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5000",
-        "http://localhost:5173",
-        "http://127.0.0.1:5000",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

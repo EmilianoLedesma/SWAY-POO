@@ -1,111 +1,93 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import Optional
-from app.data.database import get_db_connection, construir_nombre_completo
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+from app.data.database import get_db, construir_nombre_completo
+from app.data.models import Producto, CategoriaProducto, Material, ResenaProducto, Usuario
 
-router = APIRouter(tags=["productos"])
+router = APIRouter(prefix="/api", tags=["productos"])
 
 
-@router.get("/api/productos")
-def get_productos(
+@router.get("/productos")
+async def get_productos(
     categoria_id: Optional[int] = Query(None),
     busqueda: str = Query(""),
     pagina: int = Query(1),
     limite: int = Query(6),
-    ordenar: str = Query("fecha_agregado")
+    ordenar: str = Query("fecha_agregado"),
+    db: Session = Depends(get_db)
 ):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
+        # Subquery: avg rating and review count per product
+        resenas_sq = (
+            db.query(
+                ResenaProducto.id_producto.label("id_producto"),
+                func.avg(ResenaProducto.calificacion).label("calificacion_promedio"),
+                func.count(ResenaProducto.id).label("total_resenas"),
+            )
+            .group_by(ResenaProducto.id_producto)
+            .subquery()
+        )
 
-        base_query = """
-            SELECT
-                p.id, p.nombre, p.descripcion, p.precio, p.stock,
-                p.imagen_url, p.dimensiones, p.peso_gramos, p.es_sostenible,
-                p.fecha_agregado, cp.nombre as categoria_nombre,
-                m.nombre as material_nombre,
-                COALESCE(r.calificacion_promedio, 0) as calificacion_promedio,
-                COALESCE(r.total_reseñas, 0) as total_reseñas
-            FROM Productos p
-            LEFT JOIN CategoriasProducto cp ON p.id_categoria = cp.id
-            LEFT JOIN Materiales m ON p.id_material = m.id
-            LEFT JOIN (
-                SELECT id_producto,
-                       AVG(CAST(calificacion AS FLOAT)) as calificacion_promedio,
-                       COUNT(id) as total_reseñas
-                FROM ReseñasProducto
-                GROUP BY id_producto
-            ) r ON p.id = r.id_producto
-            WHERE p.activo = 1
-        """
-
-        params = []
+        q = (
+            db.query(Producto, CategoriaProducto, Material, resenas_sq)
+            .outerjoin(CategoriaProducto, Producto.id_categoria == CategoriaProducto.id)
+            .outerjoin(Material, Producto.id_material == Material.id)
+            .outerjoin(resenas_sq, Producto.id == resenas_sq.c.id_producto)
+            .filter(Producto.activo == True)
+        )
 
         if categoria_id:
-            base_query += " AND p.id_categoria = ?"
-            params.append(categoria_id)
-
+            q = q.filter(Producto.id_categoria == categoria_id)
         if busqueda:
-            base_query += " AND (p.nombre LIKE ? OR p.descripcion LIKE ?)"
-            params.extend([f'%{busqueda}%', f'%{busqueda}%'])
+            like = f"%{busqueda}%"
+            q = q.filter(
+                (Producto.nombre.ilike(like)) | (Producto.descripcion.ilike(like))
+            )
 
-        if ordenar == 'precio_asc':
-            base_query += " ORDER BY p.precio ASC"
-        elif ordenar == 'precio_desc':
-            base_query += " ORDER BY p.precio DESC"
-        elif ordenar == 'nombre':
-            base_query += " ORDER BY p.nombre ASC"
-        elif ordenar == 'popularidad':
-            base_query += " ORDER BY total_reseñas DESC"
+        if ordenar == "precio_asc":
+            q = q.order_by(Producto.precio.asc())
+        elif ordenar == "precio_desc":
+            q = q.order_by(Producto.precio.desc())
+        elif ordenar == "nombre":
+            q = q.order_by(Producto.nombre.asc())
+        elif ordenar == "popularidad":
+            q = q.order_by(func.coalesce(resenas_sq.c.total_resenas, 0).desc())
         else:
-            base_query += " ORDER BY p.fecha_agregado DESC"
+            q = q.order_by(Producto.fecha_agregado.desc())
 
+        total_productos = q.count()
         offset = (pagina - 1) * limite
-        base_query += f" OFFSET {offset} ROWS FETCH NEXT {limite} ROWS ONLY"
-
-        cursor = conn.cursor()
-        cursor.execute(base_query, params)
+        rows = q.offset(offset).limit(limite).all()
 
         productos = []
-        for row in cursor.fetchall():
+        for p, cat, mat, rsq in rows:
+            avg_rating = float(rsq.calificacion_promedio) if rsq and rsq.calificacion_promedio is not None else 0.0
+            total_rev = rsq.total_resenas if rsq and rsq.total_resenas else 0
             productos.append({
-                'id': row.id,
-                'name': row.nombre,
-                'description': row.descripcion,
-                'price': float(row.precio),
-                'stock': row.stock,
-                'image_url': row.imagen_url,
-                'dimensions': row.dimensiones,
-                'weight_grams': row.peso_gramos,
-                'is_sustainable': bool(row.es_sostenible),
-                'date_added': row.fecha_agregado.isoformat() if row.fecha_agregado else None,
-                'category': row.categoria_nombre,
-                'material': row.material_nombre,
-                'average_rating': round(row.calificacion_promedio, 1) if row.calificacion_promedio else 0,
-                'total_reviews': row.total_reseñas or 0
+                "id": p.id,
+                "name": p.nombre,
+                "description": p.descripcion,
+                "price": float(p.precio),
+                "stock": p.stock,
+                "image_url": p.imagen_url,
+                "dimensions": p.dimensiones,
+                "weight_grams": p.peso_gramos,
+                "is_sustainable": bool(p.es_sostenible),
+                "date_added": p.fecha_agregado.isoformat() if p.fecha_agregado else None,
+                "category": cat.nombre if cat else None,
+                "material": mat.nombre if mat else None,
+                "average_rating": round(avg_rating, 1),
+                "total_reviews": total_rev,
             })
 
-        count_query = "SELECT COUNT(*) as total FROM Productos p WHERE p.activo = 1"
-        count_params = []
-        if categoria_id:
-            count_query += " AND p.id_categoria = ?"
-            count_params.append(categoria_id)
-        if busqueda:
-            count_query += " AND (p.nombre LIKE ? OR p.descripcion LIKE ?)"
-            count_params.extend([f'%{busqueda}%', f'%{busqueda}%'])
-
-        cursor.execute(count_query, count_params)
-        total_productos = cursor.fetchone().total
-
-        conn.close()
-
         return {
-            'success': True,
-            'products': productos,
-            'total': total_productos,
-            'pagina': pagina,
-            'limite': limite,
-            'total_paginas': (total_productos + limite - 1) // limite
+            "success": True,
+            "products": productos,
+            "total": total_productos,
+            "pagina": pagina,
+            "limite": limite,
+            "total_paginas": (total_productos + limite - 1) // limite,
         }
 
     except HTTPException:
@@ -116,56 +98,48 @@ def get_productos(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/producto/{producto_id}")
-def get_producto_detalle(producto_id: int):
+@router.get("/producto/{producto_id}")
+async def get_producto_detalle(producto_id: int, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
-
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT p.id, p.nombre, p.descripcion, p.precio, p.stock,
-                   p.imagen_url, p.dimensiones, p.peso_gramos, p.es_sostenible,
-                   p.fecha_agregado, cp.nombre as categoria_nombre, m.nombre as material_nombre
-            FROM Productos p
-            LEFT JOIN CategoriasProducto cp ON p.id_categoria = cp.id
-            LEFT JOIN Materiales m ON p.id_material = m.id
-            WHERE p.id = ? AND p.activo = 1
-        """, (producto_id,))
-
-        row = cursor.fetchone()
+        row = (
+            db.query(Producto, CategoriaProducto, Material)
+            .outerjoin(CategoriaProducto, Producto.id_categoria == CategoriaProducto.id)
+            .outerjoin(Material, Producto.id_material == Material.id)
+            .filter(Producto.id == producto_id, Producto.activo == True)
+            .first()
+        )
         if not row:
-            conn.close()
             raise HTTPException(status_code=404, detail="Producto no encontrado")
 
-        cursor.execute("""
-            SELECT COALESCE(AVG(CAST(calificacion AS FLOAT)), 0) as calificacion_promedio,
-                   COUNT(id) as total_reseñas
-            FROM ReseñasProducto WHERE id_producto = ?
-        """, (producto_id,))
+        p, cat, mat = row
 
-        reseñas_row = cursor.fetchone()
-        conn.close()
+        stats = (
+            db.query(
+                func.coalesce(func.avg(ResenaProducto.calificacion), 0).label("avg"),
+                func.count(ResenaProducto.id).label("total"),
+            )
+            .filter(ResenaProducto.id_producto == producto_id)
+            .one()
+        )
 
         return {
-            'success': True,
-            'producto': {
-                'id': row.id,
-                'nombre': row.nombre,
-                'descripcion': row.descripcion,
-                'precio': float(row.precio),
-                'stock': row.stock,
-                'imagen_url': row.imagen_url,
-                'dimensiones': row.dimensiones,
-                'peso_gramos': row.peso_gramos,
-                'es_sostenible': bool(row.es_sostenible),
-                'fecha_agregado': row.fecha_agregado.isoformat() if row.fecha_agregado else None,
-                'categoria_nombre': row.categoria_nombre,
-                'material_nombre': row.material_nombre,
-                'calificacion_promedio': round(reseñas_row.calificacion_promedio, 1) if reseñas_row else 0,
-                'total_reseñas': reseñas_row.total_reseñas if reseñas_row else 0
-            }
+            "success": True,
+            "producto": {
+                "id": p.id,
+                "nombre": p.nombre,
+                "descripcion": p.descripcion,
+                "precio": float(p.precio),
+                "stock": p.stock,
+                "imagen_url": p.imagen_url,
+                "dimensiones": p.dimensiones,
+                "peso_gramos": p.peso_gramos,
+                "es_sostenible": bool(p.es_sostenible),
+                "fecha_agregado": p.fecha_agregado.isoformat() if p.fecha_agregado else None,
+                "categoria_nombre": cat.nombre if cat else None,
+                "material_nombre": mat.nombre if mat else None,
+                "calificacion_promedio": round(float(stats.avg), 1),
+                "total_reseñas": stats.total,
+            },
         }
 
     except HTTPException:
@@ -174,36 +148,28 @@ def get_producto_detalle(producto_id: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/reseñas/{producto_id}")
-def get_reseñas_producto(producto_id: int):
+@router.get("/reseñas/{producto_id}")
+async def get_resenas_producto(producto_id: int, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
+        rows = (
+            db.query(ResenaProducto, Usuario)
+            .join(Usuario, ResenaProducto.id_usuario == Usuario.id)
+            .filter(ResenaProducto.id_producto == producto_id)
+            .order_by(ResenaProducto.fecha_resena.desc())
+            .all()
+        )
 
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT r.id, r.calificacion, r.comentario, r.fecha_reseña,
-                   u.nombre, u.apellido_paterno, u.apellido_materno
-            FROM ReseñasProducto r
-            JOIN Usuarios u ON r.id_usuario = u.id
-            WHERE r.id_producto = ?
-            ORDER BY r.fecha_reseña DESC
-        """, (producto_id,))
-
-        reseñas = []
-        for row in cursor.fetchall():
-            usuario_nombre = construir_nombre_completo(row.nombre, row.apellido_paterno, row.apellido_materno)
-            reseñas.append({
-                'id': row.id,
-                'calificacion': row.calificacion,
-                'comentario': row.comentario,
-                'fecha_reseña': row.fecha_reseña.isoformat() if row.fecha_reseña else None,
-                'usuario_nombre': usuario_nombre
+        resenas = []
+        for r, u in rows:
+            resenas.append({
+                "id": r.id,
+                "calificacion": r.calificacion,
+                "comentario": r.comentario,
+                "fecha_reseña": r.fecha_resena.isoformat() if r.fecha_resena else None,
+                "usuario_nombre": construir_nombre_completo(u.nombre, u.apellido_paterno, u.apellido_materno),
             })
 
-        conn.close()
-        return {'reseñas': reseñas}
+        return {"reseñas": resenas}
 
     except HTTPException:
         raise
@@ -211,33 +177,24 @@ def get_reseñas_producto(producto_id: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/materiales")
-def get_materiales():
+@router.get("/materiales")
+async def get_materiales(db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre FROM Materiales ORDER BY nombre")
-        materiales = [{'id': row.id, 'nombre': row.nombre} for row in cursor.fetchall()]
-        conn.close()
-        return {'materiales': materiales}
+        materiales = db.query(Material).order_by(Material.nombre).all()
+        return {"materiales": [{"id": m.id, "nombre": m.nombre} for m in materiales]}
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/api/categorias")
-def get_categories():
+@router.get("/categorias")
+async def get_categories(db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
-        cursor = conn.cursor()
-        cursor.execute('SELECT id, nombre, descripcion FROM CategoriasProducto ORDER BY nombre')
-        categories_list = [{'id': r[0], 'name': r[1], 'description': r[2] or ''} for r in cursor.fetchall()]
-        conn.close()
-        return {'success': True, 'categories': categories_list}
+        cats = db.query(CategoriaProducto).order_by(CategoriaProducto.nombre).all()
+        return {
+            "success": True,
+            "categories": [{"id": c.id, "name": c.nombre, "description": c.descripcion or ""} for c in cats],
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

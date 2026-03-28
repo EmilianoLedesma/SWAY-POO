@@ -1,5 +1,8 @@
-import pyodbc
+import psycopg
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def construir_nombre_completo(nombre, apellido_paterno, apellido_materno, prefijo=""):
@@ -29,14 +32,14 @@ def construir_nombre_completo(nombre, apellido_paterno, apellido_materno, prefij
 
 def get_db_connection():
     try:
-        server = 'DESKTOP-VAT773J'
-        database = 'sway'  # Cambiado a la base de datos sway
-        username = 'EmilianoLedesma'
-        password = 'Emiliano1'
-
-        connection_string = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
-        connection = pyodbc.connect(connection_string)
-        return connection
+        conn = psycopg.connect(
+            host=os.environ.get('DB_HOST', 'localhost'),
+            port=os.environ.get('DB_PORT', '5433'),
+            dbname=os.environ.get('DB_NAME', 'sway'),
+            user=os.environ.get('DB_USER', 'sway_app'),
+            password=os.environ.get('DB_PASSWORD', '')
+        )
+        return conn
     except Exception as e:
-        print(f"Error de conexión: {e}")
+        print(f"Error de conexion: {e}")
         return None

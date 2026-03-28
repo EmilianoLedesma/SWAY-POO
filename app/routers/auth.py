@@ -1,10 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional
-from app.data.database import get_db_connection, construir_nombre_completo
+from sqlalchemy.orm import Session
+from app.data.database import get_db, construir_nombre_completo
+from app.data.models import Usuario
 from app.security.auth import create_token, get_current_tienda_user
 
-router = APIRouter(tags=["auth"])
+router = APIRouter(prefix="/api", tags=["auth"])
 
 
 class UserLogin(BaseModel):
@@ -39,40 +41,27 @@ class AuthRegister(BaseModel):
     newsletter: Optional[bool] = False
 
 
-@router.post("/api/user/login")
-def user_login(data: UserLogin):
+@router.post("/user/login")
+async def user_login(data: UserLogin, db: Session = Depends(get_db)):
     try:
-        email = data.email
-        password = data.password
-
-        if not email or not password:
+        if not data.email or not data.password:
             raise HTTPException(status_code=400, detail="Email y contraseña son requeridos")
 
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión a la base de datos")
+        user = db.query(Usuario).filter(
+            Usuario.email == data.email,
+            Usuario.activo == True
+        ).first()
 
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, nombre, apellido_paterno, apellido_materno,
-                   email, password_hash, telefono, activo
-            FROM Usuarios
-            WHERE email = ? AND activo = 1
-        """, (email,))
-
-        user = cursor.fetchone()
-        conn.close()
-
-        if user and user.password_hash == password:
-            nombre_completo = construir_nombre_completo(user.nombre, user.apellido_paterno, user.apellido_materno)
-
+        if user and user.password_hash == data.password:
+            nombre_completo = construir_nombre_completo(
+                user.nombre, user.apellido_paterno, user.apellido_materno
+            )
             token = create_token({
                 "sub": str(user.id),
                 "email": user.email,
                 "name": nombre_completo,
                 "token_type": "tienda"
             })
-
             return {
                 "success": True,
                 "message": "Login exitoso",
@@ -96,34 +85,35 @@ def user_login(data: UserLogin):
         raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 
-@router.post("/api/user/register")
-def user_register(data: UserRegister):
+@router.post("/user/register")
+async def user_register(data: UserRegister, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión a la base de datos")
-
-        cursor = conn.cursor()
-        cursor.execute("SELECT id FROM Usuarios WHERE email = ?", (data.email,))
-        if cursor.fetchone():
-            conn.close()
+        existente = db.query(Usuario).filter(Usuario.email == data.email).first()
+        if existente:
             raise HTTPException(status_code=400, detail="El email ya está registrado")
 
-        cursor.execute("""
-            INSERT INTO Usuarios (nombre, apellido_paterno, apellido_materno, email, password_hash, telefono, fecha_nacimiento, suscrito_newsletter, activo, fecha_registro)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, GETDATE())
-        """, (data.nombre, data.apellidoPaterno, data.apellidoMaterno, data.email, data.password, data.telefono, data.fecha_nacimiento, data.newsletter))
+        nuevo_usuario = Usuario(
+            nombre=data.nombre,
+            apellido_paterno=data.apellidoPaterno,
+            apellido_materno=data.apellidoMaterno,
+            email=data.email,
+            password_hash=data.password,
+            telefono=data.telefono,
+            fecha_nacimiento=data.fecha_nacimiento,
+            suscrito_newsletter=data.newsletter,
+            activo=True
+        )
+        db.add(nuevo_usuario)
+        db.commit()
+        db.refresh(nuevo_usuario)
 
-        conn.commit()
-        cursor.execute("SELECT @@IDENTITY")
-        user_id = cursor.fetchone()[0]
-        conn.close()
-
-        nombre_completo = data.nombre + ' ' + data.apellidoPaterno + (' ' + data.apellidoMaterno if data.apellidoMaterno else '')
+        nombre_completo = data.nombre + " " + data.apellidoPaterno
+        if data.apellidoMaterno:
+            nombre_completo += " " + data.apellidoMaterno
 
         token = create_token({
-            "sub": str(int(user_id)),
-            "email": data.email,
+            "sub": str(nuevo_usuario.id),
+            "email": nuevo_usuario.email,
             "name": nombre_completo,
             "token_type": "tienda"
         })
@@ -134,10 +124,10 @@ def user_register(data: UserRegister):
             "access_token": token,
             "token_type": "bearer",
             "user": {
-                "id": int(user_id),
+                "id": nuevo_usuario.id,
                 "nombre": nombre_completo,
-                "email": data.email,
-                "telefono": data.telefono
+                "email": nuevo_usuario.email,
+                "telefono": nuevo_usuario.telefono
             }
         }
 
@@ -149,44 +139,33 @@ def user_register(data: UserRegister):
         raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 
-@router.post("/api/user/logout")
-def logout():
+@router.post("/user/logout")
+async def logout():
     return {"success": True, "message": "Sesión cerrada exitosamente"}
 
 
-@router.get("/api/user/status")
-def user_status(current_user: dict = Depends(get_current_tienda_user)):
+@router.get("/user/status")
+async def user_status(current_user: dict = Depends(get_current_tienda_user), db: Session = Depends(get_db)):
     try:
         user_id = int(current_user["sub"])
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión")
 
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, nombre, apellido_paterno, apellido_materno,
-                   email, telefono, fecha_registro, fecha_nacimiento
-            FROM Usuarios
-            WHERE id = ?
-        """, (user_id,))
-
-        user = cursor.fetchone()
-        conn.close()
-
+        user = db.query(Usuario).filter(Usuario.id == user_id).first()
         if not user:
             raise HTTPException(status_code=401, detail="Usuario no encontrado")
 
-        nombre_completo = construir_nombre_completo(user[1], user[2], user[3])
+        nombre_completo = construir_nombre_completo(
+            user.nombre, user.apellido_paterno, user.apellido_materno
+        )
 
         return {
             "success": True,
             "user": {
-                "id": user[0],
+                "id": user.id,
                 "nombre": nombre_completo,
-                "email": user[4],
-                "telefono": user[5],
-                "fecha_registro": user[6].isoformat() if user[6] else None,
-                "fecha_nacimiento": user[7].isoformat() if user[7] else None
+                "email": user.email,
+                "telefono": user.telefono,
+                "fecha_registro": user.fecha_registro.isoformat() if user.fecha_registro else None,
+                "fecha_nacimiento": user.fecha_nacimiento.isoformat() if user.fecha_nacimiento else None
             }
         }
     except HTTPException:
@@ -196,17 +175,11 @@ def user_status(current_user: dict = Depends(get_current_tienda_user)):
         raise HTTPException(status_code=500, detail="Error al verificar sesión")
 
 
-@router.post("/api/auth/register")
-def auth_register(data: AuthRegister):
+@router.post("/auth/register")
+async def auth_register(data: AuthRegister, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión a la base de datos")
-
-        cursor = conn.cursor()
-        cursor.execute("SELECT id FROM Usuarios WHERE email = ?", (data.email,))
-        if cursor.fetchone():
-            conn.close()
+        existente = db.query(Usuario).filter(Usuario.email == data.email).first()
+        if existente:
             raise HTTPException(status_code=400, detail="El email ya está registrado")
 
         if data.apellidoPaterno:
@@ -214,22 +187,30 @@ def auth_register(data: AuthRegister):
             apellido_paterno = data.apellidoPaterno
             apellido_materno = data.apellidoMaterno
         else:
-            nombre_partes = data.nombre.split()
-            primer_nombre = nombre_partes[0] if nombre_partes else 'Usuario'
-            apellido_paterno = nombre_partes[1] if len(nombre_partes) > 1 else 'Sin Apellido'
-            apellido_materno = nombre_partes[2] if len(nombre_partes) > 2 else None
+            partes = data.nombre.split()
+            primer_nombre = partes[0] if partes else "Usuario"
+            apellido_paterno = partes[1] if len(partes) > 1 else "Sin Apellido"
+            apellido_materno = partes[2] if len(partes) > 2 else None
 
-        cursor.execute("""
-            INSERT INTO Usuarios (nombre, apellido_paterno, apellido_materno, email, password_hash, telefono, fecha_nacimiento, suscrito_newsletter)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (primer_nombre, apellido_paterno, apellido_materno, data.email, data.password, data.telefono, data.fecha_nacimiento, data.newsletter or False))
+        nuevo_usuario = Usuario(
+            nombre=primer_nombre,
+            apellido_paterno=apellido_paterno,
+            apellido_materno=apellido_materno,
+            email=data.email,
+            password_hash=data.password,
+            telefono=data.telefono,
+            fecha_nacimiento=data.fecha_nacimiento,
+            suscrito_newsletter=data.newsletter or False
+        )
+        db.add(nuevo_usuario)
+        db.commit()
+        db.refresh(nuevo_usuario)
 
-        conn.commit()
-        cursor.execute("SELECT @@IDENTITY")
-        user_id = cursor.fetchone()[0]
-        conn.close()
-
-        return {"success": True, "message": "Usuario registrado exitosamente", "user_id": int(user_id)}
+        return {
+            "success": True,
+            "message": "Usuario registrado exitosamente",
+            "user_id": nuevo_usuario.id
+        }
 
     except HTTPException:
         raise
@@ -238,28 +219,20 @@ def auth_register(data: AuthRegister):
         raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 
-@router.post("/api/auth/login")
-def auth_login(data: AuthLogin):
+@router.post("/auth/login")
+async def auth_login(data: AuthLogin, db: Session = Depends(get_db)):
     try:
-        conn = get_db_connection()
-        if not conn:
-            raise HTTPException(status_code=500, detail="Error de conexión a la base de datos")
-
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, nombre, apellido_paterno, apellido_materno,
-                   email, telefono, activo
-            FROM Usuarios
-            WHERE email = ? AND password_hash = ?
-        """, (data.email, data.password))
-
-        user = cursor.fetchone()
-        conn.close()
+        user = db.query(Usuario).filter(
+            Usuario.email == data.email,
+            Usuario.password_hash == data.password
+        ).first()
 
         if not user or not user.activo:
             raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
-        nombre_completo = construir_nombre_completo(user.nombre, user.apellido_paterno, user.apellido_materno)
+        nombre_completo = construir_nombre_completo(
+            user.nombre, user.apellido_paterno, user.apellido_materno
+        )
 
         return {
             "success": True,
