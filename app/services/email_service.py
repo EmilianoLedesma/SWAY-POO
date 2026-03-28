@@ -157,7 +157,8 @@ def send_welcome_email(nombre: str, email: str, institucion: str) -> None:
 
         msg = MIMEMultipart("alternative")
         msg["Subject"] = "¡Tu acceso como colaborador SWAY ha sido aprobado!"
-        msg["From"]    = f"{Header('SWAY Conservacion Marina', 'utf-8')} <{smtp_user}>"
+        sender_email = os.getenv("MAIL_FROM", f"noreply@proyecto-sway.site")
+        msg["From"]    = f"{Header('SWAY Conservacion Marina', 'utf-8')} <{sender_email}>"
         msg["To"]      = email
 
         msg.attach(MIMEText(_build_text(nombre, institucion), "plain", "utf-8"))
@@ -166,7 +167,7 @@ def send_welcome_email(nombre: str, email: str, institucion: str) -> None:
         with smtplib.SMTP(smtp_host, smtp_port) as server:
             server.starttls()
             server.login(smtp_user, smtp_pass)
-            server.sendmail(msg["From"], [email], msg.as_string())
+            server.sendmail(sender_email, [email], msg.as_string())
 
         print(f"[EMAIL] Bienvenida enviada a {email}")
 
