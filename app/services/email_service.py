@@ -269,7 +269,6 @@ def _build_newsletter_confirmation_html() -> str:
                            style="background:#f5fbff;border-radius:8px;text-align:center;">
                       <tr>
                         <td style="padding:20px 12px;">
-                          <p style="margin:0 0 8px;font-size:22px;">🐠</p>
                           <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#0d3b5e;">
                             Especies
                           </p>
@@ -285,7 +284,6 @@ def _build_newsletter_confirmation_html() -> str:
                            style="background:#f5fbff;border-radius:8px;text-align:center;">
                       <tr>
                         <td style="padding:20px 12px;">
-                          <p style="margin:0 0 8px;font-size:22px;">📊</p>
                           <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#0d3b5e;">
                             Datos
                           </p>
@@ -301,7 +299,6 @@ def _build_newsletter_confirmation_html() -> str:
                            style="background:#f5fbff;border-radius:8px;text-align:center;">
                       <tr>
                         <td style="padding:20px 12px;">
-                          <p style="margin:0 0 8px;font-size:22px;">🌊</p>
                           <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#0d3b5e;">
                             Impacto
                           </p>
