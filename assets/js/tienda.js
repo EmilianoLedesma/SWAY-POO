@@ -3,6 +3,11 @@
 // Sistema de comercio electrónico para productos marinos sostenibles
 // =============================================
 
+function authHeaders() {
+  const token = localStorage.getItem('tienda_token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 /**
  * Variables globales del sistema de tienda
  * Almacenan el estado de productos, categorías, carrito de compras y configuración general
@@ -160,12 +165,13 @@ async function checkUserStatus() {
         }
         
         // Verificar el estado actual del usuario en el servidor
-        const response = await fetch('/api/user/status', {
+        const response = await fetch(API_BASE + '/user/status', {
             method: 'GET',
             credentials: 'same-origin', // Incluir cookies de sesión
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                ...authHeaders()
             }
         });
         
@@ -279,7 +285,7 @@ function updateUserDropdown(isLoggedIn) {
  */
 async function loadProducts() {
     try {
-        const response = await fetch('/api/productos');
+        const response = await fetch(API_BASE + '/productos');
         const data = await response.json();
         
         if (data.success) {
@@ -303,7 +309,7 @@ async function loadProducts() {
  */
 async function loadCategories() {
     try {
-        const response = await fetch('/api/categorias');
+        const response = await fetch(API_BASE + '/categorias');
         const data = await response.json();
         
         if (data.success) {
@@ -458,7 +464,7 @@ function renderProducts() {
 async function loadImpactoSostenible() {
     try {
         console.log('Cargando datos de impacto sostenible...');
-        const response = await fetch('/api/impacto-sostenible');
+        const response = await fetch(API_BASE + '/impacto-sostenible');
         const data = await response.json();
         
         if (data.success) {
@@ -664,7 +670,7 @@ async function showProductModal(productId) {
     
     try {
         // Obtener detalles completos del producto desde el servidor
-        const response = await fetch(`/api/producto/${productId}`);
+        const response = await fetch(`${API_BASE}/producto/${productId}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -1039,7 +1045,7 @@ async function loadCheckoutData() {
     console.log('Loading checkout data for unified modal...');
     // Cargar estados
     try {
-        const response = await fetch('/api/direcciones/estados');
+        const response = await fetch(API_BASE + '/direcciones/estados');
         const data = await response.json();
         
         const stateSelect = document.getElementById('shipping-state');
@@ -1105,7 +1111,7 @@ async function loadMunicipios() {
     if (!stateId) return;
     
     try {
-        const response = await fetch(`/api/direcciones/municipios/${stateId}`);
+        const response = await fetch(`${API_BASE}/direcciones/municipios/${stateId}`);
         const data = await response.json();
         
         if (data.municipios) {
@@ -1132,7 +1138,7 @@ async function loadColonias() {
     if (!municipioId) return;
     
     try {
-        const response = await fetch(`/api/direcciones/colonias/${municipioId}`);
+        const response = await fetch(`${API_BASE}/direcciones/colonias/${municipioId}`);
         const data = await response.json();
         
         if (data.colonias) {
@@ -1158,7 +1164,7 @@ async function loadCalles() {
     if (!coloniaId) return;
     
     try {
-        const response = await fetch(`/api/direcciones/calles/${coloniaId}`);
+        const response = await fetch(`${API_BASE}/direcciones/calles/${coloniaId}`);
         const data = await response.json();
         
         if (data.calles) {
@@ -1284,17 +1290,18 @@ async function login(event) {
     const password = document.getElementById('loginPassword').value;
     
     try {
-        const response = await fetch('/api/user/login', {
+        const response = await fetch(API_BASE + '/user/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ email, password })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
+            if (data.access_token) localStorage.setItem('tienda_token', data.access_token);
             // Remover todos los flags de logout manual al iniciar sesión exitosamente
             localStorage.removeItem('manual-logout');
             localStorage.removeItem('manual-logout-time');
@@ -1346,7 +1353,7 @@ async function register(event) {
     }
     
     try {
-        const response = await fetch('/api/user/register', {
+        const response = await fetch(API_BASE + '/user/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1401,14 +1408,16 @@ async function register(event) {
 async function logout() {
     try {
         // Hacer logout en el servidor
-        const response = await fetch('/api/logout', {
+        const response = await fetch(API_BASE + '/logout', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                ...authHeaders()
             }
         });
-        
+
         // Limpiar datos locales independientemente de la respuesta del servidor
+        localStorage.removeItem('tienda_token');
         currentUser = null;
         localStorage.removeItem('usuario-sway');
         localStorage.removeItem('carrito-sway');
@@ -1774,10 +1783,11 @@ async function handleCheckoutSubmit(e) {
         submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
         submitBtn.disabled = true;
         
-        const response = await fetch('/api/pedidos/crear', {
+        const response = await fetch(API_BASE + '/pedidos/crear', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                ...authHeaders()
             },
             body: JSON.stringify(formData)
         });

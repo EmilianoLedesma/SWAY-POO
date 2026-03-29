@@ -3,6 +3,11 @@
 // Sistema de gestión y visualización de eventos marinos
 // =============================================
 
+function authHeaders() {
+  const token = localStorage.getItem('tienda_token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 /**
  * Variables globales del sistema de eventos
  * Controlan el estado del calendario, filtros y datos de eventos marinos
@@ -31,7 +36,7 @@ let datosFormularioCargados = false; // Control para evitar carga duplicada de d
  */
 async function cargarEventos() {
   try {
-    const response = await fetch('/api/eventos');
+    const response = await fetch(API_BASE + '/eventos');
     const data = await response.json();
     
     if (data.success) {
@@ -901,7 +906,7 @@ function crearEvento(e) {
   }
   
   // Enviar datos al servidor
-  fetch('/api/eventos/crear', {
+  fetch(API_BASE + '/eventos/crear', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -972,7 +977,7 @@ async function cargarTiposEvento() {
       return;
     }
     
-    const response = await fetch('/api/tipos-evento');
+    const response = await fetch(API_BASE + '/tipos-evento');
     const data = await response.json();
     
     if (data.success) {
@@ -1022,7 +1027,7 @@ async function cargarModalidades() {
       return;
     }
     
-    const response = await fetch('/api/modalidades');
+    const response = await fetch(API_BASE + '/modalidades');
     const data = await response.json();
     
     if (data.success) {

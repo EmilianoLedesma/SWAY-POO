@@ -1,0 +1,192 @@
+from fastapi import APIRouter, HTTPException, Depends, Query
+from typing import Optional
+from sqlalchemy.orm import Session
+from app.data.database import get_db
+from app.data.models import (
+    Evento, TipoEvento, Modalidad, Organizador, Usuario,
+    Estatus, Direccion, Calle, Colonia, Municipio, Estado
+)
+from app.security.auth import get_optional_tienda_user
+from app.models.eventos import EventoCreate
+
+router = APIRouter(prefix="/api", tags=["eventos"])
+
+
+@router.get("/eventos")
+async def get_eventos(
+    tipo: str = Query(""),
+    modalidad: str = Query(""),
+    fecha_inicio: str = Query(""),
+    fecha_fin: str = Query(""),
+    db: Session = Depends(get_db)
+):
+    try:
+        q = (
+            db.query(Evento, TipoEvento, Modalidad, Usuario, Estatus, Calle, Colonia, Municipio, Estado)
+            .outerjoin(TipoEvento, Evento.id_tipo_evento == TipoEvento.id)
+            .outerjoin(Modalidad, Evento.id_modalidad == Modalidad.id)
+            .outerjoin(Organizador, Evento.id_organizador == Organizador.id)
+            .outerjoin(Usuario, Organizador.id_usuario == Usuario.id)
+            .outerjoin(Estatus, Evento.id_estatus == Estatus.id)
+            .outerjoin(Direccion, Evento.id_direccion == Direccion.id)
+            .outerjoin(Calle, Direccion.id_calle == Calle.id)
+            .outerjoin(Colonia, Calle.id_colonia == Colonia.id)
+            .outerjoin(Municipio, Colonia.id_municipio == Municipio.id)
+            .outerjoin(Estado, Municipio.id_estado == Estado.id)
+            .filter(Estatus.nombre == "Activo")
+        )
+
+        if tipo:
+            q = q.filter(TipoEvento.nombre == tipo)
+        if modalidad:
+            q = q.filter(Modalidad.nombre == modalidad)
+        if fecha_inicio:
+            q = q.filter(Evento.fecha_evento >= fecha_inicio)
+        if fecha_fin:
+            q = q.filter(Evento.fecha_evento <= fecha_fin)
+
+        q = q.order_by(Evento.fecha_evento.asc(), Evento.hora_inicio.asc())
+        filas = q.all()
+
+        eventos = []
+        for evento, tipo_ev, modal, usr, est, calle, colonia, municipio, estado_geo in filas:
+            partes_dir = []
+            if calle:
+                partes_dir.append(calle.nombre)
+                if calle.n_exterior:
+                    partes_dir.append(str(calle.n_exterior))
+            if colonia:
+                partes_dir.append(colonia.nombre)
+            if municipio:
+                partes_dir.append(municipio.nombre)
+            if estado_geo:
+                partes_dir.append(estado_geo.nombre)
+            direccion_completa = ", ".join(p for p in partes_dir if p)
+
+            nombre_organizador = None
+            if usr:
+                partes_nombre = [usr.nombre, usr.apellido_paterno, usr.apellido_materno]
+                nombre_organizador = " ".join(p for p in partes_nombre if p)
+
+            costo = float(evento.costo) if evento.costo else 0.0
+
+            eventos.append({
+                "id": evento.id,
+                "title": evento.titulo,
+                "titulo": evento.titulo,
+                "descripcion": evento.descripcion,
+                "start": evento.fecha_evento.isoformat() if evento.fecha_evento else None,
+                "fecha_evento": evento.fecha_evento.isoformat() if evento.fecha_evento else None,
+                "hora_inicio": str(evento.hora_inicio) if evento.hora_inicio else None,
+                "hora_fin": str(evento.hora_fin) if evento.hora_fin else None,
+                "url_evento": evento.url_evento,
+                "capacidad_maxima": evento.capacidad_maxima,
+                "costo": costo,
+                "tipo_evento": tipo_ev.nombre if tipo_ev else None,
+                "modalidad": modal.nombre if modal else None,
+                "organizador": nombre_organizador,
+                "estatus": est.nombre if est else None,
+                "direccion": direccion_completa,
+                "es_gratuito": costo == 0.0
+            })
+
+        return {"success": True, "eventos": eventos}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error en get_eventos: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/eventos/crear")
+async def crear_evento(
+    data: EventoCreate,
+    current_user: Optional[dict] = Depends(get_optional_tienda_user),
+    db: Session = Depends(get_db)
+):
+    try:
+        if current_user:
+            user_id = int(current_user["sub"])
+        else:
+            nombre_completo = data.nombre_organizador or "Organizador Sin Apellido"
+            partes = nombre_completo.split()
+            primer_nombre = partes[0] if partes else "Organizador"
+            apellido_paterno = partes[1] if len(partes) > 1 else "Sin Apellido"
+            apellido_materno = partes[2] if len(partes) > 2 else None
+
+            nuevo_usuario = Usuario(
+                nombre=primer_nombre,
+                apellido_paterno=apellido_paterno,
+                apellido_materno=apellido_materno,
+                email=data.contacto,
+                suscrito_newsletter=False,
+                activo=True
+            )
+            db.add(nuevo_usuario)
+            db.commit()
+            db.refresh(nuevo_usuario)
+            user_id = nuevo_usuario.id
+
+        organizador = db.query(Organizador).filter(Organizador.id_usuario == user_id).first()
+        if not organizador:
+            organizador = Organizador(
+                id_usuario=user_id,
+                experiencia_eventos=0,
+                certificado=False
+            )
+            db.add(organizador)
+            db.commit()
+            db.refresh(organizador)
+
+        nuevo_evento = Evento(
+            titulo=data.titulo,
+            descripcion=data.descripcion,
+            fecha_evento=data.fecha_evento,
+            hora_inicio=data.hora_inicio,
+            hora_fin=data.hora_fin,
+            id_tipo_evento=data.id_tipo_evento,
+            id_modalidad=data.id_modalidad,
+            url_evento=data.url_evento if data.url_evento else None,
+            capacidad_maxima=data.capacidad_maxima,
+            costo=data.costo,
+            id_organizador=organizador.id,
+            id_estatus=1
+        )
+        db.add(nuevo_evento)
+        db.commit()
+        db.refresh(nuevo_evento)
+
+        return {
+            "success": True,
+            "evento_id": nuevo_evento.id,
+            "message": "Evento creado exitosamente. Será revisado y publicado pronto."
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error en crear_evento: {e}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
+
+
+@router.get("/tipos-evento")
+async def get_tipos_evento(db: Session = Depends(get_db)):
+    try:
+        tipos = db.query(TipoEvento).order_by(TipoEvento.nombre).all()
+        return {"success": True, "tipos": [
+            {"id": t.id, "nombre": t.nombre, "descripcion": t.descripcion} for t in tipos
+        ]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/modalidades")
+async def get_modalidades(db: Session = Depends(get_db)):
+    try:
+        modalidades = db.query(Modalidad).order_by(Modalidad.nombre).all()
+        return {"success": True, "modalidades": [
+            {"id": m.id, "nombre": m.nombre} for m in modalidades
+        ]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

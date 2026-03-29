@@ -20,7 +20,26 @@
       "Bash(start http://localhost:5000/tienda)",
       "Bash(explorer \"http://localhost:5000/tienda\")",
       "Bash(NUL)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "WebSearch",
+      "Bash(py:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(wc -l \"/c/Users/Emiliano/Videos/SWAY POO\"/*.sql 2>/dev/null)",
+      "Bash(ls -lh \"/c/Users/Emiliano/Videos/SWAY POO\"/*.py 2>/dev/null)",
+      "Bash(cd \"C:\\\\Users\\\\Emiliano\\\\Videos\\\\SWAY POO\\\\web2\" && npm install)",
+      "Bash(cd \"C:\\\\Users\\\\Emiliano\\\\Videos\\\\SWAY POO\\\\web2\" && npm run dev)",
+      "Bash(wc:*)",
+      "Bash(python -c \":*)",
+      "Bash(docker exec:*)",
+      "Bash(netstat -ano)",
+      "Bash(powershell \"netstat -ano | Select-String ''''5433''''\")",
+      "Bash(docker ps:*)",
+      "Bash(powershell \"Get-Process -Id 6540, 16016 | Select-Object Id, ProcessName, Description\" 2>&1)",
+      "Bash(powershell \"Get-Process -Id 6540 | Select-Object Id, ProcessName, Path\" 2>&1)",
+      "Bash(powershell \"Get-WmiObject Win32_Process -Filter 'ProcessId=6540' | Select-Object ProcessId, ExecutablePath, CommandLine\" 2>&1)",
+      "Bash(powershell \"Get-Service | Where-Object {$_.DisplayName -like '*postgres*' -or $_.Name -like '*postgres*'} | Select-Object Name, DisplayName, Status, StartType\" 2>&1)",
+      "Bash(powershell \"Stop-Process -Id 6540 -Force; Write-Host 'Proceso 6540 terminado'\" 2>&1)",
+      "Bash(powershell \"Get-WmiObject Win32_Service | Where-Object {$_.PathName -like '*postgres*'} | Select-Object Name, DisplayName, State, StartMode, PathName\" 2>&1)"
     ],
     "deny": []
   }

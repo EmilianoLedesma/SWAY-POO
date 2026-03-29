@@ -3,6 +3,12 @@
 // Sistema principal de funcionalidades de la página
 // =============================================
 
+
+function authHeaders() {
+  const token = localStorage.getItem('tienda_token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 /**
  * Variables globales del sistema principal
  * Controlan donaciones, newsletter y funcionalidades generales de la página
@@ -131,7 +137,7 @@ function closeNewsletterPopup() {
  */
 async function suscribirNewsletter(email) {
   try {
-    const response = await fetch('/api/newsletter', {
+    const response = await fetch(API_BASE + '/newsletter', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -204,7 +210,7 @@ async function enviarContacto(event) {
   };
   
   try {
-    const response = await fetch('/api/contacto', {
+    const response = await fetch(API_BASE + '/contacto', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
