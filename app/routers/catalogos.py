@@ -1,10 +1,17 @@
-from fastapi import APIRouter, HTTPException, Depends
+import asyncio
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.data.database import get_db
 from app.data.models import (
     Usuario, Contacto, Donador, Donacion, CategoriaProducto, Material
 )
 from app.models.catalogos import NewsletterSuscripcion, ContactoMensaje, DonacionCreate
+from app.services.email_service import send_newsletter_confirmation, send_newsletter
+
+
+async def _send_newsletter_after_delay(email: str, nombre: str, delay_seconds: int = 120):
+    await asyncio.sleep(delay_seconds)
+    send_newsletter(email, nombre)
 
 router = APIRouter(prefix="/api", tags=["catalogos"])
 
@@ -24,7 +31,7 @@ async def get_regiones():
 
 
 @router.post("/newsletter")
-async def suscribir_newsletter(data: NewsletterSuscripcion, db: Session = Depends(get_db)):
+async def suscribir_newsletter(data: NewsletterSuscripcion, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     try:
         email = data.email
         if not email or "@" not in email or "." not in email:
@@ -38,6 +45,9 @@ async def suscribir_newsletter(data: NewsletterSuscripcion, db: Session = Depend
             else:
                 user.suscrito_newsletter = True
                 db.commit()
+                nombre = user.nombre or "Suscriptor"
+                background_tasks.add_task(send_newsletter_confirmation, email)
+                background_tasks.add_task(_send_newsletter_after_delay, email, nombre, 120)
                 return {"success": True, "message": "Suscripción reactivada exitosamente"}
         else:
             nuevo_usuario = Usuario(
@@ -50,12 +60,38 @@ async def suscribir_newsletter(data: NewsletterSuscripcion, db: Session = Depend
             )
             db.add(nuevo_usuario)
             db.commit()
+            background_tasks.add_task(send_newsletter_confirmation, email)
+            background_tasks.add_task(_send_newsletter_after_delay, email, "Suscriptor", 120)
             return {"success": True, "message": "Suscripción exitosa al newsletter"}
 
     except HTTPException:
         raise
     except Exception as e:
         print(f"Error en suscribir_newsletter: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/newsletter/enviar")
+async def enviar_newsletter(background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    """Dispara el newsletter a todos los usuarios suscritos."""
+    try:
+        suscritos = db.query(Usuario).filter(
+            Usuario.suscrito_newsletter == True,
+            Usuario.activo == True,
+            Usuario.email != None
+        ).all()
+
+        if not suscritos:
+            return {"success": True, "message": "No hay suscriptores activos", "total": 0}
+
+        for usuario in suscritos:
+            nombre = usuario.nombre or "Suscriptor"
+            background_tasks.add_task(send_newsletter, usuario.email, nombre)
+
+        return {"success": True, "message": f"Newsletter enviándose a {len(suscritos)} suscriptores", "total": len(suscritos)}
+
+    except Exception as e:
+        print(f"Error en enviar_newsletter: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
