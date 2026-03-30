@@ -611,3 +611,229 @@ def send_newsletter(email: str, nombre: str = "Suscriptor") -> None:
 
     except Exception as e:
         print(f"[EMAIL ERROR] No se pudo enviar newsletter a {email}: {e}")
+
+
+# ── Donación ──────────────────────────────────────────────────────────────────
+
+def _build_donacion_html(nombre: str, monto: float) -> str:
+    monto_fmt = f"${monto:,.2f} MXN"
+    return f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gracias por tu donación — SWAY</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:32px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0"
+               style="max-width:600px;width:100%;border-radius:14px;overflow:hidden;
+                      box-shadow:0 6px 32px rgba(30,80,120,0.13);">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0d3b5e 0%,#1a6b8a 60%,#47b2e4 100%);
+                       padding:44px 40px 32px;text-align:center;">
+              <p style="margin:0;font-size:11px;letter-spacing:4px;text-transform:uppercase;
+                        color:#a8dff0;font-weight:600;">Conservación Marina</p>
+              <h1 style="margin:10px 0 4px;font-size:42px;font-weight:900;
+                         color:#ffffff;letter-spacing:3px;">SWAY</h1>
+              <p style="margin:0;font-size:13px;color:#cceeff;letter-spacing:1px;">
+                Sistema de Monitoreo y Conservación Marina
+              </p>
+              <div style="width:60px;height:3px;background:#47b2e4;margin:16px auto 0;border-radius:2px;"></div>
+            </td>
+          </tr>
+
+          <!-- BANNER -->
+          <tr>
+            <td style="background-color:#47b2e4;padding:10px 40px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#ffffff;letter-spacing:1.5px;font-weight:600;">
+                CONFIRMACIÓN DE DONACIÓN
+              </p>
+            </td>
+          </tr>
+
+          <!-- BODY -->
+          <tr>
+            <td style="background-color:#ffffff;padding:44px 40px 36px;">
+              <p style="margin:0 0 8px;font-size:24px;font-weight:700;color:#0d3b5e;">
+                Gracias, {nombre}.
+              </p>
+              <p style="margin:0 0 28px;font-size:14px;color:#47b2e4;font-weight:600;letter-spacing:0.5px;">
+                Tu aportación llega en el momento justo.
+              </p>
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.8;color:#444444;">
+                Hemos recibido tu donación a <strong style="color:#0d3b5e;">SWAY Conservación Marina</strong>.
+                Cada peso que contribuyes se destina directamente a las actividades de monitoreo,
+                catalogación de especies y restauración de ecosistemas marinos en México.
+              </p>
+
+              <!-- MONTO -->
+              <table width="100%" cellpadding="0" cellspacing="0"
+                     style="background:linear-gradient(135deg,#0d3b5e,#1a6b8a);
+                            border-radius:10px;margin-bottom:28px;text-align:center;">
+                <tr>
+                  <td style="padding:28px 32px;">
+                    <p style="margin:0 0 6px;font-size:11px;color:#a8dff0;
+                               letter-spacing:2px;text-transform:uppercase;font-weight:600;">
+                      Monto donado
+                    </p>
+                    <p style="margin:0;font-size:40px;font-weight:900;color:#ffffff;">
+                      {monto_fmt}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- USO DE LA DONACION -->
+              <p style="margin:0 0 16px;font-size:11px;color:#47b2e4;font-weight:700;
+                         letter-spacing:2px;text-transform:uppercase;">
+                En qué se usará tu donación
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+                <tr>
+                  <td style="padding:0 0 10px 0;vertical-align:top;">
+                    <table width="100%" cellpadding="0" cellspacing="0"
+                           style="background:#f5fbff;border-radius:8px;
+                                  border-left:4px solid #47b2e4;">
+                      <tr>
+                        <td style="padding:16px 20px;">
+                          <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#0d3b5e;">
+                            Catalogación de especies
+                          </p>
+                          <p style="margin:0;font-size:13px;color:#555;line-height:1.6;">
+                            Financiamos el trabajo de biólogos marinos que documentan especies
+                            en zonas costeras de difícil acceso. Cada registro contribuye a la
+                            base de datos científica más completa del país.
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0 0 10px 0;vertical-align:top;">
+                    <table width="100%" cellpadding="0" cellspacing="0"
+                           style="background:#f5fbff;border-radius:8px;
+                                  border-left:4px solid #1a6b8a;">
+                      <tr>
+                        <td style="padding:16px 20px;">
+                          <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#0d3b5e;">
+                            Restauración de arrecifes de coral
+                          </p>
+                          <p style="margin:0;font-size:13px;color:#555;line-height:1.6;">
+                            Los arrecifes de coral albergan el 25% de todas las especies marinas
+                            conocidas, a pesar de ocupar menos del 1% del fondo oceánico.
+                            Tu donación apoya la siembra y monitoreo de colonias de coral.
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="vertical-align:top;">
+                    <table width="100%" cellpadding="0" cellspacing="0"
+                           style="background:#f5fbff;border-radius:8px;
+                                  border-left:4px solid #0d3b5e;">
+                      <tr>
+                        <td style="padding:16px 20px;">
+                          <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#0d3b5e;">
+                            Educación ambiental comunitaria
+                          </p>
+                          <p style="margin:0;font-size:13px;color:#555;line-height:1.6;">
+                            Llevamos talleres de educación ambiental a comunidades costeras.
+                            Las familias que comprenden el valor del océano son sus mejores
+                            guardianes a largo plazo.
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- DATO CURIOSO -->
+              <table width="100%" cellpadding="0" cellspacing="0"
+                     style="background:linear-gradient(135deg,#e8f6fd,#f0faff);
+                            border-radius:10px;border-left:5px solid #47b2e4;
+                            margin-bottom:8px;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <p style="margin:0 0 8px;font-size:11px;color:#47b2e4;font-weight:700;
+                               letter-spacing:2px;text-transform:uppercase;">
+                      ¿Sabías que...?
+                    </p>
+                    <p style="margin:0;font-size:14px;color:#444;line-height:1.8;">
+                      El océano absorbe aproximadamente el <strong style="color:#0d3b5e;">30% del CO2</strong>
+                      que los humanos producimos cada año. Sin océanos saludables, el cambio climático
+                      avanzaría a un ritmo considerablemente mayor. Cada acción de conservación marina
+                      es también una acción climática.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="background-color:#0d3b5e;padding:28px 40px;text-align:center;">
+              <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#ffffff;">
+                SWAY — Conservación Marina
+              </p>
+              <p style="margin:0 0 12px;font-size:12px;color:#7aaec8;line-height:1.6;">
+                Este correo fue generado automáticamente. Por favor no respondas a este mensaje.<br/>
+                Si no realizaste esta donación, contáctanos de inmediato.
+              </p>
+              <p style="margin:0;font-size:11px;color:#4a7a9b;">
+                © 2025 SWAY Conservación Marina. Todos los derechos reservados.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>"""
+
+
+def send_donation_thanks(nombre: str, email: str, monto: float) -> None:
+    """Correo de agradecimiento por donacion."""
+    try:
+        smtp_host = os.getenv("MAIL_HOST", "smtp.gmail.com")
+        smtp_port = int(os.getenv("MAIL_PORT", "587"))
+        smtp_user = os.getenv("MAIL_USER", "")
+        smtp_pass = os.getenv("MAIL_PASS", "")
+        sender_email = os.getenv("MAIL_FROM", "noreply@proyecto-sway.site")
+
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"SWAY — Confirmacion de donacion por ${monto:,.2f} MXN"
+        msg["From"]    = f"{Header('SWAY Conservacion Marina', 'utf-8')} <{sender_email}>"
+        msg["To"]      = email
+
+        text = (
+            f"Gracias por tu donacion, {nombre}.\n\n"
+            f"Hemos recibido tu aportacion de ${monto:,.2f} MXN a SWAY Conservacion Marina.\n\n"
+            "Tu donacion se destinara a catalogacion de especies, restauracion de arrecifes\n"
+            "y educacion ambiental comunitaria.\n\n"
+            "Dato: El oceano absorbe el 30% del CO2 que producimos. Conservarlo es tambien actuar contra el cambio climatico.\n\n"
+            "© 2025 SWAY Conservacion Marina."
+        )
+        msg.attach(MIMEText(text, "plain", "utf-8"))
+        msg.attach(MIMEText(_build_donacion_html(nombre, monto), "html", "utf-8"))
+
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.sendmail(sender_email, [email], msg.as_string())
+
+        print(f"[EMAIL] Donacion agradecida a {email}")
+
+    except Exception as e:
+        print(f"[EMAIL ERROR] No se pudo enviar agradecimiento donacion a {email}: {e}")

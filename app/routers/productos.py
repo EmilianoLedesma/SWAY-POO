@@ -30,7 +30,13 @@ async def get_productos(
         )
 
         q = (
-            db.query(Producto, CategoriaProducto, Material, resenas_sq)
+            db.query(
+                Producto,
+                CategoriaProducto,
+                Material,
+                resenas_sq.c.calificacion_promedio,
+                resenas_sq.c.total_resenas,
+            )
             .outerjoin(CategoriaProducto, Producto.id_categoria == CategoriaProducto.id)
             .outerjoin(Material, Producto.id_material == Material.id)
             .outerjoin(resenas_sq, Producto.id == resenas_sq.c.id_producto)
@@ -61,9 +67,9 @@ async def get_productos(
         rows = q.offset(offset).limit(limite).all()
 
         productos = []
-        for p, cat, mat, rsq in rows:
-            avg_rating = float(rsq.calificacion_promedio) if rsq and rsq.calificacion_promedio is not None else 0.0
-            total_rev = rsq.total_resenas if rsq and rsq.total_resenas else 0
+        for p, cat, mat, calificacion_promedio, total_resenas in rows:
+            avg_rating = float(calificacion_promedio) if calificacion_promedio is not None else 0.0
+            total_rev = total_resenas if total_resenas else 0
             productos.append({
                 "id": p.id,
                 "name": p.nombre,

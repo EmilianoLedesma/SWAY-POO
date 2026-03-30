@@ -379,6 +379,7 @@
     <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
 
     <!-- Validation JS -->
+    <script src="/config.js"></script>
     <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
 
     <!-- Payment JS -->
@@ -606,7 +607,7 @@
         }
 
         // Send to server
-        fetch("/api/procesar-donacion", {
+        fetch(API_BASE + "/procesar-donacion", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

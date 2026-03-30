@@ -6,7 +6,7 @@ from app.data.models import (
     Usuario, Contacto, Donador, Donacion, CategoriaProducto, Material
 )
 from app.models.catalogos import NewsletterSuscripcion, ContactoMensaje, DonacionCreate
-from app.services.email_service import send_newsletter_confirmation, send_newsletter
+from app.services.email_service import send_newsletter_confirmation, send_newsletter, send_donation_thanks
 
 
 async def _send_newsletter_after_delay(email: str, nombre: str, delay_seconds: int = 120):
@@ -142,7 +142,7 @@ async def enviar_contacto(data: ContactoMensaje, db: Session = Depends(get_db)):
 
 
 @router.post("/procesar-donacion")
-async def procesar_donacion(data: DonacionCreate, db: Session = Depends(get_db)):
+async def procesar_donacion(data: DonacionCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     try:
         user = db.query(Usuario).filter(Usuario.email == data.contact_email).first()
 
@@ -208,6 +208,7 @@ async def procesar_donacion(data: DonacionCreate, db: Session = Depends(get_db))
             db.add(nueva_donacion)
 
         db.commit()
+        background_tasks.add_task(send_donation_thanks, user.nombre, data.contact_email, float(data.amount))
         return {"success": True, "message": "Donación procesada exitosamente", "donador_id": nuevo_donador.id}
 
     except HTTPException:
