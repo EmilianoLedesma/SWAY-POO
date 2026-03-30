@@ -15,27 +15,33 @@ export default function Portal() {
   const [especies, setEspecies]           = useState([])
   const [avistamientos, setAvistamientos] = useState([])
   const [estadosConservacion, setEstados] = useState([])
+  const [amenazas, setAmenazas]           = useState([])
+  const [habitats, setHabitats]           = useState([])
   const [loading, setLoading]             = useState(true)
   const [modal, setModal]                 = useState({ open: false, especie: null })
   const [confirmDelete, setConfirmDelete] = useState({ open: false, especie: null })
   const [sidebarOpen, setSidebarOpen]     = useState(() => window.innerWidth > 768)
   const [reporteLoading, setReporteLoading] = useState(false)
   const [reporteMsg, setReporteMsg]         = useState(null)
+  const [toast, setToast]                   = useState(null)
   const navigate = useNavigate()
 
   const loadData = useCallback(async () => {
     try {
-      const [profileData, especiesData, avistamientosData, estadosData] = await Promise.all([
+      const [profileData, especiesData, avistamientosData, estadosData, amenazasData, habitatsData] = await Promise.all([
         api.profile(),
         api.getEspecies(),
         api.getAvistamientos(),
         api.getEstadosConservacion(),
+        api.getAmenazas(),
+        api.getHabitats(),
       ])
-      // La API retorna { success, colaborador: {...} } — extraemos el objeto plano
       setProfile(profileData.colaborador || profileData)
       setEspecies(especiesData.especies || especiesData || [])
       setAvistamientos(avistamientosData.avistamientos || avistamientosData || [])
       setEstados(estadosData?.estados || estadosData || [])
+      setAmenazas(amenazasData?.amenazas || amenazasData || [])
+      setHabitats(habitatsData?.habitats || habitatsData || [])
     } catch {
       navigate('/')
     } finally {
@@ -79,14 +85,21 @@ export default function Portal() {
     }
   }
 
+  const showToast = (msg) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 3500)
+  }
+
   const handleSaveEspecie = async (formData) => {
-    if (modal.especie) {
+    const isEdit = !!modal.especie
+    if (isEdit) {
       await api.updateEspecie(modal.especie.id, formData)
     } else {
       await api.createEspecie(formData)
     }
     setModal({ open: false, especie: null })
     await refreshEspecies()
+    showToast(isEdit ? 'Especie actualizada correctamente' : 'Especie creada correctamente')
   }
 
   const initials = profile
@@ -247,6 +260,8 @@ export default function Portal() {
         <EspecieModal
           especie={modal.especie}
           estadosConservacion={estadosConservacion}
+          amenazas={amenazas}
+          habitats={habitats}
           onSave={handleSaveEspecie}
           onClose={() => setModal({ open: false, especie: null })}
         />
@@ -258,6 +273,15 @@ export default function Portal() {
           onConfirm={handleConfirmDelete}
           onCancel={() => setConfirmDelete({ open: false, especie: null })}
         />
+      )}
+
+      {toast && (
+        <div className="toast-success">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="16" height="16">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          {toast}
+        </div>
       )}
     </div>
   )

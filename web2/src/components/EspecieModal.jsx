@@ -8,9 +8,11 @@ const EMPTY = {
   poblacion_estimada: '',
   id_estado_conservacion: '',
   imagen_url: '',
+  amenazas: [],
+  habitats: [],
 }
 
-export default function EspecieModal({ especie, estadosConservacion, onSave, onClose }) {
+export default function EspecieModal({ especie, estadosConservacion, amenazas, habitats, onSave, onClose }) {
   const [form, setForm]     = useState(EMPTY)
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
@@ -24,6 +26,8 @@ export default function EspecieModal({ especie, estadosConservacion, onSave, onC
       poblacion_estimada:      especie.poblacion_estimada     ?? '',
       id_estado_conservacion:  especie.id_estado_conservacion ?? '',
       imagen_url:              especie.imagen_url             || '',
+      amenazas:                especie.amenaza_ids            || [],
+      habitats:                especie.habitat_ids            || [],
     } : EMPTY)
     setErrors({})
   }, [especie])
@@ -48,6 +52,16 @@ export default function EspecieModal({ especie, estadosConservacion, onSave, onC
     const { name, value } = e.target
     setForm(p => ({ ...p, [name]: value }))
     if (errors[name]) setErrors(p => ({ ...p, [name]: '' }))
+  }
+
+  const toggleCheck = (field, id) => {
+    setForm(p => {
+      const current = p[field] || []
+      return {
+        ...p,
+        [field]: current.includes(id) ? current.filter(x => x !== id) : [...current, id]
+      }
+    })
   }
 
   const handleSubmit = async (e) => {
@@ -186,6 +200,42 @@ export default function EspecieModal({ especie, estadosConservacion, onSave, onC
               {errors.poblacion_estimada && <span className="field-err">{errors.poblacion_estimada}</span>}
             </div>
           </div>
+
+          {Array.isArray(amenazas) && amenazas.length > 0 && (
+            <div className="modal-field">
+              <label>Amenazas</label>
+              <div className="check-group">
+                {amenazas.map(a => (
+                  <label key={a.id} className="check-item">
+                    <input
+                      type="checkbox"
+                      checked={(form.amenazas || []).includes(a.id)}
+                      onChange={() => toggleCheck('amenazas', a.id)}
+                    />
+                    <span>{a.nombre}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {Array.isArray(habitats) && habitats.length > 0 && (
+            <div className="modal-field">
+              <label>Hábitats</label>
+              <div className="check-group">
+                {habitats.map(h => (
+                  <label key={h.id} className="check-item">
+                    <input
+                      type="checkbox"
+                      checked={(form.habitats || []).includes(h.id)}
+                      onChange={() => toggleCheck('habitats', h.id)}
+                    />
+                    <span>{h.nombre}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="modal-field">
             <label>URL de Fotografía</label>

@@ -102,13 +102,23 @@ def _get_especies_filtered(db: Session, search="", conservation_filter="", habit
             .all()
         ] or ["Océano Atlántico", "Océano Pacífico"]
 
-        amenazas_nombres = [
-            a.nombre for a in
+        amenazas_rows = (
             db.query(Amenaza)
             .join(EspecieAmenaza, Amenaza.id == EspecieAmenaza.id_amenaza)
             .filter(EspecieAmenaza.id_especie == especie.id)
             .all()
-        ] or ["Contaminación", "Pesca excesiva"]
+        )
+        amenazas_nombres = [a.nombre for a in amenazas_rows] or ["Contaminación", "Pesca excesiva"]
+        amenaza_ids = [a.id for a in amenazas_rows]
+
+        habitat_rows = (
+            db.query(Habitat)
+            .join(EspecieHabitat, Habitat.id == EspecieHabitat.id_habitat)
+            .filter(EspecieHabitat.id_especie == especie.id)
+            .all()
+        )
+        habitats_nombres = [h.nombre for h in habitat_rows] or ["Océano Atlántico", "Océano Pacífico"]
+        habitat_ids = [h.id for h in habitat_rows]
 
         especies.append({
             "id": especie.id,
@@ -128,7 +138,9 @@ def _get_especies_filtered(db: Session, search="", conservation_filter="", habit
             "tipo": "marina",
             "region": "global",
             "amenazas": amenazas_nombres,
-            "habitats": habitats_nombres
+            "amenaza_ids": amenaza_ids,
+            "habitats": habitats_nombres,
+            "habitat_ids": habitat_ids,
         })
 
     return especies, total_count
@@ -296,21 +308,23 @@ async def get_especie(especie_id: int, db: Session = Depends(get_db)):
         especie, estado = resultado
         estado_slug = _mapear_estado_conservacion(estado.nombre if estado else None)
 
-        amenazas_nombres = [
-            a.nombre for a in
+        amenazas_rows = (
             db.query(Amenaza)
             .join(EspecieAmenaza, Amenaza.id == EspecieAmenaza.id_amenaza)
             .filter(EspecieAmenaza.id_especie == especie_id)
             .all()
-        ]
+        )
+        amenazas_nombres = [a.nombre for a in amenazas_rows]
+        amenaza_ids = [a.id for a in amenazas_rows]
 
-        habitats_nombres = [
-            h.nombre for h in
+        habitats_rows = (
             db.query(Habitat)
             .join(EspecieHabitat, Habitat.id == EspecieHabitat.id_habitat)
             .filter(EspecieHabitat.id_especie == especie_id)
             .all()
-        ]
+        )
+        habitats_nombres = [h.nombre for h in habitats_rows]
+        habitat_ids = [h.id for h in habitats_rows]
 
         caracteristicas = (
             db.query(Caracteristica)
@@ -340,7 +354,9 @@ async def get_especie(especie_id: int, db: Session = Depends(get_db)):
             "imagen": especie.imagen_url,
             "estado_conservacion": estado_slug,
             "amenazas": amenazas_nombres,
+            "amenaza_ids": amenaza_ids,
             "habitats": habitats_nombres,
+            "habitat_ids": habitat_ids,
             "longitud": longitud,
             "peso": peso,
             "habitat": habitats_nombres[0].lower().replace(" ", "-") if habitats_nombres else "marino"
