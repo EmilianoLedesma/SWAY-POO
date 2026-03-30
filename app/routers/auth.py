@@ -90,22 +90,36 @@ async def user_register(data: UserRegister, db: Session = Depends(get_db)):
     try:
         existente = db.query(Usuario).filter(Usuario.email == data.email).first()
         if existente:
-            raise HTTPException(status_code=400, detail="El email ya está registrado")
-
-        nuevo_usuario = Usuario(
-            nombre=data.nombre,
-            apellido_paterno=data.apellidoPaterno,
-            apellido_materno=data.apellidoMaterno,
-            email=data.email,
-            password_hash=data.password,
-            telefono=data.telefono,
-            fecha_nacimiento=data.fecha_nacimiento,
-            suscrito_newsletter=data.newsletter,
-            activo=True
-        )
-        db.add(nuevo_usuario)
-        db.commit()
-        db.refresh(nuevo_usuario)
+            if existente.password_hash:
+                raise HTTPException(status_code=400, detail="El email ya está registrado")
+            # Usuario ghost creado por newsletter — completar registro
+            existente.nombre = data.nombre
+            existente.apellido_paterno = data.apellidoPaterno
+            existente.apellido_materno = data.apellidoMaterno
+            existente.password_hash = data.password
+            existente.telefono = data.telefono
+            existente.fecha_nacimiento = data.fecha_nacimiento
+            if data.newsletter:
+                existente.suscrito_newsletter = True
+            existente.activo = True
+            db.commit()
+            db.refresh(existente)
+            nuevo_usuario = existente
+        else:
+            nuevo_usuario = Usuario(
+                nombre=data.nombre,
+                apellido_paterno=data.apellidoPaterno,
+                apellido_materno=data.apellidoMaterno,
+                email=data.email,
+                password_hash=data.password,
+                telefono=data.telefono,
+                fecha_nacimiento=data.fecha_nacimiento,
+                suscrito_newsletter=data.newsletter,
+                activo=True
+            )
+            db.add(nuevo_usuario)
+            db.commit()
+            db.refresh(nuevo_usuario)
 
         nombre_completo = data.nombre + " " + data.apellidoPaterno
         if data.apellidoMaterno:

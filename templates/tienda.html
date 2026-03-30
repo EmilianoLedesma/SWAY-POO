@@ -1369,39 +1369,26 @@
             municipio: formData.get("municipio"),
             colonia: formData.get("colonia"),
             calle: formData.get("calle"),
-            codigo_postal: formData.get("codigo_postal"),
-            numero_exterior: formData.get("numero_exterior"),
+            codigo_postal: formData.get("codigo_postal") || null,
+            numero_exterior: formData.get("numero_exterior") || null,
             numero_interior: formData.get("numero_interior") || null,
-            // Use user data for contact info
-            nombre_destinatario: currentUser
-              ? `${currentUser.nombre} ${currentUser.apellido_paterno}${
-                  currentUser.apellido_materno
-                    ? " " + currentUser.apellido_materno
-                    : ""
-                }`
-              : "Usuario",
-            telefono_contacto: currentUser ? currentUser.telefono : "",
+            telefono_contacto: currentUser ? currentUser.telefono : null,
           },
           // Payment structure as expected by backend
           pago: {
-            numero_tarjeta:
-              paymentMethod === "credit_card"
-                ? document.getElementById("card-number").value
-                : "", // Empty for PayPal, backend will handle
-            fecha_expiracion:
-              paymentMethod === "credit_card"
+            tipo_pago: paymentMethod === "credit_card" ? "credit_card" : "paypal",
+            numero_tarjeta: paymentMethod === "credit_card"
+                ? document.getElementById("card-number").value.replace(/\s/g, '')
+                : null,
+            fecha_expiracion: paymentMethod === "credit_card"
                 ? document.getElementById("card-expiry").value
-                : "", // Empty for PayPal, backend will handle
-            cvv:
-              paymentMethod === "credit_card"
+                : null,
+            cvv: paymentMethod === "credit_card"
                 ? document.getElementById("card-cvv").value
-                : "", // Empty for PayPal, backend will handle
-            nombre_tarjeta:
-              paymentMethod === "credit_card"
+                : null,
+            nombre_tarjeta: paymentMethod === "credit_card"
                 ? document.getElementById("card-name").value
-                : "", // Empty for PayPal, backend will handle
-            tipo_pago: paymentMethod === "credit_card" ? "tarjeta" : "paypal",
-            monto: amount,
+                : null,
           },
           // Additional shipping info
           notas: formData.get("notas") || "",
@@ -1410,32 +1397,35 @@
         console.log("Order data prepared:", orderData);
 
         // Send to server
-        fetch("/api/pedidos/crear", {
+        fetch(API_BASE + "/pedidos/crear", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            ...authHeaders()
           },
           body: JSON.stringify(orderData),
         })
-          .then((response) => response.json())
+          .then((response) => {
+            if (!response.ok) {
+              return response.json().then(err => {
+                console.error("Error 422 detalle:", JSON.stringify(err, null, 2));
+                throw new Error(JSON.stringify(err.detail || err));
+              });
+            }
+            return response.json();
+          })
           .then((data) => {
             if (data.success) {
-              // Clear cart
               clearCart();
               updateCartUI();
-
-              // Show success modal
               showPaymentSuccess();
             } else {
-              showStyledAlert(
-                "Error al procesar el pedido: " + (data.error || data.message),
-                'error'
-              );
+              showStyledAlert("Error al procesar el pedido: " + (data.error || data.message), 'error');
             }
           })
           .catch((error) => {
-            console.error("Error:", error);
-            showStyledAlert("Error de conexión. Por favor, inténtalo de nuevo.", 'error');
+            console.error("Error al crear pedido:", error.message);
+            showStyledAlert("Error: " + error.message, 'error');
           })
           .finally(() => {
             submitButton.innerHTML = originalText;

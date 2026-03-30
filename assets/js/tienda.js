@@ -1101,12 +1101,16 @@ function updateCheckoutSummary() {
  * @returns {Promise<void>} Municipios cargados
  */
 async function loadMunicipios() {
-    const stateId = document.getElementById('shipping-state').value;
+    const stateId = document.getElementById('shipping-state')?.value;
     const municipioSelect = document.getElementById('shipping-municipio');
-    
+
+    if (!municipioSelect) return;
+
     municipioSelect.innerHTML = '<option value="">Seleccionar Municipio</option>';
-    document.getElementById('shipping-colonia').innerHTML = '<option value="">Seleccionar Colonia</option>';
-    document.getElementById('shipping-calle').innerHTML = '<option value="">Seleccionar Calle</option>';
+    const coloniaEl = document.getElementById('shipping-colonia');
+    const calleEl = document.getElementById('shipping-calle');
+    if (coloniaEl) coloniaEl.innerHTML = '<option value="">Seleccionar Colonia</option>';
+    if (calleEl) calleEl.innerHTML = '<option value="">Seleccionar Calle</option>';
     
     if (!stateId) return;
     
@@ -1758,16 +1762,21 @@ async function handleCheckoutSubmit(e) {
         user_id: currentUser.id,
         productos: carrito,
         direccion: {
-            id_calle: document.getElementById('shipping-calle').value,
-            nombre_destinatario: document.getElementById('shipping-name').value,
-            telefono_contacto: document.getElementById('shipping-phone').value
+            estado: document.getElementById('shipping-state')?.value || '',
+            municipio: document.getElementById('shipping-city')?.value || '',
+            colonia: document.getElementById('shipping-colony')?.value || '',
+            calle: document.getElementById('shipping-street')?.value || '',
+            codigo_postal: document.getElementById('shipping-zip')?.value || null,
+            numero_exterior: document.getElementById('shipping-exterior')?.value || null,
+            numero_interior: document.getElementById('shipping-interior')?.value || null,
+            telefono_contacto: currentUser?.telefono || null
         },
         pago: {
+            tipo_pago: 'credit_card',
             numero_tarjeta: document.getElementById('card-number').value.replace(/\s/g, ''),
             fecha_expiracion: document.getElementById('card-expiry').value,
             cvv: document.getElementById('card-cvv').value,
-            nombre_tarjeta: document.getElementById('card-name').value,
-            tipo_tarjeta: document.getElementById('card-type').value
+            nombre_tarjeta: document.getElementById('card-name').value
         }
     };
     
@@ -1829,13 +1838,13 @@ async function handleCheckoutSubmit(e) {
  */
 function validateCheckoutForm(formData) {
     // Validar dirección
-    if (!formData.direccion.id_calle || !formData.direccion.nombre_destinatario || !formData.direccion.telefono_contacto) {
+    if (!formData.direccion.estado || !formData.direccion.municipio || !formData.direccion.colonia || !formData.direccion.calle) {
         showError('Por favor completa toda la información de envío');
         return false;
     }
-    
+
     // Validar pago
-    if (!formData.pago.numero_tarjeta || !formData.pago.fecha_expiracion || !formData.pago.cvv || !formData.pago.nombre_tarjeta || !formData.pago.tipo_tarjeta) {
+    if (!formData.pago.numero_tarjeta || !formData.pago.fecha_expiracion || !formData.pago.cvv || !formData.pago.nombre_tarjeta) {
         showError('Por favor completa toda la información de pago');
         return false;
     }
