@@ -4,7 +4,7 @@
      con formularios para avistamientos y colaboradores
      ============================================= -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="utf-8" />
@@ -388,8 +388,43 @@
       }
 
       .checkbox-container input[type="checkbox"] {
-        width: auto;
-        margin: 0;
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .checkmark {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #adb5bd;
+        border-radius: 50%;
+        margin-top: 1px;
+        transition: border-color 0.2s, background-color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .checkbox-container:hover .checkmark {
+        border-color: #0d6efd;
+      }
+
+      .checkbox-container input[type="checkbox"]:checked ~ .checkmark {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+      }
+
+      .checkbox-container input[type="checkbox"]:checked ~ .checkmark::after {
+        content: "";
+        width: 5px;
+        height: 9px;
+        border: 2px solid #fff;
+        border-top: none;
+        border-left: none;
+        transform: rotate(45deg) translateY(-1px);
+        display: block;
       }
 
       .terms-text {
@@ -678,7 +713,6 @@
                         </option>
                       </select>
                     </div>
-
                   </div>
 
                   <button class="btn-search w-100">
@@ -1125,7 +1159,7 @@
             <div class="col-lg-4" data-aos="fade-up">
               <div class="card success-story-card h-100">
                 <img
-                  src="https://blog.waterfronthotel.com.mx/wp-content/uploads/2022/10/P19-96036.jpg"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxKQ4u_94pBTGG5BBcRaiAPDCr-vbO2uLQTg&s"
                   class="card-img-top"
                   alt="Ballena Gris"
                 />
@@ -1470,14 +1504,6 @@
                   >Registrarse como Colaborador</a
                 >
               </li>
-              <li>
-                <i class="bi bi-chevron-right"></i>
-                <a
-                  href="javascript:void(0)"
-                  onclick="openCollaboratorModal(event, 'login')"
-                  >Acceso Colaboradores</a
-                >
-              </li>
             </ul>
           </div>
 
@@ -1567,11 +1593,7 @@
                   class="form-control-readonly"
                   placeholder="Especie será auto-rellenada"
                 />
-                <input
-                  type="hidden"
-                  id="id-especie"
-                  name="id_especie"
-                />
+                <input type="hidden" id="id-especie" name="id_especie" />
               </div>
             </div>
 
@@ -1584,7 +1606,7 @@
                   type="datetime-local"
                   id="fecha-avistamiento"
                   name="fecha_avistamiento"
-                max=""
+                  max=""
                   data-validation="fechaPasada"
                 />
               </div>
@@ -1600,7 +1622,7 @@
                   step="any"
                   id="latitud"
                   name="latitud"
-                min="-90"
+                  min="-90"
                   max="90"
                   placeholder="Ej: 20.6296"
                   data-validation="latitud"
@@ -1615,7 +1637,7 @@
                   step="any"
                   id="longitud"
                   name="longitud"
-                min="-180"
+                  min="-180"
                   max="180"
                   placeholder="Ej: -87.0739"
                   data-validation="longitud"
@@ -1649,7 +1671,7 @@
                     type="text"
                     id="nombre-usuario"
                     name="nombre_usuario"
-                minlength="2"
+                    minlength="2"
                     maxlength="50"
                     placeholder="Juan"
                     data-validation="soloTexto"
@@ -1663,7 +1685,7 @@
                     type="text"
                     id="apellido-paterno-usuario"
                     name="apellido_paterno_usuario"
-                minlength="2"
+                    minlength="2"
                     maxlength="50"
                     placeholder="Pérez"
                     data-validation="soloTexto"
@@ -1691,7 +1713,7 @@
                     type="email"
                     id="email-usuario"
                     name="email_usuario"
-                maxlength="150"
+                    maxlength="150"
                     placeholder="juan.perez@gmail.com"
                     data-validation="email"
                   />
@@ -1732,62 +1754,8 @@
             </p>
           </div>
 
-          <!-- Pestañas -->
-          <div class="tab-navigation">
-            <button
-              class="tab-btn active"
-              type="button"
-              onclick="switchCollaboratorTab('login')"
-            >
-              <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
-            </button>
-            <button
-              class="tab-btn"
-              type="button"
-              onclick="switchCollaboratorTab('register')"
-            >
-              <i class="bi bi-person-plus"></i> Registrarse
-            </button>
-          </div>
-
-          <!-- Formulario de Login -->
-          <div id="login-tab" class="tab-content active">
-            <div id="login-message-container" class="message-container"></div>
-            <form id="collaborator-login-form" class="collaborator-form">
-              <div class="form-group">
-                <label for="login-email">
-                  <i class="bi bi-envelope"></i> Correo Electrónico *
-                </label>
-                <input
-                  type="email"
-                  id="login-email"
-                  name="email"
-                placeholder="tu@email.com"
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="login-password">
-                  <i class="bi bi-lock"></i> Contraseña *
-                </label>
-                <input
-                  type="password"
-                  id="login-password"
-                  name="password"
-                placeholder="••••••••"
-                />
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn-primary full-width">
-                  <i class="bi bi-box-arrow-in-right"></i> Acceder al Panel
-                </button>
-              </div>
-            </form>
-          </div>
-
           <!-- Formulario de Registro -->
-          <div id="register-tab" class="tab-content">
+          <div id="register-tab" class="tab-content active">
             <div
               id="register-message-container"
               class="message-container"
@@ -1805,7 +1773,7 @@
                       type="text"
                       id="reg-nombre"
                       name="nombre"
-                minlength="2"
+                      minlength="2"
                       maxlength="50"
                       placeholder="Juan"
                       data-validation="soloTexto"
@@ -1819,7 +1787,7 @@
                       type="text"
                       id="reg-apellido-paterno"
                       name="apellidoPaterno"
-                minlength="2"
+                      minlength="2"
                       maxlength="50"
                       placeholder="Pérez"
                       data-validation="soloTexto"
@@ -1847,7 +1815,7 @@
                       type="email"
                       id="reg-email"
                       name="email"
-                placeholder="juan.perez@universidad.edu"
+                      placeholder="juan.perez@universidad.edu"
                     />
                   </div>
                 </div>
@@ -1861,7 +1829,7 @@
                       type="password"
                       id="reg-password"
                       name="password"
-                minlength="8"
+                      minlength="8"
                       placeholder="Mínimo 8 caracteres"
                     />
                   </div>
@@ -1873,7 +1841,7 @@
                       type="password"
                       id="reg-confirm-password"
                       name="confirm_password"
-                placeholder="Repetir contraseña"
+                      placeholder="Repetir contraseña"
                     />
                   </div>
                 </div>
@@ -1889,8 +1857,7 @@
                     <label for="reg-especialidad">
                       <i class="bi bi-bookmark"></i> Especialidad *
                     </label>
-                    <select id="reg-especialidad" name="especialidad"
-                >
+                    <select id="reg-especialidad" name="especialidad">
                       <option value="">Selecciona tu especialidad</option>
                       <option value="biologia-marina">Biología Marina</option>
                       <option value="oceanografia">Oceanografía</option>
@@ -1907,10 +1874,7 @@
                     <label for="reg-grado-academico">
                       <i class="bi bi-award"></i> Grado Académico *
                     </label>
-                    <select
-                      id="reg-grado-academico"
-                      name="grado_academico"
-                >
+                    <select id="reg-grado-academico" name="grado_academico">
                       <option value="">Selecciona tu grado</option>
                       <option value="licenciatura">Licenciatura</option>
                       <option value="maestria">Maestría</option>
@@ -1929,7 +1893,7 @@
                       type="text"
                       id="reg-institucion"
                       name="institucion"
-                maxlength="200"
+                      maxlength="200"
                       placeholder="Universidad o Centro de Investigación"
                     />
                   </div>
@@ -1941,7 +1905,7 @@
                       type="number"
                       id="reg-anos-experiencia"
                       name="años_experiencia"
-                min="0"
+                      min="0"
                       max="100"
                       placeholder="Ingresa tus años de experiencia (0-100)"
                     />
@@ -1955,26 +1919,27 @@
                 <div class="form-group">
                   <label for="reg-numero-cedula">
                     <i class="bi bi-card-text"></i> Número de Cédula Profesional
+                    *
                   </label>
                   <input
                     type="text"
                     id="reg-numero-cedula"
                     name="numero_cedula"
                     maxlength="20"
-                    placeholder="Número de cédula (si aplica)"
+                    placeholder="Número de cédula"
                   />
                 </div>
 
                 <div class="form-group">
                   <label for="reg-orcid">
-                    <i class="bi bi-link-45deg"></i> ORCID ID
+                    <i class="bi bi-link-45deg"></i> ORCID ID *
                   </label>
                   <input
                     type="text"
                     id="reg-orcid"
                     name="orcid"
                     maxlength="50"
-                    placeholder="0000-0000-0000-0000 (opcional)"
+                    placeholder="0000-0000-0000-0000"
                   />
                 </div>
 
@@ -1986,7 +1951,7 @@
                     id="reg-motivacion"
                     name="motivacion"
                     rows="4"
-                minlength="50"
+                    minlength="50"
                     maxlength="500"
                     placeholder="Describe tu motivación para colaborar en el proyecto y tu experiencia relevante en especies marinas..."
                   ></textarea>
@@ -1996,8 +1961,7 @@
 
               <div class="terms-section">
                 <label class="checkbox-container">
-                  <input type="checkbox" id="reg-terms" name="terms"
-                />
+                  <input type="checkbox" id="reg-terms" name="terms" />
                   <span class="checkmark"></span>
                   <span class="terms-text">
                     Acepto los
@@ -2040,6 +2004,7 @@
 
     <!-- Main JS File -->
     <script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+    <script src="/config.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/especies.js') }}?v=2025080207"></script>
 
@@ -2111,7 +2076,7 @@
       });
 
       // Funciones principales del modal
-      function openCollaboratorModal(event, initialTab = "login") {
+      function openCollaboratorModal(event, initialTab = "register") {
         console.log("Opening collaborator modal with tab:", initialTab);
 
         if (event) {
@@ -2146,7 +2111,7 @@
             console.log("Modal classes:", collaboratorModal.className);
             console.log(
               "Modal display:",
-              window.getComputedStyle(collaboratorModal).display
+              window.getComputedStyle(collaboratorModal).display,
             );
 
             // Verificar si el modal sigue visible después de un momento
@@ -2182,19 +2147,11 @@
             document.body.style.overflow = "auto";
             document.body.classList.remove("modal-open");
 
-            // Reset formularios
-            const loginForm = document.getElementById(
-              "collaborator-login-form"
-            );
+            // Reset formulario
             const registerForm = document.getElementById(
-              "collaborator-register-form"
+              "collaborator-register-form",
             );
-
-            if (loginForm) loginForm.reset();
             if (registerForm) registerForm.reset();
-
-            // Reset pestañas
-            switchCollaboratorTab("login");
             console.log("Modal closed successfully");
           }
         } catch (error) {
@@ -2214,7 +2171,7 @@
           // Mostrar pestaña seleccionada
           const selectedTab = document.getElementById(tabName + "-tab");
           const selectedBtn = document.querySelector(
-            `[onclick*="switchCollaboratorTab('${tabName}')"]`
+            `[onclick*="switchCollaboratorTab('${tabName}')"]`,
           );
 
           if (selectedTab) selectedTab.classList.add("active");
@@ -2227,23 +2184,9 @@
       }
 
       // Funciones de validación usando el sistema existente
-      function validateLoginForm() {
-        const loginForm = document.getElementById("collaborator-login-form");
-
-        const configLogin = {
-          "login-email": { tipo: "email" },
-          "login-password": { tipo: "password" },
-        };
-
-        return validacionesSway.validarFormularioCompleto(
-          loginForm,
-          configLogin
-        );
-      }
-
       function validateRegisterForm() {
         const registerForm = document.getElementById(
-          "collaborator-register-form"
+          "collaborator-register-form",
         );
         const passwordField = document.getElementById("reg-password");
 
@@ -2275,7 +2218,7 @@
         if (cedula.value.trim() && !isValidCedula(cedula.value)) {
           validacionesSway.mostrarError(
             cedula,
-            "Formato de cédula profesional inválido (7-8 dígitos)"
+            "Formato de cédula profesional inválido (7-8 dígitos)",
           );
           isValid = false;
         } else if (cedula.value.trim()) {
@@ -2287,7 +2230,7 @@
         if (orcid.value.trim() && !isValidOrcid(orcid.value)) {
           validacionesSway.mostrarError(
             orcid,
-            "Formato de ORCID inválido (0000-0000-0000-0000)"
+            "Formato de ORCID inválido (0000-0000-0000-0000)",
           );
           isValid = false;
         } else if (orcid.value.trim()) {
@@ -2299,19 +2242,19 @@
         if (!motivacion.value.trim()) {
           validacionesSway.mostrarError(
             motivacion,
-            "La motivación para colaborar es obligatoria"
+            "La motivación para colaborar es obligatoria",
           );
           isValid = false;
         } else if (motivacion.value.trim().length < 50) {
           validacionesSway.mostrarError(
             motivacion,
-            "La motivación debe tener al menos 50 caracteres"
+            "La motivación debe tener al menos 50 caracteres",
           );
           isValid = false;
         } else if (motivacion.value.trim().length > 500) {
           validacionesSway.mostrarError(
             motivacion,
-            "La motivación no puede exceder 500 caracteres"
+            "La motivación no puede exceder 500 caracteres",
           );
           isValid = false;
         } else {
@@ -2323,7 +2266,7 @@
         if (!terms.checked) {
           validacionesSway.mostrarError(
             terms,
-            "Debes aceptar los términos y condiciones"
+            "Debes aceptar los términos y condiciones",
           );
           isValid = false;
         } else {
@@ -2344,7 +2287,7 @@
               opciones: { passwordField: passwordField },
             },
             "reg-institucion": { tipo: "soloTexto" },
-          }
+          },
         );
 
         // Validar selects obligatorios
@@ -2352,7 +2295,7 @@
         if (!especialidad.value) {
           validacionesSway.mostrarError(
             especialidad,
-            "La especialidad es obligatoria"
+            "La especialidad es obligatoria",
           );
           isValid = false;
         } else {
@@ -2363,7 +2306,7 @@
         if (!gradoAcademico.value) {
           validacionesSway.mostrarError(
             gradoAcademico,
-            "El grado académico es obligatorio"
+            "El grado académico es obligatorio",
           );
           isValid = false;
         } else {
@@ -2375,13 +2318,17 @@
         if (!anosExperiencia.value) {
           validacionesSway.mostrarError(
             anosExperiencia,
-            "Los años de experiencia son obligatorios"
+            "Los años de experiencia son obligatorios",
           );
           isValid = false;
-        } else if (isNaN(valorAnosExperiencia) || valorAnosExperiencia < 0 || valorAnosExperiencia > 100) {
+        } else if (
+          isNaN(valorAnosExperiencia) ||
+          valorAnosExperiencia < 0 ||
+          valorAnosExperiencia > 100
+        ) {
           validacionesSway.mostrarError(
             anosExperiencia,
-            "Los años de experiencia deben ser un número entre 0 y 100"
+            "Los años de experiencia deben ser un número entre 0 y 100",
           );
           isValid = false;
         } else {
@@ -2405,18 +2352,53 @@
       // Función para verificar email duplicado
       async function checkEmailExists(email) {
         try {
-          const response = await fetch("/api/colaboradores/check-email", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+          const response = await fetch(
+            "/api/colaboradores/check-email",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: email }),
             },
-            body: JSON.stringify({ email: email }),
-          });
-
-          const data = await response.json();
-          return data;
+          );
+          return await response.json();
         } catch (error) {
           console.error("Error checking email:", error);
+          return { exists: false, can_register: true };
+        }
+      }
+
+      // Función para verificar ORCID duplicado
+      async function checkOrcidExists(orcid) {
+        try {
+          const response = await fetch(
+            "/api/colaboradores/check-orcid",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orcid: orcid }),
+            },
+          );
+          return await response.json();
+        } catch (error) {
+          console.error("Error checking ORCID:", error);
+          return { exists: false, can_register: true };
+        }
+      }
+
+      // Función para verificar cédula profesional duplicada
+      async function checkCedulaExists(cedula) {
+        try {
+          const response = await fetch(
+            "/api/colaboradores/check-cedula",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ cedula: cedula }),
+            },
+          );
+          return await response.json();
+        } catch (error) {
+          console.error("Error checking cédula:", error);
           return { exists: false, can_register: true };
         }
       }
@@ -2478,7 +2460,7 @@
                 if (emailCheck.exists && !emailCheck.can_register) {
                   validacionesSway.mostrarError(
                     this,
-                    "Este email ya está registrado"
+                    "Este email ya está registrado",
                   );
                 } else {
                   validacionesSway.mostrarExito(this);
@@ -2490,14 +2472,22 @@
           // Configurar validación de campos especiales
           const cedula = document.getElementById("reg-cedula");
           if (cedula) {
-            cedula.addEventListener("blur", function () {
+            cedula.addEventListener("blur", async function () {
               if (this.value.trim()) {
                 if (isValidCedula(this.value)) {
-                  validacionesSway.mostrarExito(this);
+                  const cedulaCheck = await checkCedulaExists(this.value);
+                  if (cedulaCheck.exists && !cedulaCheck.can_register) {
+                    validacionesSway.mostrarError(
+                      this,
+                      cedulaCheck.message || "Esta cédula ya está registrada",
+                    );
+                  } else {
+                    validacionesSway.mostrarExito(this);
+                  }
                 } else {
                   validacionesSway.mostrarError(
                     this,
-                    "Formato de cédula inválido (7-8 dígitos)"
+                    "Formato de cédula inválido (7-8 dígitos)",
                   );
                 }
               }
@@ -2506,14 +2496,22 @@
 
           const orcid = document.getElementById("reg-orcid");
           if (orcid) {
-            orcid.addEventListener("blur", function () {
+            orcid.addEventListener("blur", async function () {
               if (this.value.trim()) {
                 if (isValidOrcid(this.value)) {
-                  validacionesSway.mostrarExito(this);
+                  const orcidCheck = await checkOrcidExists(this.value);
+                  if (orcidCheck.exists && !orcidCheck.can_register) {
+                    validacionesSway.mostrarError(
+                      this,
+                      orcidCheck.message || "Este ORCID ya está registrado",
+                    );
+                  } else {
+                    validacionesSway.mostrarExito(this);
+                  }
                 } else {
                   validacionesSway.mostrarError(
                     this,
-                    "Formato de ORCID inválido (0000-0000-0000-0000)"
+                    "Formato de ORCID inválido (0000-0000-0000-0000)",
                   );
                 }
               }
@@ -2527,17 +2525,17 @@
               if (length === 0) {
                 validacionesSway.mostrarError(
                   this,
-                  "La motivación para colaborar es obligatoria"
+                  "La motivación para colaborar es obligatoria",
                 );
               } else if (length < 50) {
                 validacionesSway.mostrarError(
                   this,
-                  "La motivación debe tener al menos 50 caracteres"
+                  "La motivación debe tener al menos 50 caracteres",
                 );
               } else if (length > 500) {
                 validacionesSway.mostrarError(
                   this,
-                  "La motivación no puede exceder 500 caracteres"
+                  "La motivación no puede exceder 500 caracteres",
                 );
               } else {
                 validacionesSway.mostrarExito(this);
@@ -2553,12 +2551,12 @@
               if (!this.value.trim()) {
                 validacionesSway.mostrarError(
                   this,
-                  "Los años de experiencia son obligatorios"
+                  "Los años de experiencia son obligatorios",
                 );
               } else if (isNaN(valor) || valor < 0 || valor > 100) {
                 validacionesSway.mostrarError(
                   this,
-                  "Los años de experiencia deben ser un número entre 0 y 100"
+                  "Los años de experiencia deben ser un número entre 0 y 100",
                 );
               } else {
                 validacionesSway.mostrarExito(this);
@@ -2568,96 +2566,19 @@
             // Limpiar error mientras escribe
             anosExp.addEventListener("input", function () {
               const valor = parseInt(this.value);
-              if (this.value.trim() && !isNaN(valor) && valor >= 0 && valor <= 100) {
+              if (
+                this.value.trim() &&
+                !isNaN(valor) &&
+                valor >= 0 &&
+                valor <= 100
+              ) {
                 validacionesSway.mostrarExito(this);
               }
             });
           }
 
-          // Configurar formularios con validaciones
-          const loginForm = document.getElementById("collaborator-login-form");
-          if (loginForm) {
-            loginForm.addEventListener("submit", function (e) {
-              e.preventDefault();
-
-              if (!validateLoginForm()) {
-                return;
-              }
-
-              // Limpiar mensajes anteriores
-              clearMessages("login-message-container");
-
-              const formData = new FormData(this);
-              const loginData = {
-                email: formData.get("email"),
-                password: formData.get("password"),
-              };
-
-              // Deshabilitar botón mientras se procesa
-              const submitBtn = this.querySelector('button[type="submit"]');
-              const originalText = submitBtn.innerHTML;
-              submitBtn.disabled = true;
-              submitBtn.innerHTML =
-                '<i class="bi bi-hourglass-split"></i> Iniciando sesión...';
-
-              // Enviar datos al servidor
-              fetch("/api/colaboradores/login", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(loginData),
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  if (data.success) {
-                    showMessage(
-                      "login-message-container",
-                      "success",
-                      `¡Bienvenido ${data.user.nombre}! Redirigiendo al portal de colaboradores...`
-                    );
-
-                    // Guardar datos del colaborador en sessionStorage
-                    sessionStorage.setItem(
-                      "colaborador-session",
-                      JSON.stringify({
-                        id: data.user.id,
-                        nombre: data.user.nombre,
-                        especialidad: data.user.especialidad,
-                        institucion: data.user.institucion,
-                        email: data.user.email,
-                      })
-                    );
-
-                    setTimeout(() => {
-                      window.location.href = "/portal-colaboradores";
-                    }, 1500);
-                  } else {
-                    showMessage(
-                      "login-message-container",
-                      "error",
-                      data.error || "Error desconocido al iniciar sesión"
-                    );
-                  }
-                })
-                .catch((error) => {
-                  console.error("Error:", error);
-                  showMessage(
-                    "login-message-container",
-                    "error",
-                    "Error de conexión. Por favor intenta de nuevo."
-                  );
-                })
-                .finally(() => {
-                  // Restaurar botón
-                  submitBtn.disabled = false;
-                  submitBtn.innerHTML = originalText;
-                });
-            });
-          }
-
           const registerForm = document.getElementById(
-            "collaborator-register-form"
+            "collaborator-register-form",
           );
           if (registerForm) {
             registerForm.addEventListener("submit", function (e) {
@@ -2702,7 +2623,7 @@
                 '<i class="bi bi-hourglass-split"></i> Enviando solicitud...';
 
               // Enviar datos al servidor
-              fetch("/api/colaboradores/register", {
+              fetch(API_BASE + "/colaboradores/register", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -2715,19 +2636,12 @@
                     showMessage(
                       "register-message-container",
                       "success",
-                      `¡Registro exitoso! ${data.message}. Ya puedes iniciar sesión como colaborador.`
+                      `¡Registro exitoso! ${data.message}. Ya puedes iniciar sesión como colaborador.`,
                     );
 
-                    // Limpiar formulario y cambiar a pestaña de login después de un momento
+                    // Limpiar formulario después de un momento
                     setTimeout(() => {
                       this.reset();
-                      switchCollaboratorTab("login");
-
-                      // Opcional: rellenar el email en el formulario de login
-                      const loginEmail = document.getElementById("login-email");
-                      if (loginEmail) {
-                        loginEmail.value = registerData.email;
-                      }
                     }, 2000);
                   } else {
                     showMessage(
@@ -2735,7 +2649,7 @@
                       "error",
                       `Error en el registro: ${
                         data.error || "Error desconocido"
-                      }`
+                      }`,
                     );
                   }
                 })
@@ -2744,7 +2658,7 @@
                   showMessage(
                     "register-message-container",
                     "error",
-                    "Error de conexión. Por favor intenta de nuevo."
+                    "Error de conexión. Por favor intenta de nuevo.",
                   );
                 })
                 .finally(() => {
@@ -2773,9 +2687,8 @@
       }
 
       // Debug: Función para probar el modal
-      window.testCollaboratorModal = function (tab = "login") {
-        console.log("Testing modal with tab:", tab);
-        openCollaboratorModal(null, tab);
+      window.testCollaboratorModal = function () {
+        openCollaboratorModal(null, "register");
       };
     </script>
   </body>

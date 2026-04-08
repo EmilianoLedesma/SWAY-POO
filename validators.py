@@ -192,12 +192,6 @@ def validate_especie_marina(data):
     validated['nombre_cientifico'] = validate_text(data.get('nombreCientifico'), 'Nombre Científico', min_length=3, max_length=100)
     validated['descripcion'] = validate_text(data.get('descripcion'), 'Descripción', min_length=10, max_length=5000)
     
-    # Taxonomía
-    validated['filo'] = validate_text(data.get('filo'), 'Filo', min_length=2, max_length=50, allow_empty=True)
-    validated['clase'] = validate_text(data.get('clase'), 'Clase', min_length=2, max_length=50, allow_empty=True)
-    validated['orden'] = validate_text(data.get('orden'), 'Orden', min_length=2, max_length=50, allow_empty=True)
-    validated['familia'] = validate_text(data.get('familia'), 'Familia', min_length=2, max_length=50, allow_empty=True)
-    
     # Datos numéricos
     validated['profundidad_min'] = validate_integer(data.get('profundidadMin'), 'Profundidad Mínima', min_value=0, allow_empty=True)
     validated['profundidad_max'] = validate_integer(data.get('profundidadMax'), 'Profundidad Máxima', min_value=0, allow_empty=True)

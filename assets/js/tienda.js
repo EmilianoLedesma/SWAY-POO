@@ -3,6 +3,11 @@
 // Sistema de comercio electrónico para productos marinos sostenibles
 // =============================================
 
+function authHeaders() {
+  const token = localStorage.getItem('tienda_token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 /**
  * Variables globales del sistema de tienda
  * Almacenan el estado de productos, categorías, carrito de compras y configuración general
@@ -160,12 +165,13 @@ async function checkUserStatus() {
         }
         
         // Verificar el estado actual del usuario en el servidor
-        const response = await fetch('/api/user/status', {
+        const response = await fetch(API_BASE + '/user/status', {
             method: 'GET',
             credentials: 'same-origin', // Incluir cookies de sesión
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                ...authHeaders()
             }
         });
         
@@ -279,7 +285,7 @@ function updateUserDropdown(isLoggedIn) {
  */
 async function loadProducts() {
     try {
-        const response = await fetch('/api/productos');
+        const response = await fetch(API_BASE + '/productos');
         const data = await response.json();
         
         if (data.success) {
@@ -303,7 +309,7 @@ async function loadProducts() {
  */
 async function loadCategories() {
     try {
-        const response = await fetch('/api/categorias');
+        const response = await fetch(API_BASE + '/categorias');
         const data = await response.json();
         
         if (data.success) {
@@ -458,7 +464,7 @@ function renderProducts() {
 async function loadImpactoSostenible() {
     try {
         console.log('Cargando datos de impacto sostenible...');
-        const response = await fetch('/api/impacto-sostenible');
+        const response = await fetch(API_BASE + '/impacto-sostenible');
         const data = await response.json();
         
         if (data.success) {
@@ -664,7 +670,7 @@ async function showProductModal(productId) {
     
     try {
         // Obtener detalles completos del producto desde el servidor
-        const response = await fetch(`/api/producto/${productId}`);
+        const response = await fetch(`${API_BASE}/producto/${productId}`);
         const data = await response.json();
         
         if (!data.success) {
@@ -1039,7 +1045,7 @@ async function loadCheckoutData() {
     console.log('Loading checkout data for unified modal...');
     // Cargar estados
     try {
-        const response = await fetch('/api/direcciones/estados');
+        const response = await fetch(API_BASE + '/direcciones/estados');
         const data = await response.json();
         
         const stateSelect = document.getElementById('shipping-state');
@@ -1095,17 +1101,21 @@ function updateCheckoutSummary() {
  * @returns {Promise<void>} Municipios cargados
  */
 async function loadMunicipios() {
-    const stateId = document.getElementById('shipping-state').value;
+    const stateId = document.getElementById('shipping-state')?.value;
     const municipioSelect = document.getElementById('shipping-municipio');
-    
+
+    if (!municipioSelect) return;
+
     municipioSelect.innerHTML = '<option value="">Seleccionar Municipio</option>';
-    document.getElementById('shipping-colonia').innerHTML = '<option value="">Seleccionar Colonia</option>';
-    document.getElementById('shipping-calle').innerHTML = '<option value="">Seleccionar Calle</option>';
+    const coloniaEl = document.getElementById('shipping-colonia');
+    const calleEl = document.getElementById('shipping-calle');
+    if (coloniaEl) coloniaEl.innerHTML = '<option value="">Seleccionar Colonia</option>';
+    if (calleEl) calleEl.innerHTML = '<option value="">Seleccionar Calle</option>';
     
     if (!stateId) return;
     
     try {
-        const response = await fetch(`/api/direcciones/municipios/${stateId}`);
+        const response = await fetch(`${API_BASE}/direcciones/municipios/${stateId}`);
         const data = await response.json();
         
         if (data.municipios) {
@@ -1132,7 +1142,7 @@ async function loadColonias() {
     if (!municipioId) return;
     
     try {
-        const response = await fetch(`/api/direcciones/colonias/${municipioId}`);
+        const response = await fetch(`${API_BASE}/direcciones/colonias/${municipioId}`);
         const data = await response.json();
         
         if (data.colonias) {
@@ -1158,7 +1168,7 @@ async function loadCalles() {
     if (!coloniaId) return;
     
     try {
-        const response = await fetch(`/api/direcciones/calles/${coloniaId}`);
+        const response = await fetch(`${API_BASE}/direcciones/calles/${coloniaId}`);
         const data = await response.json();
         
         if (data.calles) {
@@ -1284,17 +1294,18 @@ async function login(event) {
     const password = document.getElementById('loginPassword').value;
     
     try {
-        const response = await fetch('/api/user/login', {
+        const response = await fetch(API_BASE + '/user/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ email, password })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
+            if (data.access_token) localStorage.setItem('tienda_token', data.access_token);
             // Remover todos los flags de logout manual al iniciar sesión exitosamente
             localStorage.removeItem('manual-logout');
             localStorage.removeItem('manual-logout-time');
@@ -1346,7 +1357,7 @@ async function register(event) {
     }
     
     try {
-        const response = await fetch('/api/user/register', {
+        const response = await fetch(API_BASE + '/user/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1401,14 +1412,16 @@ async function register(event) {
 async function logout() {
     try {
         // Hacer logout en el servidor
-        const response = await fetch('/api/logout', {
+        const response = await fetch(API_BASE + '/logout', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                ...authHeaders()
             }
         });
-        
+
         // Limpiar datos locales independientemente de la respuesta del servidor
+        localStorage.removeItem('tienda_token');
         currentUser = null;
         localStorage.removeItem('usuario-sway');
         localStorage.removeItem('carrito-sway');
@@ -1749,16 +1762,21 @@ async function handleCheckoutSubmit(e) {
         user_id: currentUser.id,
         productos: carrito,
         direccion: {
-            id_calle: document.getElementById('shipping-calle').value,
-            nombre_destinatario: document.getElementById('shipping-name').value,
-            telefono_contacto: document.getElementById('shipping-phone').value
+            estado: document.getElementById('shipping-state')?.value || '',
+            municipio: document.getElementById('shipping-city')?.value || '',
+            colonia: document.getElementById('shipping-colony')?.value || '',
+            calle: document.getElementById('shipping-street')?.value || '',
+            codigo_postal: document.getElementById('shipping-zip')?.value || null,
+            numero_exterior: document.getElementById('shipping-exterior')?.value || null,
+            numero_interior: document.getElementById('shipping-interior')?.value || null,
+            telefono_contacto: currentUser?.telefono || null
         },
         pago: {
+            tipo_pago: 'credit_card',
             numero_tarjeta: document.getElementById('card-number').value.replace(/\s/g, ''),
             fecha_expiracion: document.getElementById('card-expiry').value,
             cvv: document.getElementById('card-cvv').value,
-            nombre_tarjeta: document.getElementById('card-name').value,
-            tipo_tarjeta: document.getElementById('card-type').value
+            nombre_tarjeta: document.getElementById('card-name').value
         }
     };
     
@@ -1774,10 +1792,11 @@ async function handleCheckoutSubmit(e) {
         submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
         submitBtn.disabled = true;
         
-        const response = await fetch('/api/pedidos/crear', {
+        const response = await fetch(API_BASE + '/pedidos/crear', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                ...authHeaders()
             },
             body: JSON.stringify(formData)
         });
@@ -1819,13 +1838,13 @@ async function handleCheckoutSubmit(e) {
  */
 function validateCheckoutForm(formData) {
     // Validar dirección
-    if (!formData.direccion.id_calle || !formData.direccion.nombre_destinatario || !formData.direccion.telefono_contacto) {
+    if (!formData.direccion.estado || !formData.direccion.municipio || !formData.direccion.colonia || !formData.direccion.calle) {
         showError('Por favor completa toda la información de envío');
         return false;
     }
-    
+
     // Validar pago
-    if (!formData.pago.numero_tarjeta || !formData.pago.fecha_expiracion || !formData.pago.cvv || !formData.pago.nombre_tarjeta || !formData.pago.tipo_tarjeta) {
+    if (!formData.pago.numero_tarjeta || !formData.pago.fecha_expiracion || !formData.pago.cvv || !formData.pago.nombre_tarjeta) {
         showError('Por favor completa toda la información de pago');
         return false;
     }
